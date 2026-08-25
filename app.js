@@ -1103,7 +1103,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1E4222; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p1)}
           </div>
-          <img src="public/images/s10_param1_tractor.png" alt="Driving Speed Tractor" style="max-width: 100%; height: 76px; object-fit: contain;">
+          <img src="public/images/s10_param1_tractor.png" alt="Driving Speed Tractor" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 2: Spray Pressure (Red) -->
@@ -1112,7 +1112,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #C62828; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p2)}
           </div>
-          <img src="public/images/s10_param2_pressure.png" alt="Spray Pressure Gauge" style="max-width: 100%; height: 76px; object-fit: contain;">
+          <img src="public/images/s10_param2_pressure.png" alt="Spray Pressure Gauge" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 3: Nozzle Size (Blue) -->
@@ -1121,7 +1121,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1565C0; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p3)}
           </div>
-          <img src="public/images/s10_param3_nozzles.png" alt="Nozzle Size" style="max-width: 100%; height: 76px; object-fit: contain;">
+          <img src="public/images/s10_param3_nozzles.png" alt="Nozzle Size" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 4: Number of Active Nozzles (Purple) -->
@@ -1130,7 +1130,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.86rem; color: #6A1B9A; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p4)}
           </div>
-          <img src="public/images/s10_param4_activenozzles.png" alt="Active Nozzles Sprayer" style="max-width: 100%; height: 76px; object-fit: contain;">
+          <img src="public/images/s10_param4_activenozzles.png" alt="Active Nozzles Sprayer" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
       </div>
@@ -1591,8 +1591,27 @@ function renderBottomNavBar() {
   }
 }
 
+// Calculate Responsive Scale Factor dynamically for smartphones, tablets & laptops
+function updateResponsiveScale() {
+  const container = document.getElementById('game-container');
+  if (!container) return;
+  
+  // Calculate viewport height (1vh workaround for mobile browsers)
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+
+  const width = container.clientWidth;
+  // Reference target width is 420px (standard 9:16 vertical viewport)
+  const scale = Math.min(1.25, Math.max(0.68, width / 420));
+  container.style.setProperty('--scale-factor', scale.toFixed(3));
+}
+
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
+  updateResponsiveScale();
+  window.addEventListener('resize', updateResponsiveScale);
+  window.addEventListener('orientationchange', updateResponsiveScale);
+
   preloadBackdropImages();
   loadCustomCoordinates();
   renderTopBar();
