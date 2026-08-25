@@ -1,0 +1,26 @@
+[PROGRAM MODULE 01: REPOSITORY SETUP, TRANSLATION SCRIPT & LANG DROPDOWN]
+
+GOAL:
+Configure the initial project workspace, write a local parsing utility to convert "docs/Calibration_Serious-Game_Text.xlsx" into 12 static translation files, and implement Screen 1 with the language selector.
+
+STEP 1.1: LOCAL TRANSLATION EXTRACTION SCRIPT
+- Provide a Node.js utility script (e.g., 'extract-translations.js') that uses the 'xlsx' library to read 'docs/Calibration_Serious-Game_Text.xlsx'.
+- The script must iterate through all rows, map the columns ('Screen/Slide', 'Element ID', 'Content Group ID', 'Phrase Group ID', 'Sequence') and extract translation columns into 12 static, clean JSON dictionaries:
+  - en-GB.json, es-ES.json, fr-FR.json, it-IT.json, nl-BE.json, cs-CZ.json, pt-PT.json, pl-PL.json, el-CY.json, de-DE.json, nl-NL.json, el-GR.json.
+- Output files must be saved under 'public/locales/'.
+- Ensure the script outputs clean JSON with key-value pairs matching "Element ID" or combined "Screen_ID_Element" key formats to prevent duplicate key collisions.
+
+STEP 1.2: SCREEN 1 BACKGROUND & VIEWPORT LAYOUT
+- Set up 'index.html' and 'styles.css' (using Tailwind CSS).
+- Force a strict 9:16 vertical viewport container centered on the screen with a dark grey backdrop (#1E1E1E) for desktop viewports (letterbox layout).
+- Set Screen 1 background image as:
+  'background-image: url("public/images/SeriousGame_tela1.jpg");'
+- Ensure background properties are: background-size: cover, background-position: center.
+
+STEP 1.3: DYNAMIC LANGUAGE DROPDOWN & START BUTTON OVERLAY
+- Dynamically overlay a native styled dropdown selector on the bottom section of Screen 1.
+- Dropdown Options:
+  - en-GB, es-ES, fr-FR, it-IT, nl-BE, cs-CZ, pt-PT, pl-PL, el-CY, de-DE, nl-NL, el-GR.
+- Selecting an option must trigger a fetch request to './public/locales/[selected_lang].json' to load active translations into the runtime dictionary state ('activeTranslations') and render the UI elements instantly.
+- Create a beautiful Start Game action button overlapping the lower middle part of Screen 1. Clicking this button triggers the transition to Screen 2.
+- No embedded text or speech bubbles on Screen 1 background must be covered.

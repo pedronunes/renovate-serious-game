@@ -1,0 +1,24 @@
+[PROGRAM MODULE 04: GAME STATES, QUIZ SELECTION ENGINE & LOCAL PERSISTENCE]
+
+GOAL:
+Manage sequential slide navigation, score tracking, interactive quizzes with visual/audio feedback, locked review states, and browser session saving.
+
+STEP 4.1: GLOBAL STATE MACHINE
+- Maintain game state structure in Javascript:
+  `const gameState = { currentSlide: 1, score: 0, userAnswers: {}, activeLanguage: "en-GB" };`
+- Implement custom BACK and NEXT navigation buttons on the overlay layout.
+- Navigation Rules:
+  - Explanatory Screens: Normal navigation via buttons or tapping the screen background.
+  - Quiz Screens: Hide NEXT/BACK buttons. Progression is completely blocked until the user submits a valid response.
+  - Locked Read-Only State: When pressing BACK to review answered questions, the options are disabled, showing the user's previous choice with correct (green) and incorrect (red) highlights, preventing any cheat points.
+
+STEP 4.2: QUIZ OPTION SELECTORS & FEEDBACK
+- For Quiz Screens, render custom buttons for each option using the translation text mapped to the slide's choice 'Element ID'.
+- Interactive Feedback:
+  - Clicking the correct option highlights it in Forest-Green (#2E7D32), updates 'gameState.score', unlocks progression, and synthesizes a high-pitch success sound ("Ding") via Web Audio API.
+  - Clicking an incorrect option highlights it in Red (#C62828), highlights the correct option in Green, unlocks progression (or handles retries if specified), and synthesizes a low-pitch error buzz sound via Web Audio API.
+  - Web Audio API Sound Generator: Use browser synthesizer (OscillatorNode) to avoid local mp3 files. Ding: 880Hz sine wave for 0.15s. Buzz: 120Hz sawtooth wave for 0.3s.
+
+STEP 4.3: SESSION RESUMING (LOCALSTORAGE)
+- Save 'gameState' to 'localStorage.setItem("renovate_game_state")' automatically on every slide change.
+- On launch (Screen 1): Check if a saved session exists. If found, overlay a clean ivory modal asking: "Resume your training session from screen X?" with "Yes, Resume" and "Restart" actions.

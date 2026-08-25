@@ -1,0 +1,32 @@
+[PROGRAM MODULE 02: POSITIONING DICTIONARY & COMPONENT ESTHETICS]
+
+GOAL:
+Build a centralized responsive positioning dictionary in 'script.js' to absolute-position all UI speech bubbles, information cards, and game elements over the static background images without covering characters or critical scene elements.
+
+STEP 2.1: CENTRALIZED COORDINATES MAP (UI_COORDINATES_MAP)
+- Define a global javascript constant 'UI_COORDINATES_MAP' storing absolute coordinate properties in percentage (%) values relative to the 9:16 parent container.
+- Design layout schemas:
+  - Left Dialogue: { top: "X%", left: "5%", width: "50%", pointing: "left" }
+  - Right Dialogue: { top: "X%", right: "5%", width: "50%", pointing: "right" }
+  - Full Card Overlay: { top: "15%", left: "8%", width: "84%", height: "auto" }
+- Provide coordinate mapping configurations for the following key template slides:
+  - Screen 2 (Laura Intro): Text Card on the left (top: 15%, left: 8%, width: 50%).
+  - Screen 3 (Mia Intro): Text Card on the right (top: 15%, right: 8%, width: 50%).
+  - Screen 5 (Mia Welcome): Dialogue speech bubble pointing to Mia's face on the upper middle-left.
+  - Screen 8 (Mia Tip & Pillars): Dialogue speech bubble (top: 12%), Mia's Tip Card (middle-right: 45%), Pillars Card (bottom-right: 75%).
+- Ensure developers can easily change coordinates directly inside this central object to fine-tune placement.
+
+STEP 2.2: DIALOGUE SPEECH BUBBLE COMPONENT
+- Program an elegant HTML/CSS generator for dialogue speech bubbles adhering to "docs/AnaliseVisualTecnica.txt":
+  - Shape: Rounded corners (border-radius: 16px).
+  - Background Color: Opaque Cream/Ivory (#F7F7F2) - 100% fill, no translucency.
+  - Border: Thin colored outline (1.5px thick) in Forest-Green (#2A5C30).
+  - Drop Shadow: Soft, elegant elevation shadow (RGBA 0, 0, 0, 0.15).
+  - Speaker Name: All-Caps bold text in Forest-Green (#2A5C30) inside the bubble (e.g., MIA, LAURA).
+  - Speech Text: Anthracite color (#1A1A1A), regular weight. No quotation marks around speech.
+  - Pointer (Tail): CSS triangular vertex positioned dynamically. It must point to the mouth of the talking character (configured in the coordinates map).
+
+STEP 2.3: GENERAL INFO & TIP CARDS
+- Implement 'Mia's Tip' container: cream background, Forest-Green thin border, with a golden-yellow highlight icon (#FFCC66) of a lightbulb in the corner.
+- Implement general information cards: rounded container (12px), cream background, dark anthracite text.
+- Ensure all texts are loaded from the translation dictionary based on 'Element ID'.

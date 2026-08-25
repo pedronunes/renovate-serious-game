@@ -1,0 +1,18 @@
+[PROGRAM MODULE 05: GITHUB PAGES OPTIMIZATION & SEO METADATA]
+
+GOAL:
+Prepare the application code for static serving on GitHub Pages, add responsive meta-headers, and prepare assets for easy QR Code scanning.
+
+STEP 5.1: RELATIVE PATH RESOLUTION
+- All image sources, script references, and JSON translation fetch requests must use strict relative paths (e.g., `./public/images/` and `./public/locales/` instead of absolute `/public/` paths).
+- This is a critical requirement to ensure the application loads perfectly when served from a GitHub Pages sub-folder (e.g., `https://username.github.io/repository-name/`).
+
+STEP 5.2: MOBILE METADATA & STYLES
+- Add essential HTML meta tags in 'index.html':
+  - `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">`
+  - Disable pinch-to-zoom and double-tap zoom via CSS to ensure the game feels like a native mobile app.
+  - Add SEO OpenGraph cards: title "RENOVATE Serious Game", description "Vineyard Pesticide Sprayer Calibration Game", and a preview thumbnail.
+
+STEP 5.3: QR CODE PREPARATION
+- Instruct the developer on how to deploy the repository to GitHub Pages.
+- Explain how to generate the QR Code pointing directly to the deployed URL, so it can be printed on sheets or field boards.

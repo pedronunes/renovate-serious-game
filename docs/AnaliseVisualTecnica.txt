@@ -1,0 +1,91 @@
+Aqui está a análise visual e técnica do projeto, conduzida com o máximo rigor de engenharia forense e direção de arte 2D. A análise cruza as evidências das telas fornecidas com a documentação técnica oficial.
+1. <art_style_dna>
+Estilo de Ilustração: O projeto utiliza um estilo de Flat Vector Art enriquecido com sombreamento cel-shading suave (sombras duras mas com transições controladas). Não se trata de um flat design puro, pois existe volumetria e renderização de luz direcional nos tecidos e rostos.
+Contornos (Linework): Não há outlines pretos puros (estilo comic book). Em vez disso, utiliza-se colored lineart (linhas de contorno num tom ligeiramente mais escuro que a cor de preenchimento adjacente) com uma espessura relativa de 1 a 2 píxeis em resolução nativa, ajudando a separar as personagens do fundo.
+Tratamento de Profundidade 2D: O motor de renderização simula profundidade de campo (DoF) fotográfica. Os fundos (vinhas, montanhas, céu) apresentam um desfoque gaussiano ligeiro a moderado (soft blur), enquanto as personagens e as interfaces em primeiro plano se mantêm perfeitamente nítidas (crisp).
+Sombras e Halos: Elementos de UI, como os cards de texto e os balões de diálogo, sobrepõem-se ao fundo fotográfico vetorial com recurso a uma sombra projetada (drop shadow) escura, de opacidade baixa (estimada entre 15% a 20%) e desfoque suave, criando elevação (eixo Z).
+2. <renovate_chromatic_palette>
+Amarelo-Ouro Oficial (RENOVATE): O código cromático exato do projeto é o #FFCC66 (RGB: 225, 204, 102). Esta cor é aplicada de forma estrita no cabeçalho superior (Top App Bar) para ancorar a identidade da marca, criando a hierarquia visual primária e servindo de base para o logótipo e tipografia em tons escuros.
+Verde Primário (Títulos e Fardamento): Um verde-floresta escuro (estimado #2A5C30) é usado agressivamente em títulos mestre (ex: "MEET LAURA", "CALIBRATION CHALLENGE"), ícones de UI e na camisa da personagem Laura.
+Cores de Fundo da UI (Cards): Os contentores flutuantes não são brancos puros. Utilizam um tom creme/marfim mate (estimado #F7F7F2) que reduz a fadiga visual, contrastando com o fundo natural.
+Tipografia: O texto de corpo e os subtítulos utilizam um cinzento-antracite quase preto (estimado #1A1A1A), nunca preto puro (#000000), garantindo um rácio de contraste WCAG elevado sem ser agressivo.
+3. <character_anatomy_mia>
+Fisionomia: Rosto oval e afável, pele clara com subtom quente. Possui olhos grandes e castanhos com formato amendoado, sobrancelhas arqueadas expressivas e um sorriso pedagógico. O cabelo é castanho-escuro, cortado à altura dos ombros (estilo bob ondulado) e desenhado com volume.
+Pose: Frequentemente retratada numa postura de instrutora, com uma mão a segurar um tablet tático escuro e a outra a gesticular explicações, ou com a mão levantada (indicador em riste) num gesto de orientação técnica.
+Dresscode: Veste uma farda corporativa rigorosa: camisa de botões cinzenta-clara/creme, de mangas compridas (arregaçadas até aos antebraços), com o logótipo "MIA ADVISOR" bordado a verde-escuro no peito esquerdo. Calça calças de ganga/sarja azul-escuras, rematadas com um cinto de pele preta com fivela prateada quadrada.
+4. <character_anatomy_laura>
+Fisionomia: Rosto ligeiramente mais arredondado e jovem, tez quente. Olhos castanhos grandes, sobrancelhas expressivas e um sorriso confiante de operadora de campo. O cabelo é castanho, apanhado num rabo-de-cavalo prático na nuca.
+Pose: Atitude orgulhosa e prática, frequentemente desenhada em pose de três quartos, com os braços cruzados sobre o peito.
+Dresscode: Fardamento agrícola funcional composto por uma camisa de trabalho verde-floresta (mangas compridas e colarinho fechado), calças de ganga azul-escuras de cinta alta e um cinto de couro castanho com fivela retangular de latão/ouro. Usa sempre um boné de basebol verde (da mesma cor da camisa), sem logótipos visíveis.
+5. <typography_and_text_styles>
+Fontes: Utilização exclusiva de fontes sem-serifa (sans-serif) e geométricas (fortemente semelhantes à Montserrat ou Roboto), otimizadas para legibilidade em ecrãs móveis.
+Estrutura e Hierarquia:
+Títulos Mestre (H1): Tudo em maiúsculas (All-Caps), peso Black ou ExtraBold, alinhados à esquerda ou centrados, na cor verde-floresta.
+Subtítulos e Balões: Peso Regular ou Medium, com formatação de frase convencional (Sentence case), na cor antracite.
+Listas e Dicas: Títulos interiores a negrito e em maiúsculas (ex: "MIA'S TIP"), acompanhados de ícones alinhados verticalmente com o texto.
+Alinhamento e Margens: O texto dentro dos cards tem um padding rigoroso de cerca de 16 a 24 píxeis, mantendo alinhamento justificado à esquerda na esmagadora maioria dos blocos explicativos.
+6. <ui_containers_and_boxes>
+Geometria: As interfaces assentam em cards e balões de diálogo com cantos arredondados contínuos. O border-radius é consistente, estimado em 16px para cards primários e balões de diálogo.
+Balões de Diálogo (Speech Bubbles): Têm uma geometria retangular arredondada, com um pequeno vértice (cauda) limpo e aguçado a apontar diretamente para a personagem que fala.
+Transluscidez / Texturas: Não existe glassmorphism (vidro fosco) real. Os cards são totalmente opacos (100% de preenchimento) nas cores creme e branco. A tridimensionalidade é conseguida exclusivamente através do drop shadow direcional (luz simulada a incidir de cima, projetando sombra para baixo).
+7. <iconography_and_data_visuals>
+Estilo de Ícones: Apresentam uma mistura de arte preenchida e linear. Os ícones na interface de apresentação das personagens são delineados a verde com preenchimento (ex: o chapéu de especialização, a lâmpada, o aperto de mão, o cacho de uvas, a folha e o alvo).
+Tabelas e Listas Operacionais: A UI estrutura a informação técnica (como a identificação dos parâmetros de bicos, pressão e velocidade) com divisórias horizontais ultrafinas em cinza claro, suportadas por pictogramas vetoriais coloridos à esquerda (ex: gota de água, manómetro, conta-gotas) e títulos compactos à direita.
+8. <composition_ergonomics_safe_margins>
+Gestão de Ecrã (9:16):
+Top Bar: Ocupa os 8-10% superiores do ecrã, imutável.
+Middle/Background: Espaço reservado para a ambientação (vinha, trator) e para abrigar a anatomia das personagens do meio-corpo para cima.
+Bottom/Foreground: A zona inferior abriga a "carga pesada" de leitura (os cards de conteúdo), trancando o texto na área de alcance fácil do polegar do utilizador (thumb zone).
+Safe Margins (Margens de Segurança): O layout não é edge-to-edge. Há uma margem física (espaço negativo) de aproximadamente 5% a 8% da largura total em ambos os lados esquerdo e direito, garantindo que os cards brancos flutuam sobre o fundo natural sem nunca tocarem na moldura do telemóvel.
+9. <calibration_storyboard_logic>
+Apoio da Estética à Lógica: A UI traduz parâmetros mecânicos complexos (Caudal, Velocidade, Pressão, Número de Bicos) em blocos gamificados e coloridos. Mia funciona como a representação visual das fórmulas matemáticas e teóricas (com tips e caixas de aviso normativo), enquanto Laura e os cenários ao fundo (com tratores atomizadores) conectam essa teoria à realidade física no campo. O design isola cada variável (como "A SPRAY VOLUME RATE" e "PRECISE APPLICATION") em secções isoladas por ícones, forçando a cognição por etapas lógicas.
+--------------------------------------------------------------------------------
+10. <master_reconstitution_json_prompt_template>
+{
+  "prompt_lock_template": {
+    "target_model": "Gemini Nano Banana Pro",
+    "task": "Replicate RENOVATE UI Screen Pixel-Perfect",
+    "canvas_dimensions": "9:16",
+    "style_locks": {
+      "rendering_engine": "Flat Vector Art with cel-shaded character models and soft gaussian blur on background layers.",
+      "color_palette": {
+        "renovate_gold": "#FFCC66",
+        "renovate_gold_rgb": "R:225, G:204, B:102",
+        "title_green": "#2A5C30",
+        "card_background": "#F7F7F2",
+        "text_dark": "#1A1A1A"
+      },
+      "typography": {
+        "font_family": "Geometric Sans-Serif",
+        "h1_title": "All-Caps, ExtraBold, #2A5C30",
+        "body_text": "Sentence case, Medium/Regular, #1A1A1A"
+      },
+      "ui_components": {
+        "cards": "Solid 100% opacity, 16px border-radius, soft dark drop-shadow (blur 10px, opacity 15%, y-offset 4px)",
+        "safe_margins_x": "8% negative space padding left and right"
+      },
+      "character_mia": {
+        "appearance": "Oval face, brown almond eyes, wavy shoulder-length brown hair.",
+        "apparel": "Light grey long-sleeve collared shirt, sleeves rolled up, MIA ADVISOR logo on left chest, dark blue jeans, black belt, silver buckle."
+      },
+      "character_laura": {
+        "appearance": "Round face, warm skin, large brown eyes, dark brown ponytail.",
+        "apparel": "Dark green long-sleeve work shirt, dark blue jeans, brown belt with brass buckle, green baseball cap."
+      }
+    },
+    "dynamic_content": {
+      "top_bar_title": "RENOVATE APP",
+      "main_screen_title": "[INSERIR_TITULO_H1_AQUI]",
+      "speech_bubble_speaker": "[MIA_OU_LAURA]",
+      "speech_bubble_text": "[INSERIR_TEXTO_DE_DIALOGO_AQUI]",
+      "main_card_content_sections": [
+        {
+          "icon_type": "[INSERIR_TIPO_DE_ICONE_EX: FOLHA_ALVO]",
+          "section_title": "[INSERIR_SUBTITULO_DA_SECCAO]",
+          "section_body": "[INSERIR_TEXTO_EXPLICATIVO_AQUI]"
+        }
+      ],
+      "background_scene": "[INSERIR_CENARIO_BACKGROUND_EX: VINHA_COM_TRATOR_DESFOCADO]"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+[PROGRAM MODULE 03: INTERACTIVE NOZZLE CALIBRATION TABLE]
+
+GOAL:
+Replicate the exact visual logic and mathematical functions of the nozzle calibration grid based on "docs/nozzles-game-fixed-guides.html" for Slides 117, 118, and 119.
+
+STEP 3.1: HYDRAULIC EQUATION ENGINE
+- Code the physical flow-rate function:
+  Q2 = Q1 * Math.sqrt(P2 / 3.0)
+- Store ISO nozzle constant flow rates (Q1 in L/min at 3.0 bar):
+  - Orange (01): 0.40
+  - Green (015): 0.60
+  - Yellow (02): 0.80
+  - Blue (03): 1.20
+  - Red (04): 1.60
+  - Brown (05): 2.00
+  - Grey (06): 2.40
+
+STEP 3.2: COORDINATE HIGHLIGHTING GUIDES (FIXED-GUIDES)
+- Render the ISO nozzle debit table matrix on the overlay layer.
+- Program cross-highlight guides:
+  - Row Guide: A translucent gold-yellow (#FFCC66) horizontal bar that highlights the selected nozzle color row.
+  - Column Guide: A translucent gold-yellow (#FFCC66) vertical bar highlighting the selected pressure column.
+- Integrate a physical pressure slider bar (P2 from 1.0 to 5.0 bar, in increments of 0.1 bar). Moving the slider dynamically slides the Column Guide.
+
+STEP 3.3: ZOOM LENS OVERLAY CARD
+- On touch/hover select, overlay a "Zoom Lens Card" in first-person view:
+  - Design: Rounded ivory card with a gold-yellow border.
+  - Content: Large colored circle of the active nozzle, selected pressure (P2 bar), and the calculated flow rate (Q2 L/min) rounded precisely to two decimal places (e.g., "1.20 L/min").
+  - Position: Center of the screen to ensure instant readability on mobile screens.
