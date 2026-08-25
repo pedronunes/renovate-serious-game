@@ -74,100 +74,92 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s04": {
     "textContainer": {
-      "top": "10.5%",
-      "left": "6%",
-      "width": "58%",
+      "top": "9.0%",
+      "left": "6.0%",
+      "width": "58.0%",
       "fontSize": "1.05rem"
     }
   },
   "s05": {
     "bubble": {
-      "top": "50.1%",
-      "right": "5%",
-      "width": "58%",
-      "pointer": "pointer-top",
-      "fontSize": "0.95rem",
-      "left": "38.6%"
+      "top": "7.0%",
+      "left": "36.0%",
+      "width": "60.0%",
+      "pointer": "pointer-left",
+      "fontSize": "0.95rem"
     }
   },
   "s06": {
     "iconBlock": {
-      "top": "14.0%",
+      "top": "5.0%",
       "left": "0.0%",
       "width": "100.0%",
       "fontSize": "1.05rem"
     },
     "card": {
-      "top": "36.0%",
-      "left": "6.0%",
-      "width": "88.0%",
+      "top": "17.0%",
+      "left": "5.0%",
+      "width": "90.0%",
       "fontSize": "1.05rem"
     }
   },
   "s07": {
     "card": {
-      "top": "24%",
-      "left": "8%",
-      "width": "84%",
+      "top": "20.0%",
+      "left": "6.0%",
+      "width": "88.0%",
       "fontSize": "1rem"
     }
   },
   "s08": {
     "bubble": {
-      "top": "10.5%",
-      "right": "5%",
-      "width": "48.0%",
+      "top": "6.0%",
+      "left": "36.0%",
+      "width": "60.0%",
       "pointer": "pointer-left",
-      "fontSize": "1.05rem",
-      "left": "42.0%"
+      "fontSize": "0.95rem"
     },
     "tip": {
-      "top": "42.0%",
-      "right": "5%",
-      "width": "46.0%",
-      "fontSize": "1.05rem",
-      "left": "47.0%"
+      "top": "24.0%",
+      "left": "36.0%",
+      "width": "60.0%",
+      "fontSize": "0.88rem"
     },
     "pillars": {
-      "top": "57.0%",
-      "right": "5%",
-      "width": "86.0%",
-      "fontSize": "1.05rem",
-      "left": "7.0%"
+      "top": "46.0%",
+      "left": "5.0%",
+      "width": "90.0%",
+      "fontSize": "0.95rem"
     }
   },
   "s09": {
     "bubble": {
-      "top": "9.0%",
-      "right": "5%",
-      "width": "46%",
+      "top": "6.0%",
+      "left": "36.0%",
+      "width": "60.0%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem",
-      "left": "47.0%"
+      "fontSize": "0.95rem"
     },
     "card": {
-      "top": "50.0%",
-      "right": "5%",
-      "width": "88%",
-      "fontSize": "0.92rem",
-      "left": "7.4%"
+      "top": "25.0%",
+      "left": "5.0%",
+      "width": "90.0%",
+      "fontSize": "0.92rem"
     }
   },
   "s10": {
     "bubble": {
-      "top": "10.5%",
-      "right": "5%",
-      "width": "46.0%",
+      "top": "6.0%",
+      "left": "36.0%",
+      "width": "60.0%",
       "pointer": "pointer-left",
-      "fontSize": "1.05rem",
-      "left": "50.0%"
+      "fontSize": "0.95rem"
     },
     "card": {
-      "top": "48.5%",
-      "right": "5%",
+      "top": "24.0%",
+      "left": "5.0%",
       "width": "90.0%",
-      "fontSize": "1.05rem",
-      "left": "5.0%"
+      "fontSize": "0.95rem"
     }
   }
 };
@@ -761,11 +753,13 @@ function renderScreen4(container) {
   }
 
   container.innerHTML = `
-    <!-- Upper Left Text Container directly on background (Floating style matching Screen 2 & 3) -->
-    <div id="el-s04-textContainer" class="s02-text-container designer-target" style="position: absolute; ${styleObjToCss(coords.textContainer || coords.card || { top: '8%', left: '6%', width: '58%' })}">
-      <div class="s02-title">${title}</div>
-      <div class="s02-body-p">${p1}</div>
-      ${p2 ? `<div class="s02-body-p">${p2}</div>` : ''}
+    <!-- Upper Left Text Container with Translucent Cream Card styling for crisp contrast -->
+    <div id="el-s04-textContainer" class="cream-card designer-target" style="position: absolute; background: rgba(247, 247, 242, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); ${styleObjToCss(coords.textContainer || coords.card || { top: '9%', left: '6%', width: '58%' })}">
+      <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.02em;">${title}</div>
+      <div class="cream-card-body" style="font-size: 1.05rem; font-weight: 600; color: #1F2220; line-height: 1.42;">
+        <p style="margin-bottom: 8px;">${p1}</p>
+        ${p2 ? `<p style="margin-bottom: 0;">${p2}</p>` : ''}
+      </div>
     </div>
   `;
 }
