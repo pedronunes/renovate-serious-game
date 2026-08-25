@@ -16,8 +16,65 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+function updateAppJsCoordinates(customCoordsMap) {
+  const appJsPath = path.join(__dirname, 'app.js');
+  try {
+    let appJsContent = fs.readFileSync(appJsPath, 'utf8');
+
+    // Find INITIAL_UI_COORDINATES_MAP block
+    const mapRegex = /const INITIAL_UI_COORDINATES_MAP = \{[\s\S]*?\};/;
+    
+    // Read current INITIAL_UI_COORDINATES_MAP structure from app.js
+    const match = appJsContent.match(mapRegex);
+    if (!match) return false;
+
+    let currentMapObj = {};
+    try {
+      const evalStr = match[0].replace('const INITIAL_UI_COORDINATES_MAP = ', '').replace(/;$/, '');
+      currentMapObj = eval(`(${evalStr})`);
+    } catch (e) {
+      console.error('Error parsing existing INITIAL_UI_COORDINATES_MAP:', e);
+    }
+
+    // Merge customCoordsMap into currentMapObj
+    Object.keys(customCoordsMap).forEach(slideKey => {
+      if (!currentMapObj[slideKey]) currentMapObj[slideKey] = {};
+      Object.assign(currentMapObj[slideKey], customCoordsMap[slideKey]);
+    });
+
+    const newMapStr = `const INITIAL_UI_COORDINATES_MAP = ${JSON.stringify(currentMapObj, null, 2)};`;
+    const updatedAppJsContent = appJsContent.replace(mapRegex, newMapStr);
+
+    fs.writeFileSync(appJsPath, updatedAppJsContent, 'utf8');
+    console.log('✅ Successfully hardcoded designer coordinates into app.js on disk!');
+    return true;
+  } catch (err) {
+    console.error('Error updating app.js coordinates:', err);
+    return false;
+  }
+}
+
 const server = http.createServer((req, res) => {
   let reqUrl = decodeURIComponent(req.url.split('?')[0]);
+
+  // Endpoint to sync designer coordinates from client browser to app.js
+  if (req.method === 'POST' && (reqUrl === '/api/sync-coords' || reqUrl === '/api/save-coordinates')) {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        const coordsMap = JSON.parse(body);
+        const success = updateAppJsCoordinates(coordsMap);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success, message: success ? 'Coordinates synced to app.js' : 'Failed to sync' }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   if (reqUrl === '/') reqUrl = '/index.html';
 
   const filePath = path.join(__dirname, reqUrl);

@@ -25,44 +25,141 @@ const SUPPORTED_LANGUAGES = [
 
 // Factory Default Coordinates Map (Master Blueprint with Hardcoded Polished Positions)
 const INITIAL_UI_COORDINATES_MAP = {
-  s01: {
-    titleHeader: { top: '8.5%', left: '5%', width: '90%', fontSize: '1.05rem' },
-    startBtn: { top: '64%', left: '10%', width: '80%' },
-    stepperCard: { top: '75%', left: '4%', width: '92%', fontSize: '0.74rem' }
+  "s01": {
+    "titleHeader": {
+      "top": "8.5%",
+      "left": "5%",
+      "width": "90%",
+      "fontSize": "1.05rem"
+    },
+    "startBtn": {
+      "top": "64%",
+      "left": "10%",
+      "width": "80%"
+    },
+    "stepperCard": {
+      "top": "75%",
+      "left": "4%",
+      "width": "92%",
+      "fontSize": "0.74rem"
+    }
   },
-  s02: {
-    textContainer: { top: '10.5%', left: '6%', width: '54%', fontSize: '1.05rem' },
-    attributesCard: { top: '76%', left: '4%', width: '92%', fontSize: '0.85rem' }
+  "s02": {
+    "textContainer": {
+      "top": "10.5%",
+      "left": "6%",
+      "width": "54%",
+      "fontSize": "1.05rem"
+    },
+    "attributesCard": {
+      "top": "76%",
+      "left": "4%",
+      "width": "92%",
+      "fontSize": "0.85rem"
+    }
   },
-  s03: {
-    textContainer: { top: '10.5%', left: '40%', width: '54%', fontSize: '1.05rem' },
-    attributesCard: { top: '76%', left: '4%', width: '92%', fontSize: '0.85rem' }
+  "s03": {
+    "textContainer": {
+      "top": "10.5%",
+      "left": "40%",
+      "width": "54%",
+      "fontSize": "1.05rem"
+    },
+    "attributesCard": {
+      "top": "76%",
+      "left": "4%",
+      "width": "92%",
+      "fontSize": "0.85rem"
+    }
   },
-  s04: {
-    textContainer: { top: '10.5%', left: '6%', width: '58%', fontSize: '1.05rem' }
+  "s04": {
+    "textContainer": {
+      "top": "10.5%",
+      "left": "6%",
+      "width": "58%",
+      "fontSize": "1.05rem"
+    }
   },
-  s05: {
-    bubble: { top: '8.5%', right: '5%', width: '58%', pointer: 'pointer-left', fontSize: '0.95rem' }
+  "s05": {
+    "bubble": {
+      "top": "8.5%",
+      "right": "5%",
+      "width": "58%",
+      "pointer": "pointer-left",
+      "fontSize": "0.95rem"
+    }
   },
-  s06: {
-    iconBlock: { top: '6%', left: '0%', width: '100%' },
-    card: { top: '19%', left: '6%', width: '88%', fontSize: '1.05rem' }
+  "s06": {
+    "iconBlock": {
+      "top": "6%",
+      "left": "0%",
+      "width": "100%"
+    },
+    "card": {
+      "top": "19%",
+      "left": "6%",
+      "width": "88%",
+      "fontSize": "1.05rem"
+    }
   },
-  s07: {
-    card: { top: '24%', left: '8%', width: '84%', fontSize: '1rem' }
+  "s07": {
+    "card": {
+      "top": "24%",
+      "left": "8%",
+      "width": "84%",
+      "fontSize": "1rem"
+    }
   },
-  s08: {
-    bubble: { top: '6%', right: '5%', width: '58%', pointer: 'pointer-left', fontSize: '0.95rem' },
-    tip: { top: '26%', right: '5%', width: '58%', fontSize: '0.88rem' },
-    pillars: { top: '48%', right: '5%', width: '58%', fontSize: '0.92rem' }
+  "s08": {
+    "bubble": {
+      "top": "6%",
+      "right": "5%",
+      "width": "58%",
+      "pointer": "pointer-left",
+      "fontSize": "0.95rem"
+    },
+    "tip": {
+      "top": "26%",
+      "right": "5%",
+      "width": "58%",
+      "fontSize": "0.88rem"
+    },
+    "pillars": {
+      "top": "48%",
+      "right": "5%",
+      "width": "58%",
+      "fontSize": "0.92rem"
+    }
   },
-  s09: {
-    bubble: { top: '6%', right: '5%', width: '58%', pointer: 'pointer-left', fontSize: '0.95rem' },
-    card: { top: '27%', right: '5%', width: '58%', fontSize: '0.92rem' }
+  "s09": {
+    "bubble": {
+      "top": "6%",
+      "right": "5%",
+      "width": "58%",
+      "pointer": "pointer-left",
+      "fontSize": "0.95rem"
+    },
+    "card": {
+      "top": "27%",
+      "right": "5%",
+      "width": "58%",
+      "fontSize": "0.92rem"
+    }
   },
-  s10: {
-    bubble: { top: '6%', right: '5%', width: '58%', pointer: 'pointer-left', fontSize: '0.95rem' },
-    card: { top: '26%', right: '5%', width: '58%', fontSize: '0.92rem' }
+  "s10": {
+    "bubble": {
+      "top": "6%",
+      "right": "5%",
+      "width": "58%",
+      "pointer": "pointer-left",
+      "fontSize": "0.95rem"
+    },
+    "card": {
+      "top": "26%",
+      "right": "5%",
+      "width": "58%",
+      "fontSize": "0.92rem"
+    }
   }
 };
 
@@ -94,9 +191,9 @@ function preloadBackdropImages() {
   });
 }
 
-// Load Saved Custom Coordinates from localStorage
+// Load Saved Custom Coordinates from localStorage & auto-sync to local server
 function loadCustomCoordinates() {
-  const saved = localStorage.getItem(STORAGE_KEY_CUSTOM_COORDS);
+  const saved = localStorage.getItem(STORAGE_KEY_CUSTOM_COORDS) || localStorage.getItem('renovate_custom_coordinates');
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
@@ -104,6 +201,15 @@ function loadCustomCoordinates() {
       Object.keys(parsed).forEach(k => {
         UI_COORDINATES_MAP[k] = { ...UI_COORDINATES_MAP[k], ...parsed[k] };
       });
+
+      // Auto-sync saved designer coordinates to server file app.js on localhost
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        fetch('/api/sync-coords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(UI_COORDINATES_MAP)
+        }).catch(e => console.error('Auto-sync error:', e));
+      }
     } catch (e) {
       console.error('Error parsing custom coordinates:', e);
     }
@@ -1104,6 +1210,15 @@ function applySmartBestFit(container, slideId) {
   });
 
   localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
+
+  // Sync with local server file
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    fetch('/api/sync-coords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(UI_COORDINATES_MAP)
+    }).catch(e => console.error('Sync error:', e));
+  }
 }
 
 // Setup Interactive Designer Mode Controls (Drag, Arrow Keys, Tail Pointer, Real-time Font Sizes, Auto-Balance, Save & Fixed Reset)
@@ -1175,6 +1290,15 @@ function setupDesignerModeControls(container, slideId) {
         if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
         UI_COORDINATES_MAP[slideKey][elKey].pointer = tailClass || 'pointer-none';
         localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
+        
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          fetch('/api/sync-coords', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(UI_COORDINATES_MAP)
+          }).catch(e => console.error('Sync error:', e));
+        }
+
         updateToolbar(activeEl);
       };
 
@@ -1198,13 +1322,24 @@ function setupDesignerModeControls(container, slideId) {
       updateToolbar(gameState.selectedDesignerElement);
     });
 
-    // Bind Save & Copy Button
+    // Bind Save & Copy Button with Direct HTTP Sync to Server app.js
     document.getElementById('btn-save-coords')?.addEventListener('click', () => {
       localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
+      
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        fetch('/api/sync-coords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(UI_COORDINATES_MAP)
+        }).then(res => res.json()).then(data => {
+          console.log('Sync response:', data);
+        }).catch(e => console.error('Sync error:', e));
+      }
+
       const fullMap = UI_COORDINATES_MAP[slideKey] || {};
       const jsonStr = JSON.stringify(fullMap, null, 2);
       navigator.clipboard.writeText(jsonStr);
-      alert(`💾 Layout for ${slideKey.toUpperCase()} saved & copied to clipboard!\n\n${jsonStr}`);
+      alert(`💾 Layout for ${slideKey.toUpperCase()} saved & synced to app.js!\n\n${jsonStr}`);
     });
 
     // Bind Fixed Reset Button
@@ -1235,6 +1370,14 @@ function setupDesignerModeControls(container, slideId) {
     UI_COORDINATES_MAP[slideKey][elKey].width = curWidth + '%';
     localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
 
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      fetch('/api/sync-coords', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(UI_COORDINATES_MAP)
+      }).catch(e => console.error('Sync error:', e));
+    }
+
     updateToolbar(activeEl);
   }
 
@@ -1254,6 +1397,14 @@ function setupDesignerModeControls(container, slideId) {
     if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
     UI_COORDINATES_MAP[slideKey][elKey].fontSize = newRem;
     localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      fetch('/api/sync-coords', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(UI_COORDINATES_MAP)
+      }).catch(e => console.error('Sync error:', e));
+    }
 
     updateToolbar(activeEl);
   }
@@ -1314,6 +1465,15 @@ function setupDesignerModeControls(container, slideId) {
     });
 
     window.addEventListener('mouseup', () => {
+      if (isDragging) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          fetch('/api/sync-coords', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(UI_COORDINATES_MAP)
+          }).catch(e => console.error('Sync error:', e));
+        }
+      }
       isDragging = false;
     });
   });
@@ -1351,6 +1511,15 @@ function setupDesignerModeControls(container, slideId) {
     UI_COORDINATES_MAP[slideKey][elKey].left = newLeft;
 
     localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      fetch('/api/sync-coords', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(UI_COORDINATES_MAP)
+      }).catch(e => console.error('Sync error:', e));
+    }
+
     updateToolbar(el);
   };
 }
