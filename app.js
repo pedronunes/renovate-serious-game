@@ -455,13 +455,24 @@ function renderTopBar() {
 
 // Helper to convert style object to inline CSS string
 function styleObjToCss(styleObj = {}) {
-  return Object.entries(styleObj)
-    .filter(([k]) => k !== 'pointer')
-    .map(([k, v]) => {
-      const cssKey = k.replace(/([A-Z])/g, '-$1').toLowerCase();
-      return `${cssKey}:${v}`;
-    })
-    .join(';');
+  if (gameState.designerMode) {
+    return Object.entries(styleObj)
+      .filter(([k]) => k !== 'pointer')
+      .map(([k, v]) => {
+        const cssKey = k.replace(/([A-Z])/g, '-$1').toLowerCase();
+        return `${cssKey}:${v}`;
+      })
+      .concat('position:absolute')
+      .join(';');
+  }
+
+  // Normal Responsive App Mode (Smartphones, Tablets, Laptops)
+  const flowStyles = [];
+  if (styleObj.width) flowStyles.push(`width:${styleObj.width}`);
+  if (styleObj.maxWidth) flowStyles.push(`max-width:${styleObj.maxWidth}`);
+  if (styleObj.fontSize) flowStyles.push(`font-size:${styleObj.fontSize}`);
+  flowStyles.push('position:relative', 'margin-left:auto', 'margin-right:auto');
+  return flowStyles.join(';');
 }
 
 // Main Render Dispatcher
@@ -564,7 +575,7 @@ function renderScreen1(container) {
 
   container.innerHTML = `
     <!-- Top Header Area directly on sky (No Circle Avatar) -->
-    <div id="el-s01-titleHeader" class="s01-header-container designer-target" style="position: absolute; ${styleObjToCss(coords.titleHeader)}">
+    <div id="el-s01-titleHeader" class="s01-header-container designer-target" style="${styleObjToCss(coords.titleHeader)}">
       <div class="s01-title-wrapper">
         <div class="s01-main-title">
           <div>${line1}</div>
@@ -575,14 +586,14 @@ function renderScreen1(container) {
     </div>
 
     <!-- Start Challenge Pill Button (Green Pill with White Border) -->
-    <div id="el-s01-startBtn" class="designer-target" style="position: absolute; text-align: center; ${styleObjToCss(coords.startBtn)}">
+    <div id="el-s01-startBtn" class="designer-target" style="text-align: center; ${styleObjToCss(coords.startBtn)}">
       <button id="btn-start-game" class="btn-start-challenge-pill">
         ${startText}
       </button>
     </div>
 
     <!-- Bottom Horizontal Stepper Card (5 Connected Step Circles) -->
-    <div id="el-s01-stepperCard" class="stepper-card designer-target" style="position: absolute; ${styleObjToCss(coords.stepperCard)}">
+    <div id="el-s01-stepperCard" class="stepper-card designer-target" style="${styleObjToCss(coords.stepperCard)}">
       <div class="stepper-pipeline">
         <div class="stepper-rail"></div>
 
@@ -650,14 +661,14 @@ function renderScreen2(container) {
 
   container.innerHTML = `
     <!-- Upper Left Text Container directly on sky (No Card Box!) -->
-    <div id="el-s02-textContainer" class="s02-text-container designer-target" style="position: absolute; ${styleObjToCss(coords.textContainer)}">
+    <div id="el-s02-textContainer" class="s02-text-container designer-target" style="${styleObjToCss(coords.textContainer)}">
       <div class="s02-title">${title}</div>
       <div class="s02-body-p">${p1}</div>
       ${p2 ? `<div class="s02-body-p">${p2}</div>` : ''}
     </div>
 
     <!-- Bottom 3-Column Attributes Cream Card with 3D Glowing Icon Badges -->
-    <div id="el-s02-attributesCard" class="attributes-card-3col designer-target" style="position: absolute; ${styleObjToCss(coords.attributesCard)}">
+    <div id="el-s02-attributesCard" class="attributes-card-3col designer-target" style="${styleObjToCss(coords.attributesCard)}">
       <div class="attr-col">
         <div class="attr-icon-badge-3d">
           <i data-lucide="grape" class="attr-icon-lucide"></i>
@@ -715,14 +726,14 @@ function renderScreen3(container) {
 
   container.innerHTML = `
     <!-- Upper Right Text Container directly on sky (Right-Aligned) -->
-    <div id="el-s03-textContainer" class="s02-text-container designer-target" style="position: absolute; text-align: right; ${styleObjToCss(coords.textContainer || { top: '8%', left: '40%', width: '54%' })}">
+    <div id="el-s03-textContainer" class="s02-text-container designer-target" style="text-align: right; ${styleObjToCss(coords.textContainer || { top: '8%', left: '40%', width: '54%' })}">
       <div class="s02-title" style="text-align: right;">${title}</div>
       <div class="s02-body-p" style="text-align: right;">${p1}</div>
       ${p2 ? `<div class="s02-body-p" style="text-align: right;">${p2}</div>` : ''}
     </div>
 
     <!-- Bottom 3-Column Attributes Cream Card with 3D Glowing Icon Badges -->
-    <div id="el-s03-attributesCard" class="attributes-card-3col designer-target" style="position: absolute; ${styleObjToCss(coords.attributesCard || { top: '76%', left: '4%', width: '92%' })}">
+    <div id="el-s03-attributesCard" class="attributes-card-3col designer-target" style="${styleObjToCss(coords.attributesCard || { top: '76%', left: '4%', width: '92%' })}">
       <div class="attr-col">
         <div class="attr-icon-badge-3d">
           <i data-lucide="graduation-cap" class="attr-icon-lucide"></i>
@@ -776,7 +787,7 @@ function renderScreen4(container) {
 
   container.innerHTML = `
     <!-- Upper Left Text Container with Translucent Cream Card styling for crisp contrast -->
-    <div id="el-s04-textContainer" class="cream-card designer-target" style="position: absolute; background: rgba(247, 247, 242, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); ${styleObjToCss(coords.textContainer || coords.card || { top: '9%', left: '6%', width: '58%' })}">
+    <div id="el-s04-textContainer" class="cream-card designer-target" style="background: rgba(247, 247, 242, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); ${styleObjToCss(coords.textContainer || coords.card || { top: '9%', left: '6%', width: '58%' })}">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.02em;">${title}</div>
       <div class="cream-card-body" style="font-size: 1.05rem; font-weight: 600; color: #1F2220; line-height: 1.42;">
         <p style="margin-bottom: 8px;">${p1}</p>
@@ -813,7 +824,7 @@ function renderScreen5(container) {
     .join('');
 
   container.innerHTML = `
-    <div id="el-s05-bubble" class="speech-bubble ${pointerClass} designer-target" style="position: absolute; min-height: max-content; ${styleObjToCss(coords.bubble || { top: '8%', right: '5%', width: '58%' })}">
+    <div id="el-s05-bubble" class="speech-bubble ${pointerClass} designer-target" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '8%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 8px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; color: #1F2220;">
         ${formattedHtml}
@@ -838,12 +849,12 @@ function renderScreen6(container) {
 
   container.innerHTML = `
     <!-- Separate Floating Top Icon Block (Increased Spacing to Text Boxes) -->
-    <div id="el-s06-iconBlock" class="designer-target" style="position: absolute; ${styleObjToCss(coords.iconBlock || { top: '6%', left: '0%', width: '100%' })}; text-align: center;">
+    <div id="el-s06-iconBlock" class="designer-target" style="text-align: center; ${styleObjToCss(coords.iconBlock || { top: '6%', left: '0%', width: '100%' })}">
       <i data-lucide="info" class="s06-info-top-icon" style="width: 90px; height: 90px; stroke: #1E4222; stroke-width: 2.2; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));"></i>
     </div>
 
     <!-- Separate Floating Text Cards Container (Opacity 0.78, Increased Line-Height 1.88, Spanning > 50% Screen Height) -->
-    <div id="el-s06-card" class="designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '19%', left: '6%', width: '88%' })}">
+    <div id="el-s06-card" class="designer-target" style="${styleObjToCss(coords.card || { top: '19%', left: '6%', width: '88%' })}">
       <div class="s06-blocks-container" style="display: flex; flex-direction: column; gap: 16px;">
         <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
           ${rawInfo1}
@@ -876,7 +887,7 @@ function renderScreen7(container) {
 
   container.innerHTML = `
     <!-- Translucent Background Layer Card wrapping Icon and Text for Maximum Contrast & Distinction -->
-    <div id="el-s07-card" class="designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '24%', left: '8%', width: '84%' })}">
+    <div id="el-s07-card" class="designer-target" style="${styleObjToCss(coords.card || { top: '24%', left: '8%', width: '84%' })}">
       <div style="background: rgba(247, 247, 242, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 32px 24px; border-radius: 24px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 8px 28px rgba(0,0,0,0.14); text-align: center;">
         
         <!-- Top Floating Round Badge Icon with Number 1 (Matching Screen 6 Icon Style) -->
@@ -915,7 +926,7 @@ function renderScreen8(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s08-bubble" class="speech-bubble ${pointerClass} designer-target" style="position: absolute; ${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s08-bubble" class="speech-bubble ${pointerClass} designer-target" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
@@ -923,7 +934,7 @@ function renderScreen8(container) {
     </div>
 
     <!-- Mia's Tip Box -->
-    <div id="el-s08-tip" class="tip-card designer-target" style="position: absolute; ${styleObjToCss(coords.tip || { top: '26%', right: '5%', width: '58%' })}">
+    <div id="el-s08-tip" class="tip-card designer-target" style="${styleObjToCss(coords.tip || { top: '26%', right: '5%', width: '58%' })}">
       <div class="tip-card-header" style="display: flex; align-items: center; gap: 8px; font-weight: 900; color: #855300; font-size: 1.05rem;">
         <i data-lucide="lightbulb" style="width: 24px; height: 24px; stroke: #D97706;"></i>
         <span>${tipTitle}</span>
@@ -934,7 +945,7 @@ function renderScreen8(container) {
     </div>
 
     <!-- 3 Pillars of Effectiveness Translucent Card with Enlarged Header Title, Subtitles and Icons -->
-    <div id="el-s08-pillars" class="cream-card designer-target" style="position: absolute; ${styleObjToCss(coords.pillars || { top: '48%', right: '5%', width: '58%' })}">
+    <div id="el-s08-pillars" class="cream-card designer-target" style="${styleObjToCss(coords.pillars || { top: '48%', right: '5%', width: '58%' })}">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 8px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
         ${secTitle}
       </div>
@@ -1005,7 +1016,7 @@ function renderScreen9(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s09-bubble" class="speech-bubble ${pointerClass} designer-target" style="position: absolute; ${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s09-bubble" class="speech-bubble ${pointerClass} designer-target" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; color: #1F2220;">
         ${formattedSpeech}
@@ -1013,7 +1024,7 @@ function renderScreen9(container) {
     </div>
 
     <!-- What is Calibration Translucent Cream Card -->
-    <div id="el-s09-card" class="cream-card designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '27%', right: '5%', width: '58%' })}">
+    <div id="el-s09-card" class="cream-card designer-target" style="${styleObjToCss(coords.card || { top: '27%', right: '5%', width: '58%' })}">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 6px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
         ${secTitle}
       </div>
@@ -1089,7 +1100,7 @@ function renderScreen10(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia (Holding 4 Fingers Up!) -->
-    <div id="el-s10-bubble" class="speech-bubble ${pointerClass} designer-target" style="position: absolute; ${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s10-bubble" class="speech-bubble ${pointerClass} designer-target" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
@@ -1097,7 +1108,7 @@ function renderScreen10(container) {
     </div>
 
     <!-- The 4 Key Parameters Translucent Cream Card -->
-    <div id="el-s10-card" class="cream-card designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '26%', right: '5%', width: '58%' })}">
+    <div id="el-s10-card" class="cream-card designer-target" style="${styleObjToCss(coords.card || { top: '26%', right: '5%', width: '58%' })}">
       
       <!-- Card Header -->
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.02em; text-align: center;">
@@ -1262,7 +1273,7 @@ function renderQuizScreen(container, slideId) {
   const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
 
   container.innerHTML = `
-    <div id="el-${slideKey}-card" class="quiz-container designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '8%', left: '5%', width: '90%' })}">
+    <div id="el-${slideKey}-card" class="quiz-container designer-target" style="${styleObjToCss(coords.card || { top: '8%', left: '5%', width: '90%' })}">
       
       <div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
@@ -1354,7 +1365,7 @@ function renderQuizFeedbackScreen(container, slideId) {
 
   if (fb.isCorrect) {
     container.innerHTML = `
-      <div id="el-${slideKey}-card" class="feedback-card-correct designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
+      <div id="el-${slideKey}-card" class="feedback-card-correct designer-target" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
         <div class="feedback-badge-correct">
           <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
           <span>${statusText}!</span>
@@ -1381,7 +1392,7 @@ function renderQuizFeedbackScreen(container, slideId) {
     });
   } else {
     container.innerHTML = `
-      <div id="el-${slideKey}-card" class="feedback-card-incorrect designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
+      <div id="el-${slideKey}-card" class="feedback-card-incorrect designer-target" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
         <div class="feedback-badge-incorrect">
           <i data-lucide="x-circle" style="width: 24px; height: 24px;"></i>
           <span>${statusText}</span>
