@@ -74,92 +74,100 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s04": {
     "textContainer": {
-      "top": "9.0%",
-      "left": "6.0%",
-      "width": "58.0%",
+      "top": "10.5%",
+      "left": "6%",
+      "width": "58%",
       "fontSize": "1.05rem"
     }
   },
   "s05": {
     "bubble": {
-      "top": "7.0%",
-      "left": "36.0%",
-      "width": "60.0%",
-      "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "top": "50.1%",
+      "right": "5%",
+      "width": "58%",
+      "pointer": "pointer-top",
+      "fontSize": "0.95rem",
+      "left": "38.6%"
     }
   },
   "s06": {
     "iconBlock": {
-      "top": "5.0%",
+      "top": "14.0%",
       "left": "0.0%",
       "width": "100.0%",
       "fontSize": "1.05rem"
     },
     "card": {
-      "top": "17.0%",
-      "left": "5.0%",
-      "width": "90.0%",
+      "top": "36.0%",
+      "left": "6.0%",
+      "width": "88.0%",
       "fontSize": "1.05rem"
     }
   },
   "s07": {
     "card": {
-      "top": "20.0%",
-      "left": "6.0%",
-      "width": "88.0%",
+      "top": "24%",
+      "left": "8%",
+      "width": "84%",
       "fontSize": "1rem"
     }
   },
   "s08": {
     "bubble": {
-      "top": "6.0%",
-      "left": "36.0%",
-      "width": "60.0%",
+      "top": "10.5%",
+      "right": "5%",
+      "width": "48.0%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "fontSize": "1.05rem",
+      "left": "42.0%"
     },
     "tip": {
-      "top": "24.0%",
-      "left": "36.0%",
-      "width": "60.0%",
-      "fontSize": "0.88rem"
+      "top": "42.0%",
+      "right": "5%",
+      "width": "46.0%",
+      "fontSize": "1.05rem",
+      "left": "47.0%"
     },
     "pillars": {
-      "top": "46.0%",
-      "left": "5.0%",
-      "width": "90.0%",
-      "fontSize": "0.95rem"
+      "top": "57.0%",
+      "right": "5%",
+      "width": "86.0%",
+      "fontSize": "1.05rem",
+      "left": "7.0%"
     }
   },
   "s09": {
     "bubble": {
-      "top": "6.0%",
-      "left": "36.0%",
-      "width": "60.0%",
+      "top": "9.0%",
+      "right": "5%",
+      "width": "46%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "fontSize": "0.95rem",
+      "left": "47.0%"
     },
     "card": {
-      "top": "25.0%",
-      "left": "5.0%",
-      "width": "90.0%",
-      "fontSize": "0.92rem"
+      "top": "50.0%",
+      "right": "5%",
+      "width": "88%",
+      "fontSize": "0.92rem",
+      "left": "7.4%"
     }
   },
   "s10": {
     "bubble": {
-      "top": "6.0%",
-      "left": "36.0%",
-      "width": "60.0%",
+      "top": "10.5%",
+      "right": "5%",
+      "width": "46.0%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "fontSize": "1.05rem",
+      "left": "50.0%"
     },
     "card": {
-      "top": "24.0%",
-      "left": "5.0%",
+      "top": "48.5%",
+      "right": "5%",
       "width": "90.0%",
-      "fontSize": "0.95rem"
+      "fontSize": "1.05rem",
+      "left": "5.0%"
     }
   }
 };
@@ -496,6 +504,8 @@ function renderCurrentSlide() {
   else if (slideId === 8) renderScreen8(overlayContainer);
   else if (slideId === 9) renderScreen9(overlayContainer);
   else if (slideId === 10) renderScreen10(overlayContainer);
+  else if (QUIZ_CONFIG_MAP[slideId]) renderQuizScreen(overlayContainer, slideId);
+  else if (QUIZ_FEEDBACK_MAP[slideId]) renderQuizFeedbackScreen(overlayContainer, slideId);
   else renderGenericScreenPlaceholder(overlayContainer, slideId);
 
   // Setup or Cleanup Designer Mode Controls
@@ -1147,6 +1157,245 @@ function renderScreen10(container) {
   }
 }
 
+// Master Configuration for Interactive Quizzes (Screens 11, 14, 17, 20)
+const QUIZ_CONFIG_MAP = {
+  11: {
+    quizNum: 1,
+    correctOption: 'C',
+    correctSlide: 12,
+    incorrectSlide: 13,
+    titleKey: 's11_quiz_title',
+    questionKey: 's11_quiz_question',
+    options: [
+      { key: 'A', textKey: 's11_quiz_option_a' },
+      { key: 'B', textKey: 's11_quiz_option_b' },
+      { key: 'C', textKey: 's11_quiz_option_c' },
+      { key: 'D', textKey: 's11_quiz_option_d' }
+    ]
+  },
+  14: {
+    quizNum: 2,
+    correctOption: 'D',
+    correctSlide: 15,
+    incorrectSlide: 16,
+    titleKey: 's14_quiz_title',
+    questionKey: 's14_quiz_question',
+    options: [
+      { key: 'A', textKey: 's14_quiz_option_a' },
+      { key: 'B', textKey: 's14_quiz_option_b' },
+      { key: 'C', textKey: 's14_quiz_option_c' },
+      { key: 'D', textKey: 's14_quiz_option_d' }
+    ]
+  },
+  17: {
+    quizNum: 3,
+    correctOption: 'B',
+    correctSlide: 18,
+    incorrectSlide: 19,
+    titleKey: 's17_quiz_title',
+    questionKey: 's17_quiz_question',
+    options: [
+      { key: 'A', textKey: 's17_quiz_option_a' },
+      { key: 'B', textKey: 's17_quiz_option_b' },
+      { key: 'C', textKey: 's17_quiz_option_c' },
+      { key: 'D', textKey: 's17_quiz_option_d' }
+    ]
+  },
+  20: {
+    quizNum: 4,
+    correctOption: 'A',
+    correctSlide: 21,
+    incorrectSlide: 22,
+    titleKey: 's20_quiz_title',
+    questionKey: 's20_quiz_question',
+    options: [
+      { key: 'A', textKey: 's20_quiz_option_a' },
+      { key: 'B', textKey: 's20_quiz_option_b' },
+      { key: 'C', textKey: 's20_quiz_option_c' },
+      { key: 'D', textKey: 's20_quiz_option_d' }
+    ]
+  }
+};
+
+// Master Configuration for Quiz Feedback Screens (Screens 12, 13, 15, 16, 18, 19, 21, 22)
+const QUIZ_FEEDBACK_MAP = {
+  12: { isCorrect: true, quizNum: 1, statusKey: 's12_feedback_status', infoKey: 's12_info_text', optionKey: 's12_quiz_correct_option', nextSlide: 14 },
+  13: { isCorrect: false, quizNum: 1, statusKey: 's13_feedback_status', infoKey: 's13_info_text', retrySlide: 11 },
+  15: { isCorrect: true, quizNum: 2, statusKey: 's15_feedback_status', infoKey: 's15_info_text', optionKey: 's15_quiz_correct_d', nextSlide: 17 },
+  16: { isCorrect: false, quizNum: 2, statusKey: 's16_feedback_status', infoKey: 's16_info_text', retrySlide: 14 },
+  18: { isCorrect: true, quizNum: 3, statusKey: 's18_feedback_status', infoKey: 's18_info_text', optionKey: 's18_quiz_correct_b', nextSlide: 20 },
+  19: { isCorrect: false, quizNum: 3, statusKey: 's19_feedback_status', infoKey: 's19_info_text', retrySlide: 17 },
+  21: { isCorrect: true, quizNum: 4, statusKey: 's21_feedback_status', infoKey: 's21_info_text', optionKey: 's21_quiz_correct_a', nextSlide: 23 },
+  22: { isCorrect: false, quizNum: 4, statusKey: 's22_feedback_status', infoKey: 's22_info_text', retrySlide: 20 }
+};
+
+// Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20)
+function renderQuizScreen(container, slideId) {
+  const cfg = QUIZ_CONFIG_MAP[slideId];
+  if (!cfg) return;
+
+  const slideKey = 's' + String(slideId).padStart(2, '0');
+  const coords = UI_COORDINATES_MAP[slideKey] || {
+    card: { top: '8%', left: '5%', width: '90%' }
+  };
+
+  const titleText = t(cfg.titleKey, 'Calibration of a Sprayer');
+  const questionText = t(cfg.questionKey, 'Quiz Question');
+  const submitText = t('ui_confirm_answer', 'CONFIRMAR RESPOSTA');
+
+  // Check if previously selected
+  const previous = gameState.quizAnswers[slideId];
+  let selectedOption = previous ? previous.selected : null;
+
+  const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
+
+  container.innerHTML = `
+    <div id="el-${slideKey}-card" class="quiz-container designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '8%', left: '5%', width: '90%' })}">
+      
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span class="quiz-category-badge">QUIZ #${cfg.quizNum}</span>
+          <span style="font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 700; color: #1E4222;">${titleText}</span>
+        </div>
+
+        <div class="quiz-question-title">${questionText}</div>
+
+        <div class="quiz-options-list">
+          ${cfg.options.map(opt => {
+            const rawOptText = t(opt.textKey, opt.key);
+            const isSel = selectedOption === opt.key;
+            return `
+              <div class="quiz-option-card ${isSel ? 'selected' : ''}" data-key="${opt.key}">
+                <div class="quiz-option-badge">${opt.key}</div>
+                <div class="quiz-option-text">${cleanOptionText(rawOptText)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <div>
+        <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${!selectedOption ? 'disabled' : ''}>
+          <span>${submitText}</span>
+          <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  // Bind option selection events
+  const optionCards = container.querySelectorAll('.quiz-option-card');
+  const submitBtn = document.getElementById(`btn-submit-quiz-${slideId}`);
+
+  optionCards.forEach(card => {
+    card.addEventListener('click', () => {
+      getAudioContext();
+      optionCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedOption = card.getAttribute('data-key');
+      if (submitBtn) submitBtn.disabled = false;
+    });
+  });
+
+  // Bind submit button event
+  if (submitBtn) {
+    submitBtn.addEventListener('click', () => {
+      if (!selectedOption) return;
+
+      const isCorrect = selectedOption === cfg.correctOption;
+      gameState.quizAnswers[slideId] = { selected: selectedOption, correct: isCorrect };
+      saveProgress();
+
+      if (isCorrect) {
+        playSound('ding');
+        goToSlide(cfg.correctSlide);
+      } else {
+        playSound('buzz');
+        goToSlide(cfg.incorrectSlide);
+      }
+    });
+  }
+
+  // Trigger Lucide Icons
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Render Quiz Feedback Screen (Correct / Incorrect - Screens 12, 13, 15, 16, 18, 19, 21, 22)
+function renderQuizFeedbackScreen(container, slideId) {
+  const fb = QUIZ_FEEDBACK_MAP[slideId];
+  if (!fb) return;
+
+  const slideKey = 's' + String(slideId).padStart(2, '0');
+  const coords = UI_COORDINATES_MAP[slideKey] || {
+    card: { top: '15%', left: '6%', width: '88%' }
+  };
+
+  const statusText = t(fb.statusKey, fb.isCorrect ? 'Correto' : 'Incorreto');
+  const infoText = t(fb.infoKey, '');
+  const optionText = fb.optionKey ? t(fb.optionKey, '') : '';
+
+  const continueText = t('ui_next', 'SEGUINTE');
+  const retryText = t('ui_retry', 'TENTAR NOVAMENTE');
+
+  if (fb.isCorrect) {
+    container.innerHTML = `
+      <div id="el-${slideKey}-card" class="feedback-card-correct designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
+        <div class="feedback-badge-correct">
+          <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+          <span>${statusText}!</span>
+        </div>
+
+        ${optionText ? `
+          <div style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.05rem; color: #1E4222; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.85); border-radius: 12px; border-left: 4px solid #2E7D32;">
+            ${optionText}
+          </div>
+        ` : ''}
+
+        <div class="feedback-explanation">
+          ${infoText}
+        </div>
+
+        <button id="btn-feedback-action" class="btn-start-challenge-pill" style="margin-top: 14px; font-size: 1.1rem; padding: 10px 24px;">
+          ${continueText} ▶
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-feedback-action')?.addEventListener('click', () => {
+      goToSlide(fb.nextSlide);
+    });
+  } else {
+    container.innerHTML = `
+      <div id="el-${slideKey}-card" class="feedback-card-incorrect designer-target" style="position: absolute; ${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
+        <div class="feedback-badge-incorrect">
+          <i data-lucide="x-circle" style="width: 24px; height: 24px;"></i>
+          <span>${statusText}</span>
+        </div>
+
+        <div class="feedback-explanation" style="border-left: 4px solid #C62828;">
+          ${infoText}
+        </div>
+
+        <button id="btn-feedback-action" class="btn-start-challenge-pill" style="margin-top: 14px; font-size: 1.1rem; padding: 10px 24px; background: linear-gradient(180deg, #D32F2F 0%, #B71C1C 100%);">
+          🔄 ${retryText}
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-feedback-action')?.addEventListener('click', () => {
+      goToSlide(fb.retrySlide);
+    });
+  }
+
+  // Trigger Lucide Icons
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
 // Generic Screen Placeholder for slides > 10
 function renderGenericScreenPlaceholder(container, slideId) {
   const screenWord = t('ui_screen', 'Screen');
@@ -1607,7 +1856,11 @@ function renderBottomNavBar() {
 
   const isScreen1 = slideId === 1;
   const isBackDisabled = slideId <= 1;
-  const isNextDisabled = slideId >= gameState.totalSlides;
+
+  // Lock NEXT button on Quiz screens until answered
+  const isQuizScreen = Boolean(QUIZ_CONFIG_MAP[slideId]);
+  const isQuizUnanswered = isQuizScreen && !gameState.quizAnswers[slideId];
+  const isNextDisabled = slideId >= gameState.totalSlides || isQuizUnanswered;
 
   const backLabel = t('ui_back', 'BACK');
   const nextLabel = t('ui_next', 'NEXT');

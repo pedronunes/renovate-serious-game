@@ -848,3 +848,222 @@ html, body {
   background: #E0E0E0;
   color: #333333;
 }
+
+/* --- Interactive Quiz System & Feedback Cards (Screens 11 to 22) --- */
+
+.quiz-container {
+  background: rgba(247, 247, 242, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid var(--forest-green);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: calc(14px * var(--scale-factor, 1)) calc(16px * var(--scale-factor, 1));
+  max-height: calc(100% - 10px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.quiz-category-badge {
+  font-family: var(--font-header);
+  font-size: clamp(0.68rem, calc(0.8rem * var(--scale-factor, 1)), 0.92rem);
+  font-weight: 900;
+  color: var(--forest-green);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: rgba(35, 73, 38, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 6px;
+  border: 1px solid rgba(35, 73, 38, 0.2);
+  width: max-content;
+}
+
+.quiz-question-title {
+  font-family: var(--font-header);
+  font-size: clamp(0.92rem, calc(1.15rem * var(--scale-factor, 1)), 1.35rem);
+  font-weight: 900;
+  color: #1E4222;
+  line-height: 1.3;
+  margin-bottom: calc(12px * var(--scale-factor, 1));
+}
+
+.quiz-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(9px * var(--scale-factor, 1));
+  margin-bottom: calc(14px * var(--scale-factor, 1));
+}
+
+.quiz-option-card {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--scale-factor, 1));
+  background: #FFFFFF;
+  border: 2px solid rgba(35, 73, 38, 0.25);
+  border-radius: 14px;
+  padding: calc(10px * var(--scale-factor, 1)) calc(12px * var(--scale-factor, 1));
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.quiz-option-card:hover {
+  border-color: var(--forest-green);
+  transform: translateX(3px);
+  box-shadow: 0 4px 12px rgba(35, 73, 38, 0.18);
+}
+
+.quiz-option-card.selected {
+  background: linear-gradient(180deg, #FFF0BD 0%, #FFCC66 100%);
+  border: 2.5px solid var(--forest-green);
+  box-shadow: 0 6px 16px rgba(35, 73, 38, 0.28);
+  transform: translateX(4px);
+}
+
+.quiz-option-badge {
+  width: calc(30px * var(--scale-factor, 1));
+  height: calc(30px * var(--scale-factor, 1));
+  min-width: 26px;
+  min-height: 26px;
+  border-radius: 50%;
+  background: rgba(35, 73, 38, 0.1);
+  border: 1.8px solid var(--forest-green);
+  color: var(--forest-green);
+  font-family: var(--font-header);
+  font-size: clamp(0.75rem, calc(0.88rem * var(--scale-factor, 1)), 1rem);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quiz-option-card.selected .quiz-option-badge {
+  background: var(--forest-green);
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+}
+
+.quiz-option-text {
+  font-family: var(--font-body);
+  font-size: clamp(0.78rem, calc(0.92rem * var(--scale-factor, 1)), 1.05rem);
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.35;
+}
+
+.quiz-option-card.selected .quiz-option-text {
+  color: #1E4222;
+  font-weight: 800;
+}
+
+/* Submit Answer Button inside Quiz Card */
+.btn-submit-answer {
+  width: 100%;
+  padding: calc(10px * var(--scale-factor, 1)) calc(16px * var(--scale-factor, 1));
+  font-family: var(--font-header);
+  font-size: clamp(0.85rem, calc(1.05rem * var(--scale-factor, 1)), 1.2rem);
+  font-weight: 900;
+  color: #FFFFFF;
+  background: linear-gradient(180deg, #416B33 0%, #234926 60%, #173319 100%);
+  border: 2px solid #FFFFFF;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-submit-answer:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
+  box-shadow: none;
+}
+
+.btn-submit-answer:not(:disabled):hover {
+  background: linear-gradient(180deg, #4F7E3F 0%, #2D5B2F 60%, #1E4222 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.32);
+}
+
+/* Feedback Cards (Correct & Incorrect Screens) */
+.feedback-card-correct {
+  background: linear-gradient(180deg, #F2FBF3 0%, #E2F5E4 100%);
+  border: 2.5px solid #2E7D32;
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: calc(16px * var(--scale-factor, 1)) calc(18px * var(--scale-factor, 1));
+  text-align: center;
+  max-height: calc(100% - 10px);
+  overflow-y: auto;
+}
+
+.feedback-card-incorrect {
+  background: linear-gradient(180deg, #FFF5F5 0%, #FFECEC 100%);
+  border: 2.5px solid #C62828;
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: calc(16px * var(--scale-factor, 1)) calc(18px * var(--scale-factor, 1));
+  text-align: center;
+  max-height: calc(100% - 10px);
+  overflow-y: auto;
+}
+
+.feedback-badge-correct {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #2E7D32;
+  color: #FFFFFF;
+  font-family: var(--font-header);
+  font-size: clamp(0.88rem, calc(1.08rem * var(--scale-factor, 1)), 1.25rem);
+  font-weight: 900;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
+  margin-bottom: 12px;
+}
+
+.feedback-badge-incorrect {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  background: #C62828;
+  color: #FFFFFF;
+  font-family: var(--font-header);
+  font-size: clamp(0.88rem, calc(1.08rem * var(--scale-factor, 1)), 1.25rem);
+  font-weight: 900;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.35);
+  margin-bottom: 12px;
+}
+
+.feedback-explanation {
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, calc(1.02rem * var(--scale-factor, 1)), 1.15rem);
+  font-weight: 600;
+  color: #1F2220;
+  line-height: 1.45;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
