@@ -27,21 +27,22 @@ const SUPPORTED_LANGUAGES = [
 const INITIAL_UI_COORDINATES_MAP = {
   "s01": {
     "titleHeader": {
-      "top": "8.5%",
-      "left": "5%",
-      "width": "90%",
+      "top": "16.5%",
+      "left": "5.0%",
+      "width": "90.0%",
       "fontSize": "1.05rem"
     },
     "startBtn": {
-      "top": "64%",
-      "left": "10%",
-      "width": "80%"
+      "top": "74.5%",
+      "left": "10.0%",
+      "width": "80.0%",
+      "fontSize": "1.05rem"
     },
     "stepperCard": {
-      "top": "75%",
-      "left": "4%",
-      "width": "92%",
-      "fontSize": "0.74rem"
+      "top": "84.5%",
+      "left": "4.0%",
+      "width": "92.0%",
+      "fontSize": "1.05rem"
     }
   },
   "s02": {
