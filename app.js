@@ -23,7 +23,7 @@ const SUPPORTED_LANGUAGES = [
   { code: 'el-GR', display: 'el-GR Ελληνικά (GR)' }
 ];
 
-// Factory Default Coordinates Map (Master Blueprint)
+// Factory Default Coordinates Map (Master Blueprint with Hardcoded Polished Positions)
 const INITIAL_UI_COORDINATES_MAP = {
   s01: {
     titleHeader: { top: '4%', left: '5%', width: '90%', fontSize: '1.05rem' },
@@ -68,6 +68,31 @@ const INITIAL_UI_COORDINATES_MAP = {
 
 // Active Coordinates Map initialized from deep clone
 let UI_COORDINATES_MAP = JSON.parse(JSON.stringify(INITIAL_UI_COORDINATES_MAP));
+
+// Preload all backdrop images for instantaneous 60fps transitions without lag or black screens
+function preloadBackdropImages() {
+  const imagesToPreload = [
+    'public/images/SeriousGame_tela-Simples.jpg',
+    'public/images/SeriousGame_tela1.jpg',
+    'public/images/SeriousGame_tela2.jpg',
+    'public/images/SeriousGame_tela3.jpg',
+    'public/images/SeriousGame_tela4.jpg',
+    'public/images/SeriousGame_tela5.jpg',
+    'public/images/SeriousGame_tela8.jpg',
+    'public/images/SeriousGame_tela9.jpg',
+    'public/images/SeriousGame_tela10.jpg',
+    'public/images/SeriousGame_tela23.jpg',
+    'public/images/s10_param1_tractor.png',
+    'public/images/s10_param2_pressure.png',
+    'public/images/s10_param3_nozzles.png',
+    'public/images/s10_param4_activenozzles.png'
+  ];
+
+  imagesToPreload.forEach(src => {
+    const img = new Image();
+    img.src = src;
+  });
+}
 
 // Load Saved Custom Coordinates from localStorage
 function loadCustomCoordinates() {
@@ -261,18 +286,25 @@ function goToSlide(slideNum) {
   renderCurrentSlide();
 }
 
-// Render Top Bar (#FFCC66 with Logo, "Serious Game RENOVATE" title, Designer Mode & Language Selector)
+// Render Top Bar (#FFCC66 with Logo, "Serious Game RENOVATE" title, Designer Mode [ONLY ON LOCALHOST] & Language Selector)
 function renderTopBar() {
   const topBar = document.getElementById('top-bar');
   if (!topBar) return;
+
+  // Designer Mode is strictly restricted to Localhost (127.0.0.1 or localhost or ?designer=true)
+  const isLocalhost = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1' || 
+                      window.location.search.includes('designer=true');
 
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='public/images/RENOVATE-logo.png'">
       <span class="top-bar-app-title">Serious Game RENOVATE</span>
-      <button id="btn-toggle-designer" class="btn-designer-toggle ${gameState.designerMode ? 'active' : ''}">
-        ${gameState.designerMode ? '✓ Designer On' : '✏️ Designer'}
-      </button>
+      ${isLocalhost ? `
+        <button id="btn-toggle-designer" class="btn-designer-toggle ${gameState.designerMode ? 'active' : ''}">
+          ${gameState.designerMode ? '✓ Designer On' : '✏️ Designer'}
+        </button>
+      ` : ''}
     </div>
     
     <div class="top-bar-lang-container">
@@ -291,14 +323,16 @@ function renderTopBar() {
     loadTranslations(selectedLang);
   });
 
-  document.getElementById('btn-toggle-designer').addEventListener('click', () => {
-    gameState.designerMode = !gameState.designerMode;
-    if (!gameState.designerMode) {
-      gameState.selectedDesignerElement = null;
-    }
-    renderTopBar();
-    renderCurrentSlide();
-  });
+  if (isLocalhost) {
+    document.getElementById('btn-toggle-designer')?.addEventListener('click', () => {
+      gameState.designerMode = !gameState.designerMode;
+      if (!gameState.designerMode) {
+        gameState.selectedDesignerElement = null;
+      }
+      renderTopBar();
+      renderCurrentSlide();
+    });
+  }
 }
 
 // Helper to convert style object to inline CSS string
@@ -1380,6 +1414,7 @@ function renderBottomNavBar() {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
+  preloadBackdropImages();
   loadCustomCoordinates();
   renderTopBar();
   const hasSession = checkSessionRecovery();

@@ -46,14 +46,14 @@ html, body {
   font-family: var(--font-body);
 }
 
-/* 9:16 Aspect Ratio Viewport Container */
+/* 9:16 Aspect Ratio Viewport Container (Cream background eliminates black transition flashes) */
 #game-container {
   position: relative;
   width: 100vw;
   height: 100vh;
   max-width: calc(100vh * (9 / 16));
   max-height: calc(100vw * (16 / 9));
-  background-color: #000;
+  background-color: #F7F7F2;
   box-shadow: 0 0 45px rgba(0, 0, 0, 0.75);
   overflow: hidden;
   display: flex;
@@ -148,7 +148,9 @@ html, body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #F7F7F2;
   overflow: hidden;
+  transition: background-image 0.15s ease-in-out;
 }
 
 /* UI Overlay Layer (Layer 2) */
@@ -801,31 +803,22 @@ html, body {
 
 .btn-modal {
   flex: 1;
-  padding: 12px;
+  padding: 10px 16px;
   font-family: var(--font-header);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  border-radius: 12px;
-  border: 2px solid var(--forest-green);
+  border-radius: 10px;
   cursor: pointer;
+  border: none;
+  text-transform: uppercase;
 }
 
 .btn-modal-primary {
-  background: linear-gradient(135deg, #FFE08B 0%, #FFB733 100%);
-  color: var(--forest-green);
+  background: var(--forest-green-btn);
+  color: #FFFFFF;
 }
 
 .btn-modal-secondary {
-  background-color: #E5E7EB;
-  color: var(--text-dark);
+  background: #E0E0E0;
+  color: #333333;
 }
-
-/* Technical Parameter Highlight Style */
-.highlight-param {
-  font-weight: 900;
-  color: #1E4222;
-  background: rgba(255, 204, 102, 0.4);
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-
