@@ -392,7 +392,7 @@ function goToSlide(slideNum) {
   renderCurrentSlide();
 }
 
-// Render Top Bar (#FFCC66 with Logo, "Serious Game RENOVATE" title, Designer Mode [ONLY ON LOCALHOST] & Language Selector)
+// Render Top Bar (#FFCC66 with Logo, Title, Version/Date Badge, Designer Mode [ONLY ON LOCALHOST] & Language Selector)
 function renderTopBar() {
   const topBar = document.getElementById('top-bar');
   if (!topBar) return;
@@ -405,7 +405,10 @@ function renderTopBar() {
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='public/images/RENOVATE-logo.png'">
-      <span class="top-bar-app-title">Serious Game RENOVATE</span>
+      <div class="top-bar-title-wrapper">
+        <span class="top-bar-app-title">Serious Game RENOVATE</span>
+        <span class="top-bar-version-badge">v1.0.4 • 25.08.2026</span>
+      </div>
       ${isLocalhost ? `
         <button id="btn-toggle-designer" class="btn-designer-toggle ${gameState.designerMode ? 'active' : ''}">
           ${gameState.designerMode ? '✓ Designer On' : '✏️ Designer'}
@@ -1524,11 +1527,12 @@ function setupDesignerModeControls(container, slideId) {
   };
 }
 
-// Render Integrated Elegant Bottom Navigation Bar
+// Render Integrated Elegant Bottom Navigation Bar (Hide NEXT/BACK on Screen 1)
 function renderBottomNavBar() {
   const navContainer = document.getElementById('bottom-nav');
   const slideId = gameState.currentSlide;
 
+  const isScreen1 = slideId === 1;
   const isBackDisabled = slideId <= 1;
   const isNextDisabled = slideId >= gameState.totalSlides;
 
@@ -1540,23 +1544,29 @@ function renderBottomNavBar() {
   const chapterTitle = t(`s${String(slideId).padStart(2, '0')}_chapter_title`, 'Calibration Challenge');
 
   navContainer.innerHTML = `
-    <button id="nav-back" class="nav-btn" ${isBackDisabled ? 'disabled' : ''}>
-      ◀ ${backLabel}
-    </button>
+    <div style="min-width: 110px;">
+      ${!isScreen1 ? `
+        <button id="nav-back" class="nav-btn" ${isBackDisabled ? 'disabled' : ''}>
+          ◀ ${backLabel}
+        </button>
+      ` : ''}
+    </div>
 
     <div class="nav-center-info">
       <span class="screen-counter">${screenLabel} ${slideId} ${ofLabel} ${gameState.totalSlides}</span>
       <span class="nav-breadcrumbs">${chapterTitle}</span>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 10px; min-width: 110px; justify-content: flex-end;">
       <button id="nav-mute" class="btn-sound-toggle" title="Sound">
         ${gameState.audioMuted ? '🔇' : '🔊'}
       </button>
 
-      <button id="nav-next" class="nav-btn" ${isNextDisabled ? 'disabled' : ''}>
-        ${nextLabel} ▶
-      </button>
+      ${!isScreen1 ? `
+        <button id="nav-next" class="nav-btn" ${isNextDisabled ? 'disabled' : ''}>
+          ${nextLabel} ▶
+        </button>
+      ` : ''}
     </div>
   `;
 
@@ -1564,11 +1574,11 @@ function renderBottomNavBar() {
   const nextBtn = document.getElementById('nav-next');
   const muteBtn = document.getElementById('nav-mute');
 
-  if (backBtn && !isBackDisabled) {
+  if (backBtn && !isBackDisabled && !isScreen1) {
     backBtn.addEventListener('click', () => goToSlide(gameState.currentSlide - 1));
   }
 
-  if (nextBtn && !isNextDisabled) {
+  if (nextBtn && !isNextDisabled && !isScreen1) {
     nextBtn.addEventListener('click', () => goToSlide(gameState.currentSlide + 1));
   }
 
