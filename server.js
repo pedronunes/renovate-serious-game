@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process');
 
 const PORT = 3000;
 
@@ -16,17 +17,15 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
-function updateAppJsCoordinates(customCoordsMap) {
+function updateAppJsCoordinatesAndPush(customCoordsMap, autoPush, callback) {
   const appJsPath = path.join(__dirname, 'app.js');
   try {
     let appJsContent = fs.readFileSync(appJsPath, 'utf8');
 
     // Find INITIAL_UI_COORDINATES_MAP block
     const mapRegex = /const INITIAL_UI_COORDINATES_MAP = \{[\s\S]*?\};/;
-    
-    // Read current INITIAL_UI_COORDINATES_MAP structure from app.js
     const match = appJsContent.match(mapRegex);
-    if (!match) return false;
+    if (!match) return callback(false, 'INITIAL_UI_COORDINATES_MAP not found in app.js');
 
     let currentMapObj = {};
     try {
@@ -46,27 +45,43 @@ function updateAppJsCoordinates(customCoordsMap) {
     const updatedAppJsContent = appJsContent.replace(mapRegex, newMapStr);
 
     fs.writeFileSync(appJsPath, updatedAppJsContent, 'utf8');
-    console.log('✅ Successfully hardcoded designer coordinates into app.js on disk!');
-    return true;
+    console.log('✅ Successfully written designer coordinates into app.js on disk!');
+
+    if (autoPush) {
+      const gitCmd = `git add app.js && git commit -m "Design Update: User saved custom layout via Designer Mode" && git push origin main`;
+      exec(gitCmd, { cwd: __dirname }, (error, stdout, stderr) => {
+        if (error) {
+          console.log('Git commit note:', stderr || error.message);
+          callback(true, 'Coordinates saved to app.js on disk!');
+        } else {
+          console.log('🚀 Automatically committed and pushed designer layout to GitHub!');
+          callback(true, 'Coordinates saved to app.js and pushed to GitHub!');
+        }
+      });
+    } else {
+      callback(true, 'Coordinates saved to app.js on disk!');
+    }
   } catch (err) {
     console.error('Error updating app.js coordinates:', err);
-    return false;
+    callback(false, err.message);
   }
 }
 
 const server = http.createServer((req, res) => {
   let reqUrl = decodeURIComponent(req.url.split('?')[0]);
 
-  // Endpoint to sync designer coordinates from client browser to app.js
+  // Endpoint to save designer coordinates and auto-push to GitHub
   if (req.method === 'POST' && (reqUrl === '/api/sync-coords' || reqUrl === '/api/save-coordinates')) {
     let body = '';
     req.on('data', chunk => { body += chunk.toString(); });
     req.on('end', () => {
       try {
         const coordsMap = JSON.parse(body);
-        const success = updateAppJsCoordinates(coordsMap);
-        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-        res.end(JSON.stringify({ success, message: success ? 'Coordinates synced to app.js' : 'Failed to sync' }));
+        const shouldPush = reqUrl === '/api/save-coordinates';
+        updateAppJsCoordinatesAndPush(coordsMap, shouldPush, (success, message) => {
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          res.end(JSON.stringify({ success, message, pushed: shouldPush && success }));
+        });
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, error: err.message }));

@@ -1224,6 +1224,51 @@ function applySmartBestFit(container, slideId) {
   }
 }
 
+// Display Toast Notification for Designer Mode Actions
+function showDesignerToast(message, type = 'success') {
+  let toast = document.getElementById('designer-toast-notification');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'designer-toast-notification';
+    toast.style.cssText = `
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 18px;
+      background: #1E4222;
+      color: #FFFFFF;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 800;
+      border-radius: 30px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      z-index: 10000;
+      border: 2px solid #FFCC66;
+      transition: all 0.3s ease;
+      text-align: center;
+      max-width: 90%;
+      pointer-events: none;
+    `;
+    document.getElementById('game-container').appendChild(toast);
+  }
+
+  if (type === 'success') {
+    toast.style.background = '#1E4222';
+    toast.style.borderColor = '#FFCC66';
+  } else if (type === 'warning') {
+    toast.style.background = '#C62828';
+    toast.style.borderColor = '#FFFFFF';
+  }
+
+  toast.innerHTML = message;
+  toast.style.opacity = '1';
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+  }, 3800);
+}
+
 // Setup Interactive Designer Mode Controls (Drag, Arrow Keys, Tail Pointer, Real-time Font Sizes, Auto-Balance, Save & Fixed Reset)
 function setupDesignerModeControls(container, slideId) {
   const targets = container.querySelectorAll('.designer-target');
@@ -1241,43 +1286,43 @@ function setupDesignerModeControls(container, slideId) {
   }
 
   function updateToolbar(activeEl) {
-    const elInfo = activeEl ? activeEl.id : 'Click any element to move';
+    const elInfo = activeEl ? activeEl.id : 'Clique em qualquer elemento';
     const isBubble = activeEl && activeEl.classList.contains('speech-bubble');
 
     toolbar.innerHTML = `
       <div class="designer-toolbar-row">
         <span><strong>${slideKey.toUpperCase()}</strong>: <em>${elInfo}</em></span>
-        <span style="font-size:0.7rem; color:#FFCC66;">Drag / Arrow Keys</span>
+        <span style="font-size:0.7rem; color:#FFCC66;">Arrastar / Setas do Teclado</span>
       </div>
 
       ${isBubble ? `
         <div class="designer-toolbar-row">
-          <span>Tail Pointer:</span>
+          <span>Seta de Fala:</span>
           <div class="designer-btn-group">
-            <button class="designer-btn ${activeEl.classList.contains('pointer-left') ? 'active' : ''}" id="btn-tail-left">👈 Left</button>
-            <button class="designer-btn ${activeEl.classList.contains('pointer-right') ? 'active' : ''}" id="btn-tail-right">👉 Right</button>
-            <button class="designer-btn ${activeEl.classList.contains('pointer-top') ? 'active' : ''}" id="btn-tail-top">☝️ Top</button>
-            <button class="designer-btn ${activeEl.classList.contains('pointer-bottom') ? 'active' : ''}" id="btn-tail-bottom">👇 Bottom</button>
-            <button class="designer-btn ${!activeEl.className.includes('pointer-') ? 'active' : ''}" id="btn-tail-none">🚫 None</button>
+            <button class="designer-btn ${activeEl.classList.contains('pointer-left') ? 'active' : ''}" id="btn-tail-left">👈 Esquerda</button>
+            <button class="designer-btn ${activeEl.classList.contains('pointer-right') ? 'active' : ''}" id="btn-tail-right">👉 Direita</button>
+            <button class="designer-btn ${activeEl.classList.contains('pointer-top') ? 'active' : ''}" id="btn-tail-top">☝️ Topo</button>
+            <button class="designer-btn ${activeEl.classList.contains('pointer-bottom') ? 'active' : ''}" id="btn-tail-bottom">👇 Baixo</button>
+            <button class="designer-btn ${!activeEl.className.includes('pointer-') ? 'active' : ''}" id="btn-tail-none">🚫 Nenhuma</button>
           </div>
         </div>
       ` : ''}
 
       <div class="designer-toolbar-row">
         <div class="designer-btn-group">
-          <span>Width:</span>
+          <span>Largura:</span>
           <button class="designer-btn" id="btn-width-minus">-</button>
           <button class="designer-btn" id="btn-width-plus">+</button>
 
-          <span style="margin-left:6px;">Font:</span>
+          <span style="margin-left:6px;">Fonte:</span>
           <button class="designer-btn" id="btn-font-minus">A-</button>
           <button class="designer-btn" id="btn-font-plus">A+</button>
         </div>
 
         <div class="designer-btn-group">
-          <button id="btn-best-fit" class="designer-btn designer-btn-success">✨ Auto-Balance & Fill</button>
-          <button id="btn-save-coords" class="designer-btn designer-btn-primary">💾 Save & Copy</button>
-          <button id="btn-reset-coords" class="designer-btn designer-btn-danger" title="Reset current slide layout to defaults">🔄 Reset</button>
+          <button id="btn-best-fit" class="designer-btn designer-btn-success">✨ Auto-Ajustar</button>
+          <button id="btn-save-coords" class="designer-btn designer-btn-primary">💾 Save</button>
+          <button id="btn-reset-coords" class="designer-btn designer-btn-danger" title="Resetar posição desta tela para os padrões">🔄 Reset</button>
         </div>
       </div>
     `;
@@ -1323,27 +1368,51 @@ function setupDesignerModeControls(container, slideId) {
     document.getElementById('btn-best-fit')?.addEventListener('click', () => {
       applySmartBestFit(container, slideId);
       updateToolbar(gameState.selectedDesignerElement);
+      showDesignerToast('✨ Posições alinhadas automaticamente!', 'success');
     });
 
-    // Bind Save & Copy Button with Direct HTTP Sync to Server app.js
-    document.getElementById('btn-save-coords')?.addEventListener('click', () => {
-      localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-      
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        fetch('/api/sync-coords', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(UI_COORDINATES_MAP)
-        }).then(res => res.json()).then(data => {
-          console.log('Sync response:', data);
-        }).catch(e => console.error('Sync error:', e));
-      }
+    // Bind 1-Click Save Button with Instant Server Write & Automatic Git Commit / Push
+    const saveBtn = document.getElementById('btn-save-coords');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => {
+        saveBtn.innerText = '⏳ Guardando...';
+        saveBtn.disabled = true;
 
-      const fullMap = UI_COORDINATES_MAP[slideKey] || {};
-      const jsonStr = JSON.stringify(fullMap, null, 2);
-      navigator.clipboard.writeText(jsonStr);
-      alert(`💾 Layout for ${slideKey.toUpperCase()} saved & synced to app.js!\n\n${jsonStr}`);
-    });
+        localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
+
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          fetch('/api/save-coordinates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(UI_COORDINATES_MAP)
+          })
+          .then(res => res.json())
+          .then(data => {
+            saveBtn.innerText = '✅ Guardado!';
+            setTimeout(() => {
+              saveBtn.innerText = '💾 Save';
+              saveBtn.disabled = false;
+            }, 2000);
+
+            if (data.pushed) {
+              showDesignerToast('✅ Posições guardadas em app.js e enviadas para o GitHub com sucesso!', 'success');
+            } else {
+              showDesignerToast('✅ Posições guardadas com sucesso no ficheiro app.js!', 'success');
+            }
+          })
+          .catch(err => {
+            console.error('Save error:', err);
+            saveBtn.innerText = '💾 Save';
+            saveBtn.disabled = false;
+            showDesignerToast('⚠️ Guardado localmente no navegador', 'warning');
+          });
+        } else {
+          saveBtn.innerText = '💾 Save';
+          saveBtn.disabled = false;
+          showDesignerToast('⚠️ Modo Localhost necessário para atualizar o GitHub', 'warning');
+        }
+      });
+    }
 
     // Bind Fixed Reset Button
     document.getElementById('btn-reset-coords')?.addEventListener('click', () => {
@@ -1354,6 +1423,7 @@ function setupDesignerModeControls(container, slideId) {
       delete savedCoords[slideKey];
       localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(savedCoords));
       
+      showDesignerToast('🔄 Posições restauradas para o padrão inicial', 'info');
       renderCurrentSlide();
     });
   }
