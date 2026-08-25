@@ -656,18 +656,24 @@ function renderScreen2(container) {
       ${p2 ? `<div class="s02-body-p">${p2}</div>` : ''}
     </div>
 
-    <!-- Bottom 3-Column Attributes Cream Card with Lucide Icons -->
+    <!-- Bottom 3-Column Attributes Cream Card with 3D Glowing Icon Badges -->
     <div id="el-s02-attributesCard" class="attributes-card-3col designer-target" style="position: absolute; ${styleObjToCss(coords.attributesCard)}">
       <div class="attr-col">
-        <i data-lucide="grape" class="attr-icon-lucide"></i>
+        <div class="attr-icon-badge-3d">
+          <i data-lucide="grape" class="attr-icon-lucide"></i>
+        </div>
         <div class="attr-text">${feat1}</div>
       </div>
       <div class="attr-col">
-        <i data-lucide="leaf" class="attr-icon-lucide"></i>
+        <div class="attr-icon-badge-3d">
+          <i data-lucide="leaf" class="attr-icon-lucide"></i>
+        </div>
         <div class="attr-text">${feat2}</div>
       </div>
       <div class="attr-col">
-        <i data-lucide="target" class="attr-icon-lucide"></i>
+        <div class="attr-icon-badge-3d">
+          <i data-lucide="target" class="attr-icon-lucide"></i>
+        </div>
         <div class="attr-text">${feat3}</div>
       </div>
     </div>
@@ -715,18 +721,24 @@ function renderScreen3(container) {
       ${p2 ? `<div class="s02-body-p" style="text-align: right;">${p2}</div>` : ''}
     </div>
 
-    <!-- Bottom 3-Column Attributes Cream Card with Lucide Icons -->
+    <!-- Bottom 3-Column Attributes Cream Card with 3D Glowing Icon Badges -->
     <div id="el-s03-attributesCard" class="attributes-card-3col designer-target" style="position: absolute; ${styleObjToCss(coords.attributesCard || { top: '76%', left: '4%', width: '92%' })}">
       <div class="attr-col">
-        <i data-lucide="graduation-cap" class="attr-icon-lucide"></i>
+        <div class="attr-icon-badge-3d">
+          <i data-lucide="graduation-cap" class="attr-icon-lucide"></i>
+        </div>
         <div class="attr-text">${feat1}</div>
       </div>
       <div class="attr-col">
-        <i data-lucide="lightbulb" class="attr-icon-lucide"></i>
+        <div class="attr-icon-badge-3d">
+          <i data-lucide="lightbulb" class="attr-icon-lucide"></i>
+        </div>
         <div class="attr-text">${feat2}</div>
       </div>
       <div class="attr-col">
-        <i data-lucide="handshake" class="attr-icon-lucide"></i>
+        <div class="attr-icon-badge-3d">
+          <i data-lucide="handshake" class="attr-icon-lucide"></i>
+        </div>
         <div class="attr-text">${feat3}</div>
       </div>
     </div>
