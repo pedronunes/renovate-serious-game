@@ -82,23 +82,25 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s05": {
     "bubble": {
-      "top": "8.5%",
+      "top": "50.1%",
       "right": "5%",
       "width": "58%",
-      "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "pointer": "pointer-top",
+      "fontSize": "0.95rem",
+      "left": "38.6%"
     }
   },
   "s06": {
     "iconBlock": {
-      "top": "6%",
-      "left": "0%",
-      "width": "100%"
+      "top": "14.0%",
+      "left": "0.0%",
+      "width": "100.0%",
+      "fontSize": "1.05rem"
     },
     "card": {
-      "top": "19%",
-      "left": "6%",
-      "width": "88%",
+      "top": "36.0%",
+      "left": "6.0%",
+      "width": "88.0%",
       "fontSize": "1.05rem"
     }
   },
@@ -112,53 +114,60 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s08": {
     "bubble": {
-      "top": "6%",
+      "top": "10.5%",
       "right": "5%",
-      "width": "58%",
+      "width": "48.0%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "fontSize": "1.05rem",
+      "left": "42.0%"
     },
     "tip": {
-      "top": "26%",
+      "top": "42.0%",
       "right": "5%",
-      "width": "58%",
-      "fontSize": "0.88rem"
+      "width": "46.0%",
+      "fontSize": "1.05rem",
+      "left": "47.0%"
     },
     "pillars": {
-      "top": "48%",
+      "top": "57.0%",
       "right": "5%",
-      "width": "58%",
-      "fontSize": "0.92rem"
+      "width": "86.0%",
+      "fontSize": "1.05rem",
+      "left": "7.0%"
     }
   },
   "s09": {
     "bubble": {
-      "top": "6%",
+      "top": "9.0%",
       "right": "5%",
-      "width": "58%",
+      "width": "46%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "fontSize": "0.95rem",
+      "left": "47.0%"
     },
     "card": {
-      "top": "27%",
+      "top": "50.0%",
       "right": "5%",
-      "width": "58%",
-      "fontSize": "0.92rem"
+      "width": "88%",
+      "fontSize": "0.92rem",
+      "left": "7.4%"
     }
   },
   "s10": {
     "bubble": {
-      "top": "6%",
+      "top": "10.5%",
       "right": "5%",
-      "width": "58%",
+      "width": "46.0%",
       "pointer": "pointer-left",
-      "fontSize": "0.95rem"
+      "fontSize": "1.05rem",
+      "left": "50.0%"
     },
     "card": {
-      "top": "26%",
+      "top": "48.5%",
       "right": "5%",
-      "width": "58%",
-      "fontSize": "0.92rem"
+      "width": "90.0%",
+      "fontSize": "1.05rem",
+      "left": "5.0%"
     }
   }
 };
