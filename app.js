@@ -30,7 +30,7 @@ const INITIAL_UI_COORDINATES_MAP = {
       "top": "16.5%",
       "left": "5.0%",
       "width": "90.0%",
-      "fontSize": "1.05rem"
+      "fontSize": "1.41rem"
     },
     "startBtn": {
       "top": "74.5%",
