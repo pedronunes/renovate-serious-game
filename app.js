@@ -6,7 +6,7 @@
 const STORAGE_KEY_PROGRESS = 'renovate_game_progress';
 const STORAGE_KEY_LANG = 'renovate_game_lang';
 const STORAGE_KEY_MUTE = 'renovate_game_muted';
-const STORAGE_KEY_CUSTOM_COORDS = 'renovate_custom_coordinates';
+const STORAGE_KEY_CUSTOM_COORDS = 'renovate_custom_coordinates_v2';
 
 const SUPPORTED_LANGUAGES = [
   { code: 'en-GB', display: 'en-GB English' },
@@ -26,23 +26,23 @@ const SUPPORTED_LANGUAGES = [
 // Factory Default Coordinates Map (Master Blueprint with Hardcoded Polished Positions)
 const INITIAL_UI_COORDINATES_MAP = {
   s01: {
-    titleHeader: { top: '4%', left: '5%', width: '90%', fontSize: '1.05rem' },
+    titleHeader: { top: '8.5%', left: '5%', width: '90%', fontSize: '1.05rem' },
     startBtn: { top: '64%', left: '10%', width: '80%' },
     stepperCard: { top: '75%', left: '4%', width: '92%', fontSize: '0.74rem' }
   },
   s02: {
-    textContainer: { top: '8%', left: '6%', width: '54%', fontSize: '1.05rem' },
+    textContainer: { top: '10.5%', left: '6%', width: '54%', fontSize: '1.05rem' },
     attributesCard: { top: '76%', left: '4%', width: '92%', fontSize: '0.85rem' }
   },
   s03: {
-    textContainer: { top: '8%', left: '40%', width: '54%', fontSize: '1.05rem' },
+    textContainer: { top: '10.5%', left: '40%', width: '54%', fontSize: '1.05rem' },
     attributesCard: { top: '76%', left: '4%', width: '92%', fontSize: '0.85rem' }
   },
   s04: {
-    textContainer: { top: '8%', left: '6%', width: '58%', fontSize: '1.05rem' }
+    textContainer: { top: '10.5%', left: '6%', width: '58%', fontSize: '1.05rem' }
   },
   s05: {
-    bubble: { top: '8%', right: '5%', width: '58%', pointer: 'pointer-left', fontSize: '0.95rem' }
+    bubble: { top: '8.5%', right: '5%', width: '58%', pointer: 'pointer-left', fontSize: '0.95rem' }
   },
   s06: {
     iconBlock: { top: '6%', left: '0%', width: '100%' },
