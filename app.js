@@ -105,34 +105,27 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s07": {
     "card": {
-      "top": "24%",
-      "left": "8%",
-      "width": "84%",
-      "fontSize": "1rem"
+      "top": "18.0%",
+      "left": "46.0%",
+      "width": "48.0%"
     }
   },
   "s08": {
     "bubble": {
-      "top": "10.5%",
-      "right": "5%",
+      "top": "8.0%",
+      "left": "46.0%",
       "width": "48.0%",
-      "pointer": "pointer-left",
-      "fontSize": "1.05rem",
-      "left": "42.0%"
+      "pointer": "bubble-tail-left"
     },
     "tip": {
-      "top": "42.0%",
-      "right": "5%",
-      "width": "46.0%",
-      "fontSize": "1.05rem",
-      "left": "47.0%"
+      "top": "34.0%",
+      "left": "46.0%",
+      "width": "48.0%"
     },
     "pillars": {
-      "top": "57.0%",
-      "right": "5%",
-      "width": "86.0%",
-      "fontSize": "1.05rem",
-      "left": "7.0%"
+      "top": "54.0%",
+      "left": "6.0%",
+      "width": "88.0%"
     }
   },
   "s09": {
@@ -150,19 +143,15 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s10": {
     "bubble": {
-      "top": "10.5%",
-      "right": "5%",
-      "width": "46.0%",
-      "pointer": "pointer-left",
-      "fontSize": "1.05rem",
-      "left": "50.0%"
+      "top": "8.0%",
+      "left": "46.0%",
+      "width": "48.0%",
+      "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "48.5%",
-      "right": "5%",
-      "width": "90.0%",
-      "fontSize": "1.05rem",
-      "left": "5.0%"
+      "top": "34.0%",
+      "left": "6.0%",
+      "width": "88.0%"
     }
   },
   "s23": {
@@ -475,8 +464,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.013" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.013' : 'v2.1.4.013 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.014" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.014' : 'v2.1.4.014 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -997,34 +986,36 @@ function renderScreen6(container) {
   }
 }
 
-// Screen 7: Chapter 1 Start (Floating Translucent Card wrapping Round Icon 1 + Chapter Title)
+// Screen 7: Chapter 1 Start Announcement Card (Matching Serious Game Design System)
 function renderScreen7(container) {
   const coords = UI_COORDINATES_MAP.s07 || INITIAL_UI_COORDINATES_MAP.s07;
   
   const rawChapterTitle = t('s07_chapter_01_title', '1. Understanding the calibration process and its importance');
-  // Strip leading number prefix "1. " or "1 " if present
   const cleanTitle = rawChapterTitle.replace(/^1[\.\s]*/, '').trim();
 
   container.innerHTML = `
-    <!-- Translucent Background Layer Card wrapping Icon and Text for Maximum Contrast & Distinction -->
-    <div id="el-s07-card" style="${styleObjToCss(coords.card || { top: '24%', left: '8%', width: '84%' })}">
-      <div style="background: rgba(247, 247, 242, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 32px 24px; border-radius: 24px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 8px 28px rgba(0,0,0,0.14); text-align: center;">
+    <!-- Chapter 1 Translucent Card positioned on the right side of Mia -->
+    <div id="el-s07-card" class="cream-card" style="${styleObjToCss(coords.card || { top: '18%', left: '46%', width: '48%' })}">
+      <div style="text-align: center; padding: 10px 4px;">
         
-        <!-- Top Floating Round Badge Icon with Number 1 (Matching Screen 6 Icon Style) -->
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-          <div style="display: inline-flex; align-items: center; justify-content: center; width: 90px; height: 90px; border-radius: 50%; background: #F7F7F2; border: 3.5px solid #1E4222; box-shadow: 0 6px 16px rgba(0,0,0,0.18); font-size: 2.8rem; font-weight: 900; color: #1E4222; font-family: 'Outfit', sans-serif;">
-            1
-          </div>
+        <!-- Chapter Badge -->
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: #1E4222; color: #FFFFFF; font-weight: 900; padding: 6px 16px; border-radius: 20px; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1.5px solid #FFCC66; box-shadow: 0 4px 12px rgba(30, 66, 34, 0.25); margin-bottom: 14px;">
+          <i data-lucide="book-open" style="width: 18px; height: 18px; stroke: #FFCC66;"></i>
+          <span>${t('ui_chapter', 'CAPÍTULO')} 1</span>
         </div>
 
-        <!-- Floating Chapter Title Header (Matching Screen 2 & Screen 3 Title Style) -->
-        <div class="s02-title" style="text-align: center; font-size: 2.1rem; line-height: 1.35; color: #1E4222; font-weight: 900; text-transform: uppercase; letter-spacing: 0.03em;">
+        <!-- Floating Chapter Title Header -->
+        <div style="font-size: 1.25rem; line-height: 1.42; color: #1E4222; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em;">
           ${cleanTitle}
         </div>
 
       </div>
     </div>
   `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 }
 
 // Screen 8: Mia's Tip & 3 Pillars (On SeriousGame_tela8.jpg with Enlarged Titles & Enlarged Lucide Icons)
