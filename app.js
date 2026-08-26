@@ -226,7 +226,8 @@ const gameState = {
   activeTranslations: {},
   quizAnswers: {},
   maxUnlockedSlide: 1,
-  audioMuted: false
+  audioMuted: false,
+  customDesignMode: false
 };
 
 // Web Audio API Central Context & Safe Initialization Engine
@@ -486,6 +487,11 @@ function renderTopBar() {
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
       <span class="top-bar-version-badge">${versionText}</span>
+      ${isLocalhost() ? `
+        <button id="btn-toggle-design-mode" class="btn-designer-toggle ${gameState.customDesignMode ? 'active' : ''}">
+          ${gameState.customDesignMode ? 'Exit Design' : 'Design'}
+        </button>
+      ` : ''}
     </div>
 
     ${centerTitleText ? `
@@ -558,8 +564,246 @@ function renderTopBar() {
     renderTopBar();
   });
 
+  document.getElementById('btn-toggle-design-mode')?.addEventListener('click', () => {
+    toggleDesignMode();
+  });
+
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
+  }
+}
+
+// Localhost Helper Check
+function isLocalhost() {
+  const host = window.location.hostname;
+  const search = window.location.search;
+  return host === 'localhost' || host === '127.0.0.1' || search.includes('designer=true') || search.includes('auth=');
+}
+
+// Localhost External Designer Calibration Panel System
+function updateExternalDesignerJsonTextarea() {
+  const textarea = document.getElementById('designer-json-textarea');
+  if (!textarea) return;
+
+  const currentSlideKey = `s${String(gameState.currentSlide).padStart(2, '0')}`;
+  const activeSlideCoords = UI_COORDINATES_MAP[currentSlideKey] || INITIAL_UI_COORDINATES_MAP[currentSlideKey] || {};
+
+  const currentSlideObj = {
+    [currentSlideKey]: activeSlideCoords
+  };
+
+  textarea.value = JSON.stringify(currentSlideObj, null, 2);
+}
+
+function createExternalDesignerPanel() {
+  let panel = document.getElementById('external-designer-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'external-designer-panel';
+    document.body.appendChild(panel);
+  }
+
+  const currentSlideKey = `s${String(gameState.currentSlide).padStart(2, '0')}`;
+
+  panel.innerHTML = `
+    <h3>
+      <span>RENOVATE - Calibrador</span>
+      <span style="font-size: 0.8rem; background: #FFCC66; color: #1E4222; padding: 2px 6px; border-radius: 4px; font-weight: 900;">${currentSlideKey}</span>
+    </h3>
+    <textarea id="designer-json-textarea" readonly></textarea>
+    <button id="btn-designer-copy" class="designer-external-btn btn-designer-copy" type="button">Copy to Clipboard</button>
+    <button id="btn-designer-save-code" class="designer-external-btn btn-designer-save-code" type="button">Save directly to Code</button>
+  `;
+
+  updateExternalDesignerJsonTextarea();
+
+  // Copy to Clipboard Event Listener
+  const copyBtn = document.getElementById('btn-designer-copy');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const textarea = document.getElementById('designer-json-textarea');
+      if (textarea) {
+        textarea.select();
+        navigator.clipboard.writeText(textarea.value);
+        const originalText = copyBtn.innerText;
+        copyBtn.innerText = 'Copied to Clipboard!';
+        copyBtn.style.background = '#2E7D32';
+        setTimeout(() => {
+          copyBtn.innerText = originalText;
+          copyBtn.style.background = '';
+        }, 1800);
+      }
+    });
+  }
+
+  // Save directly to Code Endpoint Listener
+  const saveBtn = document.getElementById('btn-designer-save-code');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const originalText = saveBtn.innerText;
+        saveBtn.innerText = 'Saving to app.js...';
+        saveBtn.disabled = true;
+
+        const response = await fetch('/api/save-coordinates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(UI_COORDINATES_MAP)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          saveBtn.innerText = '✅ Code Updated!';
+          saveBtn.style.background = '#4CAF50';
+          saveBtn.style.color = '#FFF';
+        } else {
+          saveBtn.innerText = '❌ Error Saving';
+          saveBtn.style.background = '#F44336';
+          saveBtn.style.color = '#FFF';
+        }
+
+        setTimeout(() => {
+          saveBtn.innerText = originalText;
+          saveBtn.disabled = false;
+          saveBtn.style.background = '';
+          saveBtn.style.color = '';
+        }, 2200);
+      } catch (err) {
+        console.error('Failed to save coordinates:', err);
+        alert('Failed to save to app.js backend: ' + err.message);
+        saveBtn.disabled = false;
+      }
+    });
+  }
+}
+
+function removeExternalDesignerPanel() {
+  const panel = document.getElementById('external-designer-panel');
+  if (panel) {
+    panel.remove();
+  }
+}
+
+let activeDragElement = null;
+let dragStartX = 0;
+let dragStartY = 0;
+let initialElemLeft = 0;
+let initialElemTop = 0;
+
+function handlePointerDown(e) {
+  if (!gameState.customDesignMode) return;
+  const target = e.target.closest('[id^="el-"]');
+  if (!target) return;
+
+  activeDragElement = target;
+  target.style.cursor = 'grabbing';
+  target.style.zIndex = '9999';
+
+  dragStartX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+  dragStartY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+  const rect = target.getBoundingClientRect();
+  const parentContainer = document.getElementById('slide-viewport') || target.parentElement;
+  const parentRect = parentContainer.getBoundingClientRect();
+
+  initialElemLeft = rect.left - parentRect.left;
+  initialElemTop = rect.top - parentRect.top;
+
+  e.preventDefault();
+}
+
+function handlePointerMove(e) {
+  if (!gameState.customDesignMode || !activeDragElement) return;
+
+  const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+  const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+
+  const deltaX = clientX - dragStartX;
+  const deltaY = clientY - dragStartY;
+
+  const parentContainer = document.getElementById('slide-viewport') || activeDragElement.parentElement;
+  const parentRect = parentContainer.getBoundingClientRect();
+
+  const newLeftPx = initialElemLeft + deltaX;
+  const newTopPx = initialElemTop + deltaY;
+
+  const newLeftPct = (newLeftPx / parentRect.width) * 100;
+  const newTopPct = (newTopPx / parentRect.height) * 100;
+
+  const clampedLeft = Math.max(0, Math.min(92, newLeftPct)).toFixed(1) + '%';
+  const clampedTop = Math.max(0, Math.min(92, newTopPct)).toFixed(1) + '%';
+
+  activeDragElement.style.left = clampedLeft;
+  activeDragElement.style.top = clampedTop;
+
+  // Extract key name from element id, e.g. "el-s23-bubble" -> "bubble", "el-s08-pillars" -> "pillars"
+  const elemId = activeDragElement.id;
+  const match = elemId.match(/^el-s\d+-(.+)$/);
+  const elementKey = match ? match[1] : 'card';
+
+  const currentSlideKey = `s${String(gameState.currentSlide).padStart(2, '0')}`;
+  
+  if (!UI_COORDINATES_MAP[currentSlideKey]) {
+    UI_COORDINATES_MAP[currentSlideKey] = {};
+  }
+  if (!UI_COORDINATES_MAP[currentSlideKey][elementKey]) {
+    UI_COORDINATES_MAP[currentSlideKey][elementKey] = {};
+  }
+
+  UI_COORDINATES_MAP[currentSlideKey][elementKey].top = clampedTop;
+  UI_COORDINATES_MAP[currentSlideKey][elementKey].left = clampedLeft;
+
+  if (INITIAL_UI_COORDINATES_MAP[currentSlideKey]) {
+    if (!INITIAL_UI_COORDINATES_MAP[currentSlideKey][elementKey]) {
+      INITIAL_UI_COORDINATES_MAP[currentSlideKey][elementKey] = {};
+    }
+    INITIAL_UI_COORDINATES_MAP[currentSlideKey][elementKey].top = clampedTop;
+    INITIAL_UI_COORDINATES_MAP[currentSlideKey][elementKey].left = clampedLeft;
+  }
+
+  updateExternalDesignerJsonTextarea();
+}
+
+function handlePointerUp() {
+  if (activeDragElement) {
+    activeDragElement.style.cursor = '';
+    activeDragElement.style.zIndex = '';
+    activeDragElement = null;
+  }
+}
+
+function enableDragAndDrop() {
+  disableDragAndDrop();
+  document.addEventListener('pointerdown', handlePointerDown);
+  document.addEventListener('pointermove', handlePointerMove);
+  document.addEventListener('pointerup', handlePointerUp);
+  document.addEventListener('mousedown', handlePointerDown);
+  document.addEventListener('mousemove', handlePointerMove);
+  document.addEventListener('mouseup', handlePointerUp);
+}
+
+function disableDragAndDrop() {
+  document.removeEventListener('pointerdown', handlePointerDown);
+  document.removeEventListener('pointermove', handlePointerMove);
+  document.removeEventListener('pointerup', handlePointerUp);
+  document.removeEventListener('mousedown', handlePointerDown);
+  document.removeEventListener('mousemove', handlePointerMove);
+  document.removeEventListener('mouseup', handlePointerUp);
+  activeDragElement = null;
+}
+
+function toggleDesignMode() {
+  gameState.customDesignMode = !gameState.customDesignMode;
+  renderTopBar();
+
+  if (gameState.customDesignMode) {
+    createExternalDesignerPanel();
+    enableDragAndDrop();
+  } else {
+    removeExternalDesignerPanel();
+    disableDragAndDrop();
   }
 }
 
@@ -648,6 +892,10 @@ function renderCurrentSlide() {
 
   // Update Bottom Navigation Bar
   renderBottomNavBar();
+
+  if (gameState.customDesignMode) {
+    updateExternalDesignerJsonTextarea();
+  }
 }
 
 // Screen 1: Exact Reproduction of /docs/tela1.png (No circle avatar, large bold title, clear subtitle)
