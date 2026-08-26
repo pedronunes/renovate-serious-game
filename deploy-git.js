@@ -1,6 +1,6 @@
 /**
- * RENOVATE Serious Game - Automatic GitHub Pages Deploy Engine v2.0
- * Features: Automatic Version Bumping (vx.x.x.xxx), Cache-Busting, Dual Sync & Real-Time GitHub API Status Verification
+ * RENOVATE Serious Game - Automatic GitHub Pages Deploy Engine v3.0
+ * Features: Automatic Version Bumping (vx.x.x.xxx), Cache-Busting, Clean Root Repository Deployment & Real-Time GitHub Actions API Status Verification
  */
 
 const { execSync } = require('child_process');
@@ -8,27 +8,10 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-console.log('🚀 [Carregar Git] A iniciar o protocolo de deploy automatizado v2.0...\n');
+console.log('🚀 [Carregar Git] A iniciar o protocolo de deploy automatizado v3.0...\n');
 
 // -------------------------------------------------------------
-// 1. Helper: Recursive File Copy for /docs Synchronization
-// -------------------------------------------------------------
-function copyRecursiveSync(src, dest) {
-  const exists = fs.existsSync(src);
-  const stats = exists && fs.statSync(src);
-  const isDirectory = exists && stats.isDirectory();
-  if (isDirectory) {
-    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-    fs.readdirSync(src).forEach((childItemName) => {
-      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
-    });
-  } else {
-    fs.copyFileSync(src, dest);
-  }
-}
-
-// -------------------------------------------------------------
-// 2. Version Bumper (vx.x.x.xxx) & Timestamp Generator
+// 1. Version Bumper (vx.x.x.xxx) & Timestamp Generator
 // -------------------------------------------------------------
 function bumpAndSyncVersion() {
   const pkgPath = path.join(__dirname, 'package.json');
@@ -80,7 +63,7 @@ function bumpAndSyncVersion() {
 }
 
 // -------------------------------------------------------------
-// 3. GitHub Actions Status Verification Poller via REST API
+// 2. GitHub Actions Status Verification Poller via REST API
 // -------------------------------------------------------------
 function verifyGitHubStatus(callback) {
   const options = {
@@ -163,42 +146,25 @@ function pollGitHubDeployment(maxWaitSeconds = 60) {
 // -------------------------------------------------------------
 try {
   // 1. Verificação sintática de código
-  console.log('🔍 1/6 A verificar sintaxe dos ficheiros JavaScript...');
+  console.log('🔍 1/5 A verificar sintaxe dos ficheiros JavaScript...');
   execSync('node -c app.js', { stdio: 'inherit' });
   execSync('node -c server.js', { stdio: 'inherit' });
   execSync('node -c sw.js', { stdio: 'inherit' });
   console.log('✓ Sintaxe validada com sucesso!\n');
 
   // 2. Incremento Automático de Versão (vx.x.x.xxx)
-  console.log('🏷 2/6 A incrementar versão do projeto...');
+  console.log('🏷 2/5 A incrementar versão do projeto...');
   const { newVersion, dateTimeStr } = bumpAndSyncVersion();
   console.log('✓ Ficheiros de código atualizados para a nova versão!\n');
 
-  // 3. Sincronização Dual para a pasta /docs (Garante compatibilidade total com GitHub Pages)
-  console.log('📂 3/6 A sincronizar ficheiros de produção com a pasta /docs...');
-  const docsDir = path.join(__dirname, 'docs');
-  if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir, { recursive: true });
-  
-  fs.copyFileSync('index.html', path.join(docsDir, 'index.html'));
-  fs.copyFileSync('styles.css', path.join(docsDir, 'styles.css'));
-  fs.copyFileSync('app.js', path.join(docsDir, 'app.js'));
-  fs.copyFileSync('sw.js', path.join(docsDir, 'sw.js'));
-  fs.copyFileSync('manifest.json', path.join(docsDir, 'manifest.json'));
-  if (fs.existsSync('.nojekyll')) fs.copyFileSync('.nojekyll', path.join(docsDir, '.nojekyll'));
-  
-  if (fs.existsSync('public')) {
-    copyRecursiveSync('public', path.join(docsDir, 'public'));
-  }
-  console.log(`✓ Pasta /docs sincronizada com v${newVersion}!\n`);
-
-  // 4. Adicionar todos os ficheiros alterados
-  console.log('📦 4/6 A preparar ficheiros para commit (git add .)...');
+  // 3. Adicionar todos os ficheiros alterados (sem pasta /docs)
+  console.log('📦 3/5 A preparar ficheiros para commit (git add .)...');
   execSync('git add .', { stdio: 'inherit' });
   console.log('✓ Ficheiros adicionados!\n');
 
-  // 5. Criar commit automatizado
-  const commitMsg = `deploy: Release v${newVersion} - GitHub Pages Sync (${dateTimeStr})`;
-  console.log(`📝 5/6 A criar commit: "${commitMsg}"...`);
+  // 4. Criar commit automatizado
+  const commitMsg = `deploy: Release v${newVersion} - Root Clean Deployment (${dateTimeStr})`;
+  console.log(`📝 4/5 A criar commit: "${commitMsg}"...`);
   try {
     execSync(`git commit -m "${commitMsg}"`, { stdio: 'inherit' });
   } catch (e) {
@@ -206,8 +172,8 @@ try {
   }
   console.log('✓ Commit concluído!\n');
 
-  // 6. Enviar para a branch main do GitHub
-  console.log('🌐 6/6 A sincronizar com o GitHub (git push origin main)...');
+  // 5. Enviar para a branch main do GitHub
+  console.log('🌐 5/5 A sincronizar com o GitHub (git push origin main)...');
   execSync('git push origin main', { stdio: 'inherit' });
   console.log('✓ Envio concluído com sucesso!');
 

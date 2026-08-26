@@ -36,14 +36,6 @@ const server = http.createServer((req, res) => {
 
         fs.writeFileSync(appJsPath, appJsContent, 'utf8');
 
-        // Sync to docs/app.js if exists
-        const docsAppJsPath = path.join(__dirname, 'docs', 'app.js');
-        if (fs.existsSync(docsAppJsPath)) {
-          let docsContent = fs.readFileSync(docsAppJsPath, 'utf8');
-          docsContent = docsContent.replace(regex, newMapString);
-          fs.writeFileSync(docsAppJsPath, docsContent, 'utf8');
-        }
-
         res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
         res.end(JSON.stringify({ success: true, message: 'Coordenadas gravadas com sucesso no ficheiro app.js!' }));
       } catch (err) {
