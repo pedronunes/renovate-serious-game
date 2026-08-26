@@ -466,7 +466,7 @@ function renderTopBar() {
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
-      <span class="top-bar-version-badge">v2.1.3 • 26.08.2026</span>
+      <span class="top-bar-version-badge">v2.1.4 • 26.08.2026</span>
     </div>
 
     <div class="top-bar-center">
