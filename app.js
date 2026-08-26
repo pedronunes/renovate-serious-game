@@ -526,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.027" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.027' : 'v2.1.4.027 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.028" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.028' : 'v2.1.4.028 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1780,22 +1780,24 @@ function renderQuizScreen(container, slideId) {
 
   const slideKey = 's' + String(slideId).padStart(2, '0');
   const coords = UI_COORDINATES_MAP[slideKey] || {
-    card: { top: '5.0%', left: '4.0%', width: '92.0%' }
+    card: { top: '4.0%', left: '4.0%', width: '92.0%' }
   };
 
   const titleText = t(cfg.titleKey, 'CALIBRATION OF A SPRAYER');
   const questionText = t(cfg.questionKey, 'Quiz Question');
   const submitText = t('ui_confirm_answer', 'CONFIRMAR RESPOSTA');
 
-  // Check if previously selected
+  // Check if previously selected (array of option keys for multi-choice support)
   const previous = gameState.quizAnswers[slideId];
-  let selectedOption = previous ? previous.selected : null;
+  let selectedOptions = Array.isArray(previous?.selected) 
+    ? [...previous.selected] 
+    : (previous?.selected ? [previous.selected] : []);
 
   const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
 
   container.innerHTML = `
     <!-- Quiz Container Layout strictly matching uploaded mockup & Design Bible v6 -->
-    <div id="el-${slideKey}-card" class="quiz-main-container" style="${styleObjToCss(coords.card || { top: '5.0%', left: '4.0%', width: '92.0%' })}">
+    <div id="el-${slideKey}-card" class="quiz-main-container" style="${styleObjToCss(coords.card || { top: '4.0%', left: '4.0%', width: '92.0%' })}">
       
       <!-- Top Circular Question Mark Emblem Badge & Category Header -->
       <div class="quiz-header-wrapper">
@@ -1810,11 +1812,11 @@ function renderQuizScreen(container, slideId) {
         <div class="quiz-question-text">${questionText}</div>
       </div>
 
-      <!-- Option Cards A, B, C, D List -->
+      <!-- Option Cards A, B, C, D List (Multi-select toggle support) -->
       <div class="quiz-options-list">
         ${cfg.options.map(opt => {
           const rawOptText = t(opt.textKey, opt.key);
-          const isSel = selectedOption === opt.key;
+          const isSel = selectedOptions.includes(opt.key);
           return `
             <div class="quiz-option-card ${isSel ? 'selected' : ''}" data-key="${opt.key}">
               <div class="quiz-option-badge">${opt.key}</div>
@@ -1826,7 +1828,7 @@ function renderQuizScreen(container, slideId) {
 
       <!-- Action Button: Confirm Answer -->
       <div class="quiz-action-wrapper">
-        <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${!selectedOption ? 'disabled' : ''}>
+        <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${selectedOptions.length === 0 ? 'disabled' : ''}>
           <span>${submitText}</span>
           <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
         </button>
@@ -1835,7 +1837,7 @@ function renderQuizScreen(container, slideId) {
     </div>
   `;
 
-  // Bind option selection events
+  // Bind option selection events (toggle selection for multi-choice support)
   const optionCards = container.querySelectorAll('.quiz-option-card');
   const submitBtn = document.getElementById(`btn-submit-quiz-${slideId}`);
 
@@ -1843,10 +1845,17 @@ function renderQuizScreen(container, slideId) {
     const handleSelect = () => {
       initAudioEngine();
       playFeedbackSound('click');
-      optionCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedOption = card.getAttribute('data-key');
-      if (submitBtn) submitBtn.disabled = false;
+      const optKey = card.getAttribute('data-key');
+      
+      if (selectedOptions.includes(optKey)) {
+        selectedOptions = selectedOptions.filter(k => k !== optKey);
+        card.classList.remove('selected');
+      } else {
+        selectedOptions.push(optKey);
+        card.classList.add('selected');
+      }
+
+      if (submitBtn) submitBtn.disabled = selectedOptions.length === 0;
     };
     card.addEventListener('click', handleSelect);
   });
@@ -1854,10 +1863,20 @@ function renderQuizScreen(container, slideId) {
   // Bind submit button event
   if (submitBtn) {
     submitBtn.addEventListener('click', () => {
-      if (!selectedOption) return;
+      if (selectedOptions.length === 0) return;
 
-      const isCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption.includes(selectedOption) : selectedOption === cfg.correctOption;
-      gameState.quizAnswers[slideId] = { selected: selectedOption, correct: isCorrect };
+      let isCorrect = false;
+      const targetCorrect = cfg.correctOption;
+
+      if (Array.isArray(targetCorrect)) {
+        const sortedTarget = [...targetCorrect].sort().join(',');
+        const sortedSelected = [...selectedOptions].sort().join(',');
+        isCorrect = (sortedTarget === sortedSelected);
+      } else {
+        isCorrect = selectedOptions.length === 1 && selectedOptions[0] === targetCorrect;
+      }
+
+      gameState.quizAnswers[slideId] = { selected: selectedOptions, correct: isCorrect };
       saveProgress();
 
       if (isCorrect) {
