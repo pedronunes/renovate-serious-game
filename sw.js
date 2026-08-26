@@ -1,15 +1,15 @@
 /* 
-  RENOVATE Serious Game - Service Worker Engine (v1.0.9)
+  RENOVATE Serious Game - Service Worker Engine (v2.0.0)
   Full Offline Pre-Caching & Standalone Native App Execution on iOS & Android
 */
 
-const CACHE_NAME = 'renovate-serious-game-v1.0.9';
+const CACHE_NAME = 'renovate-serious-game-v2.0.0';
 
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=1.0.9',
-  './app.js?v=1.0.9',
+  './styles.css?v=2.0.0',
+  './app.js?v=2.0.0',
   './manifest.json',
   './public/images/RENOVATE-logo.svg',
   './public/images/RENOVATE-logo.png',
