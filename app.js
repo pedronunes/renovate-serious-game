@@ -538,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.035" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.035' : 'v2.1.4.035 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.036" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.036' : 'v2.1.4.036 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1904,6 +1904,9 @@ function renderQuizFeedbackScreen(container, slideId) {
         optionsToDisplay = cfg.options.filter(opt => !targetCorrect.includes(opt.key));
       }
     }
+    
+    // Sort options strictly by alphabetical order (A, B, C, D)
+    optionsToDisplay.sort((a, b) => a.key.localeCompare(b.key));
   }
 
   container.innerHTML = `
@@ -1925,10 +1928,11 @@ function renderQuizFeedbackScreen(container, slideId) {
         </div>
       ` : ''}
 
-      <!-- Feedback Status Badge Label: "CORRETO" / "INCORRETO" -->
+      <!-- Feedback Status Badge Label with Prominent Icon: "CORRETO" / "INCORRETO" -->
       <div class="feedback-status-wrapper">
         <div class="feedback-status-badge ${fb.isCorrect ? 'status-correct' : 'status-incorrect'}">
-          ${statusText.toUpperCase()}
+          <i data-lucide="${fb.isCorrect ? 'check-circle-2' : 'x-circle'}" class="status-badge-icon"></i>
+          <span>${statusText.toUpperCase()}</span>
         </div>
       </div>
 

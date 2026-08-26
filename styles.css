@@ -1137,24 +1137,46 @@ button,
 }
 
 .feedback-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   font-family: var(--font-header);
-  font-size: clamp(1.15rem, calc(1.40rem * var(--scale-factor, 1)), 1.80rem);
+  font-size: clamp(1.05rem, calc(1.30rem * var(--scale-factor, 1)), 1.70rem);
   font-weight: 900;
   letter-spacing: 1.2px;
   text-transform: uppercase;
   text-align: center;
-  padding: 4px 16px;
-  border-radius: 12px;
+  padding: calc(6px * var(--scale-factor, 1)) calc(20px * var(--scale-factor, 1));
+  border-radius: calc(14px * var(--scale-factor, 1));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
 }
 
 .feedback-status-badge.status-correct {
+  color: #1E4222;
+  background: #E8F5E9;
+  border: 2px solid #2E7D32;
+  box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
+}
+
+.feedback-status-badge.status-correct .status-badge-icon {
   color: #2E7D32;
-  text-shadow: 0 0 12px rgba(46, 125, 50, 0.4);
+  width: clamp(22px, calc(28px * var(--scale-factor, 1)), 34px);
+  height: clamp(22px, calc(28px * var(--scale-factor, 1)), 34px);
 }
 
 .feedback-status-badge.status-incorrect {
+  color: #C62828;
+  background: #FFEBEE;
+  border: 2px solid #D32F2F;
+  box-shadow: 0 4px 16px rgba(211, 47, 47, 0.3);
+}
+
+.feedback-status-badge.status-incorrect .status-badge-icon {
   color: #D32F2F;
-  text-shadow: 0 0 12px rgba(211, 47, 47, 0.4);
+  width: clamp(22px, calc(28px * var(--scale-factor, 1)), 34px);
+  height: clamp(22px, calc(28px * var(--scale-factor, 1)), 34px);
 }
 
 /* Correct Option Card with Green Glow & Green Letter Circle */
