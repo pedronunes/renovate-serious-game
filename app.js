@@ -526,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.028" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.028' : 'v2.1.4.028 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.029" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.029' : 'v2.1.4.029 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1780,7 +1780,7 @@ function renderQuizScreen(container, slideId) {
 
   const slideKey = 's' + String(slideId).padStart(2, '0');
   const coords = UI_COORDINATES_MAP[slideKey] || {
-    card: { top: '4.0%', left: '4.0%', width: '92.0%' }
+    card: { top: '3.5%', left: '4.0%', width: '92.0%' }
   };
 
   const titleText = t(cfg.titleKey, 'CALIBRATION OF A SPRAYER');
@@ -1796,13 +1796,13 @@ function renderQuizScreen(container, slideId) {
   const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
 
   container.innerHTML = `
-    <!-- Quiz Container Layout strictly matching uploaded mockup & Design Bible v6 -->
-    <div id="el-${slideKey}-card" class="quiz-main-container" style="${styleObjToCss(coords.card || { top: '4.0%', left: '4.0%', width: '92.0%' })}">
+    <!-- Quiz Container Layout strictly matching reference image & Design Bible v6 -->
+    <div id="el-${slideKey}-card" class="quiz-main-container" style="${styleObjToCss(coords.card || { top: '3.5%', left: '4.0%', width: '92.0%' })}">
       
-      <!-- Top Circular Question Mark Emblem Badge & Category Header -->
+      <!-- Top Standalone Question Mark Emblem & Category Header (Sem círculo!) -->
       <div class="quiz-header-wrapper">
-        <div class="quiz-emblem-circle">
-          <i data-lucide="help-circle" class="quiz-emblem-icon"></i>
+        <div class="quiz-emblem-icon-standalone">
+          <span class="quiz-standalone-qmark">?</span>
         </div>
         <div class="quiz-category-title">${titleText.toUpperCase()}</div>
       </div>
@@ -1812,7 +1812,7 @@ function renderQuizScreen(container, slideId) {
         <div class="quiz-question-text">${questionText}</div>
       </div>
 
-      <!-- Option Cards A, B, C, D List (Multi-select toggle support) -->
+      <!-- Option Cards A, B, C, D List (Multi-select toggle + Protruding Badges) -->
       <div class="quiz-options-list">
         ${cfg.options.map(opt => {
           const rawOptText = t(opt.textKey, opt.key);
