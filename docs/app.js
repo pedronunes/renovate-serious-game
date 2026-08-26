@@ -464,8 +464,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.014" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.014' : 'v2.1.4.014 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.015" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.015' : 'v2.1.4.015 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -1092,7 +1092,6 @@ function renderScreen8(container) {
 // Screen 9: Technical Explanation Part 1 (On SeriousGame_tela9.jpg with Lucide Icons & Matching Screen 8 Style)
 function renderScreen9(container) {
   const coords = UI_COORDINATES_MAP.s09 || INITIAL_UI_COORDINATES_MAP.s09;
-  const pointerClass = (coords.bubble && coords.bubble.pointer) || 'pointer-left';
 
   const rawSpeech = t('s09_dialogue_mia', 'Calibration prepares your sprayer for efficient and safe operation. It allows a precise and uniform application of plant protection products at the intended rate.');
   
@@ -1113,9 +1112,17 @@ function renderScreen9(container) {
   const infoTitle = t('s09_info_title', 'Remember');
   const infoText = t('s09_info_text', 'Calibration is the practical and reliable way to achieve the right spray volume rate in your vineyard or orchard.');
 
+  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '6.0%';
+  const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
+  const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
+
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '34.0%';
+  const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '6.0%';
+  const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '88.0%';
+
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s09-bubble" class="speech-bubble bubble-tail-left" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s09-bubble" class="speech-bubble bubble-tail-left" style="position: absolute; top: ${bubbleTop}; left: ${bubbleLeft}; width: ${bubbleWidth}; min-height: max-content;">
       <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; color: #1F2220;">
         ${formattedSpeech}
@@ -1123,7 +1130,7 @@ function renderScreen9(container) {
     </div>
 
     <!-- What is Calibration Translucent Cream Card -->
-    <div id="el-s09-card" class="cream-card" style="${styleObjToCss(coords.card || { top: '27%', right: '5%', width: '58%' })}">
+    <div id="el-s09-card" class="cream-card" style="position: absolute; top: ${cardTop}; left: ${cardLeft}; width: ${cardWidth};">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 6px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
         ${secTitle}
       </div>
@@ -1131,44 +1138,44 @@ function renderScreen9(container) {
         ${bodyText}
       </div>
       
-      <div class="pillars-list" style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="pillars-list" style="display: flex; flex-direction: column; gap: 10px;">
         <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="settings" style="width: 30px; height: 30px; stroke: #1E4222; stroke-width: 2.2;"></i>
+          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="settings" style="width: 26px; height: 26px; stroke: #1E4222; stroke-width: 2.2;"></i>
           </div>
           <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.1rem; display: block; margin-bottom: 2px;">${f1Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.95rem; color: #333333; line-height: 1.38; font-weight: 500;">${f1Text}</span>
+            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.05rem; display: block; margin-bottom: 2px;">${f1Title}</span>
+            <span class="pillar-item-text" style="font-size: 0.92rem; color: #333333; line-height: 1.38; font-weight: 500;">${f1Text}</span>
           </div>
         </div>
 
         <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="target" style="width: 30px; height: 30px; stroke: #1E4222; stroke-width: 2.2;"></i>
+          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="target" style="width: 26px; height: 26px; stroke: #1E4222; stroke-width: 2.2;"></i>
           </div>
           <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.1rem; display: block; margin-bottom: 2px;">${f2Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.95rem; color: #333333; line-height: 1.38; font-weight: 500;">${f2Text}</span>
+            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.05rem; display: block; margin-bottom: 2px;">${f2Title}</span>
+            <span class="pillar-item-text" style="font-size: 0.92rem; color: #333333; line-height: 1.38; font-weight: 500;">${f2Text}</span>
           </div>
         </div>
 
         <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="bar-chart-3" style="width: 30px; height: 30px; stroke: #1E4222; stroke-width: 2.2;"></i>
+          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="bar-chart-3" style="width: 26px; height: 26px; stroke: #1E4222; stroke-width: 2.2;"></i>
           </div>
           <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.1rem; display: block; margin-bottom: 2px;">${f3Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.95rem; color: #333333; line-height: 1.38; font-weight: 500;">${f3Text}</span>
+            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.05rem; display: block; margin-bottom: 2px;">${f3Title}</span>
+            <span class="pillar-item-text" style="font-size: 0.92rem; color: #333333; line-height: 1.38; font-weight: 500;">${f3Text}</span>
           </div>
         </div>
       </div>
       
       <!-- Remember / Lightbulb Info Footer Box -->
-      <div style="margin-top: 14px; padding: 10px 14px; background: rgba(255, 204, 102, 0.3); border-radius: 12px; border-left: 4px solid #D97706; display: flex; align-items: flex-start; gap: 8px;">
-        <i data-lucide="lightbulb" style="width: 24px; height: 24px; stroke: #D97706; flex-shrink: 0; margin-top: 2px;"></i>
+      <div style="margin-top: 12px; padding: 10px 14px; background: rgba(255, 204, 102, 0.3); border-radius: 12px; border-left: 4px solid #D97706; display: flex; align-items: flex-start; gap: 8px;">
+        <i data-lucide="lightbulb" style="width: 22px; height: 22px; stroke: #D97706; flex-shrink: 0; margin-top: 2px;"></i>
         <div>
-          <strong style="color: #855300; font-size: 0.98rem; font-weight: 900; display: block;">${infoTitle}</strong>
-          <p style="font-size: 0.9rem; margin-top: 2px; color: #452A00; line-height: 1.38; font-weight: 600;">${infoText}</p>
+          <strong style="color: #855300; font-size: 0.95rem; font-weight: 900; display: block;">${infoTitle}</strong>
+          <p style="font-size: 0.88rem; margin-top: 2px; color: #452A00; line-height: 1.38; font-weight: 600;">${infoText}</p>
         </div>
       </div>
     </div>
