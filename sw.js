@@ -1,6 +1,6 @@
 /* 
-  RENOVATE Serious Game - Service Worker Engine (v2.0.0)
-  Full Offline Pre-Caching & Standalone Native App Execution on iOS & Android
+  RENOVATE Serious Game - Official Service Worker Engine (v2.0.0 Hotfix Edition)
+  Full Offline Pre-Caching, Lifecycle Synchronization & Differentiated Caching Strategies
 */
 
 const CACHE_NAME = 'renovate-serious-game-v2.0.0';
@@ -43,21 +43,30 @@ const ASSETS_TO_CACHE = [
   './public/locales/pt-PT.json'
 ];
 
+// 1. Service Worker Installation Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch(err => console.log('SW Cache item skipped:', err));
+      return Promise.all(
+        ASSETS_TO_CACHE.map((asset) => {
+          return cache.add(asset).catch((err) => {
+            console.warn(`[SW] Warning: Optional asset skipped during pre-cache: ${asset}`, err);
+          });
+        })
+      );
     })
   );
   self.skipWaiting();
 });
 
+// 2. Service Worker Activation Event (Obsolete Cache Cleanup & Immediate Control Claim)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
+            console.log(`[SW] Purging obsolete cache: ${cache}`);
             return caches.delete(cache);
           }
         })
@@ -67,11 +76,16 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// 3. Service Worker Fetch Interception & Localhost Bypass
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/api/')) {
-    return;
+  const url = new URL(event.request.url);
+
+  // BYPASS CRÍTICO PARA LOCALHOST: Não cachear nada em ambiente de desenvolvimento
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.pathname.includes('/api/')) {
+    return event.respondWith(fetch(event.request));
   }
 
+  // Comportamento normal de produção (Stale-While-Revalidate seguro)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {

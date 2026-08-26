@@ -213,78 +213,26 @@ let UI_COORDINATES_MAP = JSON.parse(JSON.stringify(INITIAL_UI_COORDINATES_MAP));
 // Preload all backdrop images for instantaneous 60fps transitions without lag or black screens
 function preloadBackdropImages() {
   const imagesToPreload = [
-    'public/images/SeriousGame_tela-Simples.jpg',
-    'public/images/SeriousGame_tela1.jpg',
-    'public/images/SeriousGame_tela2.jpg',
-    'public/images/SeriousGame_tela3.jpg',
-    'public/images/SeriousGame_tela4.jpg',
-    'public/images/SeriousGame_tela5.jpg',
-    'public/images/SeriousGame_tela8.jpg',
-    'public/images/SeriousGame_tela9.jpg',
-    'public/images/SeriousGame_tela10.jpg',
-    'public/images/SeriousGame_tela23.jpg',
-    'public/images/s10_param1_tractor.png',
-    'public/images/s10_param2_pressure.png',
-    'public/images/s10_param3_nozzles.png',
-    'public/images/s10_param4_activenozzles.png'
+    './public/images/SeriousGame_tela-Simples.jpg',
+    './public/images/SeriousGame_tela1.jpg',
+    './public/images/SeriousGame_tela2.jpg',
+    './public/images/SeriousGame_tela3.jpg',
+    './public/images/SeriousGame_tela4.jpg',
+    './public/images/SeriousGame_tela5.jpg',
+    './public/images/SeriousGame_tela8.jpg',
+    './public/images/SeriousGame_tela9.jpg',
+    './public/images/SeriousGame_tela10.jpg',
+    './public/images/SeriousGame_tela23.jpg',
+    './public/images/s10_param1_tractor.png',
+    './public/images/s10_param2_pressure.png',
+    './public/images/s10_param3_nozzles.png',
+    './public/images/s10_param4_activenozzles.png'
   ];
 
   imagesToPreload.forEach(src => {
     const img = new Image();
     img.src = src;
   });
-}
-
-// Helper to resolve backend server URL (Port 3000) dynamically if frontend runs on another port
-function getBackendUrl() {
-  const backendPort = '3000';
-  return window.location.port === backendPort ? '' : `http://localhost:${backendPort}`;
-}
-
-// Save custom designer coordinates to localStorage and sync with local Node server
-function saveCustomCoordinatesLocally(coordsMap = UI_COORDINATES_MAP, endpoint = '/api/sync-coords', showToast = false) {
-  localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(coordsMap));
-  
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    const backendUrl = getBackendUrl();
-    return fetch(`${backendUrl}${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(coordsMap)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        if (showToast) showDesignerToast('✓ Coordenadas guardadas e sincronizadas com app.js!', 'success');
-      } else {
-        if (showToast) showDesignerToast('⚠️ Erro ao sincronizar com app.js no servidor local.', 'warning');
-      }
-      return data;
-    })
-    .catch(e => {
-      console.error('Sync error:', e);
-      if (showToast) showDesignerToast('⚠️ Servidor local na porta 3000 indisponível para gravação.', 'warning');
-      return { success: false, error: e.message };
-    });
-  }
-}
-
-// Load Saved Custom Coordinates from localStorage & auto-sync to local server
-function loadCustomCoordinates() {
-  const saved = localStorage.getItem(STORAGE_KEY_CUSTOM_COORDS) || localStorage.getItem('renovate_custom_coordinates');
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      UI_COORDINATES_MAP = JSON.parse(JSON.stringify(INITIAL_UI_COORDINATES_MAP));
-      Object.keys(parsed).forEach(k => {
-        UI_COORDINATES_MAP[k] = { ...UI_COORDINATES_MAP[k], ...parsed[k] };
-      });
-
-      saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-    } catch (e) {
-      console.error('Error parsing custom coordinates:', e);
-    }
-  }
 }
 
 // Central Game State
@@ -295,9 +243,7 @@ const gameState = {
   activeTranslations: {},
   quizAnswers: {},
   maxUnlockedSlide: 1,
-  audioMuted: false,
-  designerMode: false,
-  selectedDesignerElement: null
+  audioMuted: false
 };
 
 // Web Audio API Central Context & Safe Initialization Engine
@@ -504,31 +450,23 @@ function goToSlide(slideNum) {
   renderCurrentSlide();
 }
 
-// Render Top Bar (#FFCC66 with Logo, Title, Version/Date Badge, Designer Mode [ONLY ON LOCALHOST] & Language Selector)
+// Render Top Bar (#FFCC66 Gold Bar with Logo, Title, Version Badge, Language Selector & Mute Toggle)
 function renderTopBar() {
   const topBar = document.getElementById('top-bar');
   if (!topBar) return;
 
-  // Designer Mode is strictly restricted to Localhost (127.0.0.1 or localhost or ?designer=true)
-  const isLocalhost = window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1' || 
-                      window.location.search.includes('designer=true');
+  const soundIcon = gameState.audioMuted ? 'volume-x' : 'volume-2';
 
   topBar.innerHTML = `
     <div class="top-bar-left">
-      <img src="public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='public/images/RENOVATE-logo.png'">
+      <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
       <div class="top-bar-title-wrapper">
         <span class="top-bar-app-title">Serious Game RENOVATE</span>
         <span class="top-bar-version-badge">v1.0.4 • 25.08.2026</span>
       </div>
-      ${isLocalhost ? `
-        <button id="btn-toggle-designer" class="btn-designer-toggle ${gameState.designerMode ? 'active' : ''}">
-          ${gameState.designerMode ? '✓ Designer On' : '✏️ Designer'}
-        </button>
-      ` : ''}
     </div>
     
-    <div class="top-bar-lang-container">
+    <div class="top-bar-lang-container" style="display: flex; align-items: center; gap: 8px;">
       <select id="lang-select" class="top-bar-lang-select" title="${t('ui_select_language', 'Language')}">
         ${SUPPORTED_LANGUAGES.map(l => `
           <option value="${l.code}" ${l.code === gameState.activeLanguage ? 'selected' : ''}>
@@ -536,23 +474,27 @@ function renderTopBar() {
           </option>
         `).join('')}
       </select>
+
+      <button id="nav-mute" class="btn-sound-toggle" title="Sound">
+        <i data-lucide="${soundIcon}" style="width: 18px; height: 18px; color: #FFCC66;"></i>
+      </button>
     </div>
   `;
 
-  document.getElementById('lang-select').addEventListener('change', (e) => {
+  document.getElementById('lang-select')?.addEventListener('change', (e) => {
     const selectedLang = e.target.value;
     loadTranslations(selectedLang);
   });
 
-  if (isLocalhost) {
-    document.getElementById('btn-toggle-designer')?.addEventListener('click', () => {
-      gameState.designerMode = !gameState.designerMode;
-      if (!gameState.designerMode) {
-        gameState.selectedDesignerElement = null;
-      }
-      renderTopBar();
-      renderCurrentSlide();
-    });
+  document.getElementById('nav-mute')?.addEventListener('click', () => {
+    initAudioEngine();
+    gameState.audioMuted = !gameState.audioMuted;
+    localStorage.setItem(STORAGE_KEY_MUTE, String(gameState.audioMuted));
+    renderTopBar();
+  });
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
   }
 }
 
@@ -588,19 +530,19 @@ function renderCurrentSlide() {
   // Determine Backdrop Image (Layer 1) & Background Position
   // Exact Artwork Backdrop for Screens 1, 2, 3, 4, 5, 8, 9, 10, 23
   if ((slideId >= 1 && slideId <= 5) || (slideId >= 8 && slideId <= 10)) {
-    slideContainer.style.backgroundImage = `url('public/images/SeriousGame_tela${slideId}.jpg')`;
+    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela${slideId}.jpg')`;
     slideContainer.style.backgroundPosition = 'center top';
     slideContainer.style.marginTop = '-1px';
   } else if (slideId === 6 || slideId === 7 || (slideId >= 11 && slideId !== 23)) {
-    slideContainer.style.backgroundImage = `url('public/images/SeriousGame_tela-Simples.jpg')`;
+    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela-Simples.jpg')`;
     slideContainer.style.backgroundPosition = 'center center';
     slideContainer.style.marginTop = '0px';
   } else if (slideId === 23) {
-    slideContainer.style.backgroundImage = `url('public/images/SeriousGame_tela23.jpg')`;
+    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela23.jpg')`;
     slideContainer.style.backgroundPosition = 'center center';
     slideContainer.style.marginTop = '0px';
   } else {
-    slideContainer.style.backgroundImage = `url('public/images/SeriousGame_tela-Simples.jpg')`;
+    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela-Simples.jpg')`;
     slideContainer.style.backgroundPosition = 'center center';
     slideContainer.style.marginTop = '0px';
   }
@@ -631,19 +573,6 @@ function renderCurrentSlide() {
   else if (QUIZ_CONFIG_MAP[slideId]) renderQuizScreen(overlayContainer, slideId);
   else if (QUIZ_FEEDBACK_MAP[slideId]) renderQuizFeedbackScreen(overlayContainer, slideId);
   else renderGenericScreenPlaceholder(overlayContainer, slideId);
-
-  // Setup or Cleanup Designer Mode Controls
-  if (gameState.designerMode) {
-    setupDesignerModeControls(overlayContainer, slideId);
-  } else {
-    const toolbar = document.getElementById('designer-toolbar');
-    if (toolbar) toolbar.remove();
-
-    overlayContainer.querySelectorAll('.designer-target').forEach(el => {
-      el.classList.remove('designer-element-active');
-      el.style.outline = 'none';
-    });
-  }
 
   // Initialize Lucide Icons if loaded
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -688,7 +617,7 @@ function renderScreen1(container) {
 
   container.innerHTML = `
     <!-- Top Header Area directly on sky (No Circle Avatar) -->
-    <div id="el-s01-titleHeader" class="s01-header-container designer-target" style="${styleObjToCss(coords.titleHeader)}">
+    <div id="el-s01-titleHeader" class="s01-header-container" style="${styleObjToCss(coords.titleHeader)}">
       <div class="s01-title-wrapper">
         <div class="s01-main-title">
           <div>${line1}</div>
@@ -699,14 +628,14 @@ function renderScreen1(container) {
     </div>
 
     <!-- Start Challenge Pill Button (Green Pill with White Border) -->
-    <div id="el-s01-startBtn" class="designer-target" style="text-align: center; ${styleObjToCss(coords.startBtn)}">
+    <div id="el-s01-startBtn" style="text-align: center; ${styleObjToCss(coords.startBtn)}">
       <button id="btn-start-game" class="btn-start-challenge-pill">
         ${startText}
       </button>
     </div>
 
     <!-- Bottom Horizontal Stepper Card (5 Connected Step Circles) -->
-    <div id="el-s01-stepperCard" class="stepper-card designer-target" style="${styleObjToCss(coords.stepperCard)}">
+    <div id="el-s01-stepperCard" class="stepper-card" style="${styleObjToCss(coords.stepperCard)}">
       <div class="stepper-pipeline">
         <div class="stepper-rail"></div>
 
@@ -779,14 +708,14 @@ function renderScreen2(container) {
 
   container.innerHTML = `
     <!-- Upper Left Text Container directly on sky (No Card Box!) -->
-    <div id="el-s02-textContainer" class="s02-text-container designer-target" style="${styleObjToCss(coords.textContainer)}">
+    <div id="el-s02-textContainer" class="s02-text-container" style="${styleObjToCss(coords.textContainer)}">
       <div class="s02-title">${title}</div>
       <div class="s02-body-p">${p1}</div>
       ${p2 ? `<div class="s02-body-p">${p2}</div>` : ''}
     </div>
 
     <!-- Bottom 3-Column Attributes Cream Card with 3D Glowing Icon Badges -->
-    <div id="el-s02-attributesCard" class="attributes-card-3col designer-target" style="${styleObjToCss(coords.attributesCard)}">
+    <div id="el-s02-attributesCard" class="attributes-card-3col" style="${styleObjToCss(coords.attributesCard)}">
       <div class="attr-col">
         <div class="attr-icon-badge-3d">
           <i data-lucide="grape" class="attr-icon-lucide"></i>
@@ -844,14 +773,14 @@ function renderScreen3(container) {
 
   container.innerHTML = `
     <!-- Upper Right Text Container directly on sky (Right-Aligned) -->
-    <div id="el-s03-textContainer" class="s02-text-container designer-target" style="text-align: right; ${styleObjToCss(coords.textContainer || { top: '8%', left: '40%', width: '54%' })}">
+    <div id="el-s03-textContainer" class="s02-text-container" style="text-align: right; ${styleObjToCss(coords.textContainer || { top: '8%', left: '40%', width: '54%' })}">
       <div class="s02-title" style="text-align: right;">${title}</div>
       <div class="s02-body-p" style="text-align: right;">${p1}</div>
       ${p2 ? `<div class="s02-body-p" style="text-align: right;">${p2}</div>` : ''}
     </div>
 
     <!-- Bottom 3-Column Attributes Cream Card with 3D Glowing Icon Badges -->
-    <div id="el-s03-attributesCard" class="attributes-card-3col designer-target" style="${styleObjToCss(coords.attributesCard || { top: '76%', left: '4%', width: '92%' })}">
+    <div id="el-s03-attributesCard" class="attributes-card-3col" style="${styleObjToCss(coords.attributesCard || { top: '76%', left: '4%', width: '92%' })}">
       <div class="attr-col">
         <div class="attr-icon-badge-3d">
           <i data-lucide="graduation-cap" class="attr-icon-lucide"></i>
@@ -905,7 +834,7 @@ function renderScreen4(container) {
 
   container.innerHTML = `
     <!-- Upper Left Text Container with Translucent Cream Card styling for crisp contrast -->
-    <div id="el-s04-textContainer" class="cream-card designer-target" style="background: rgba(247, 247, 242, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); ${styleObjToCss(coords.textContainer || coords.card || { top: '9%', left: '6%', width: '58%' })}">
+    <div id="el-s04-textContainer" class="cream-card" style="background: rgba(247, 247, 242, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); ${styleObjToCss(coords.textContainer || coords.card || { top: '9%', left: '6%', width: '58%' })}">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.02em;">${title}</div>
       <div class="cream-card-body" style="font-size: 1.05rem; font-weight: 600; color: #1F2220; line-height: 1.42;">
         <p style="margin-bottom: 8px;">${p1}</p>
@@ -942,7 +871,7 @@ function renderScreen5(container) {
     .join('');
 
   container.innerHTML = `
-    <div id="el-s05-bubble" class="speech-bubble ${pointerClass} designer-target" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '8%', right: '5%', width: '58%' })}">
+    <div id="el-s05-bubble" class="speech-bubble ${pointerClass}" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '8%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 8px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; color: #1F2220;">
         ${formattedHtml}
@@ -967,12 +896,12 @@ function renderScreen6(container) {
 
   container.innerHTML = `
     <!-- Separate Floating Top Icon Block (Increased Spacing to Text Boxes) -->
-    <div id="el-s06-iconBlock" class="designer-target" style="text-align: center; ${styleObjToCss(coords.iconBlock || { top: '6%', left: '0%', width: '100%' })}">
+    <div id="el-s06-iconBlock" style="text-align: center; ${styleObjToCss(coords.iconBlock || { top: '6%', left: '0%', width: '100%' })}">
       <i data-lucide="info" class="s06-info-top-icon" style="width: 90px; height: 90px; stroke: #1E4222; stroke-width: 2.2; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));"></i>
     </div>
 
     <!-- Separate Floating Text Cards Container (Opacity 0.78, Increased Line-Height 1.88, Spanning > 50% Screen Height) -->
-    <div id="el-s06-card" class="designer-target" style="${styleObjToCss(coords.card || { top: '19%', left: '6%', width: '88%' })}">
+    <div id="el-s06-card" style="${styleObjToCss(coords.card || { top: '19%', left: '6%', width: '88%' })}">
       <div class="s06-blocks-container" style="display: flex; flex-direction: column; gap: 16px;">
         <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
           ${rawInfo1}
@@ -1005,7 +934,7 @@ function renderScreen7(container) {
 
   container.innerHTML = `
     <!-- Translucent Background Layer Card wrapping Icon and Text for Maximum Contrast & Distinction -->
-    <div id="el-s07-card" class="designer-target" style="${styleObjToCss(coords.card || { top: '24%', left: '8%', width: '84%' })}">
+    <div id="el-s07-card" style="${styleObjToCss(coords.card || { top: '24%', left: '8%', width: '84%' })}">
       <div style="background: rgba(247, 247, 242, 0.82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 32px 24px; border-radius: 24px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 8px 28px rgba(0,0,0,0.14); text-align: center;">
         
         <!-- Top Floating Round Badge Icon with Number 1 (Matching Screen 6 Icon Style) -->
@@ -1044,7 +973,7 @@ function renderScreen8(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s08-bubble" class="speech-bubble ${pointerClass} designer-target" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s08-bubble" class="speech-bubble ${pointerClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
@@ -1052,7 +981,7 @@ function renderScreen8(container) {
     </div>
 
     <!-- Mia's Tip Box -->
-    <div id="el-s08-tip" class="tip-card designer-target" style="${styleObjToCss(coords.tip || { top: '26%', right: '5%', width: '58%' })}">
+    <div id="el-s08-tip" class="tip-card" style="${styleObjToCss(coords.tip || { top: '26%', right: '5%', width: '58%' })}">
       <div class="tip-card-header" style="display: flex; align-items: center; gap: 8px; font-weight: 900; color: #855300; font-size: 1.05rem;">
         <i data-lucide="lightbulb" style="width: 24px; height: 24px; stroke: #D97706;"></i>
         <span>${tipTitle}</span>
@@ -1063,7 +992,7 @@ function renderScreen8(container) {
     </div>
 
     <!-- 3 Pillars of Effectiveness Translucent Card with Enlarged Header Title, Subtitles and Icons -->
-    <div id="el-s08-pillars" class="cream-card designer-target" style="${styleObjToCss(coords.pillars || { top: '48%', right: '5%', width: '58%' })}">
+    <div id="el-s08-pillars" class="cream-card" style="${styleObjToCss(coords.pillars || { top: '48%', right: '5%', width: '58%' })}">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 8px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
         ${secTitle}
       </div>
@@ -1134,7 +1063,7 @@ function renderScreen9(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s09-bubble" class="speech-bubble ${pointerClass} designer-target" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s09-bubble" class="speech-bubble ${pointerClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; color: #1F2220;">
         ${formattedSpeech}
@@ -1142,7 +1071,7 @@ function renderScreen9(container) {
     </div>
 
     <!-- What is Calibration Translucent Cream Card -->
-    <div id="el-s09-card" class="cream-card designer-target" style="${styleObjToCss(coords.card || { top: '27%', right: '5%', width: '58%' })}">
+    <div id="el-s09-card" class="cream-card" style="${styleObjToCss(coords.card || { top: '27%', right: '5%', width: '58%' })}">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 6px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
         ${secTitle}
       </div>
@@ -1218,7 +1147,7 @@ function renderScreen10(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia (Holding 4 Fingers Up!) -->
-    <div id="el-s10-bubble" class="speech-bubble ${pointerClass} designer-target" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s10-bubble" class="speech-bubble ${pointerClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
       <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
@@ -1226,7 +1155,7 @@ function renderScreen10(container) {
     </div>
 
     <!-- The 4 Key Parameters Translucent Cream Card -->
-    <div id="el-s10-card" class="cream-card designer-target" style="${styleObjToCss(coords.card || { top: '26%', right: '5%', width: '58%' })}">
+    <div id="el-s10-card" class="cream-card" style="${styleObjToCss(coords.card || { top: '26%', right: '5%', width: '58%' })}">
       
       <!-- Card Header -->
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.02em; text-align: center;">
@@ -1257,7 +1186,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1E4222; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p1)}
           </div>
-          <img src="public/images/s10_param1_tractor.png" alt="Driving Speed Tractor" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img src="./public/images/s10_param1_tractor.png" alt="Driving Speed Tractor" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 2: Spray Pressure (Red) -->
@@ -1266,7 +1195,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #C62828; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p2)}
           </div>
-          <img src="public/images/s10_param2_pressure.png" alt="Spray Pressure Gauge" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img src="./public/images/s10_param2_pressure.png" alt="Spray Pressure Gauge" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 3: Nozzle Size (Blue) -->
@@ -1275,7 +1204,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1565C0; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p3)}
           </div>
-          <img src="public/images/s10_param3_nozzles.png" alt="Nozzle Size" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img src="./public/images/s10_param3_nozzles.png" alt="Nozzle Size" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 4: Number of Active Nozzles (Purple) -->
@@ -1284,7 +1213,7 @@ function renderScreen10(container) {
           <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.86rem; color: #6A1B9A; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p4)}
           </div>
-          <img src="public/images/s10_param4_activenozzles.png" alt="Active Nozzles Sprayer" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img src="./public/images/s10_param4_activenozzles.png" alt="Active Nozzles Sprayer" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
       </div>
@@ -1457,7 +1386,7 @@ function renderQuizScreen(container, slideId) {
   const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
 
   container.innerHTML = `
-    <div id="el-${slideKey}-card" class="quiz-container designer-target" style="${styleObjToCss(coords.card || { top: '8%', left: '5%', width: '90%' })}">
+    <div id="el-${slideKey}-card" class="quiz-container" style="${styleObjToCss(coords.card || { top: '8%', left: '5%', width: '90%' })}">
       
       <div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
@@ -1550,7 +1479,7 @@ function renderQuizFeedbackScreen(container, slideId) {
 
   if (fb.isCorrect) {
     container.innerHTML = `
-      <div id="el-${slideKey}-card" class="feedback-card-correct designer-target" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
+      <div id="el-${slideKey}-card" class="feedback-card-correct" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
         <div class="feedback-badge-correct">
           <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
           <span>${statusText}!</span>
@@ -1577,7 +1506,7 @@ function renderQuizFeedbackScreen(container, slideId) {
     });
   } else {
     container.innerHTML = `
-      <div id="el-${slideKey}-card" class="feedback-card-incorrect designer-target" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
+      <div id="el-${slideKey}-card" class="feedback-card-incorrect" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
         <div class="feedback-badge-incorrect">
           <i data-lucide="x-circle" style="width: 24px; height: 24px;"></i>
           <span>${statusText}</span>
@@ -1625,7 +1554,7 @@ function renderScreen23(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble (Top Left) -->
-    <div id="el-s23-miaBubble" class="speech-bubble ${miaPointer} designer-target" style="${styleObjToCss(coords.miaBubble || { top: '15%', left: '8%', width: '44%' })}">
+    <div id="el-s23-miaBubble" class="speech-bubble ${miaPointer}" style="${styleObjToCss(coords.miaBubble || { top: '15%', left: '8%', width: '44%' })}">
       <span class="speaker-name">MIA</span>
       <div style="font-family: var(--font-header); font-weight: 800; font-size: clamp(0.74rem, calc(0.85rem * var(--scale-factor, 1)), 0.98rem); color: var(--forest-green); margin: 4px 0 6px 0; line-height: 1.25;">
         ${miaTitle}
@@ -1636,7 +1565,7 @@ function renderScreen23(container) {
     </div>
 
     <!-- Laura Speech Bubble (Middle Right) -->
-    <div id="el-s23-lauraBubble" class="speech-bubble ${lauraPointer} designer-target" style="${styleObjToCss(coords.lauraBubble || { top: '48%', left: '48%', width: '44%' })}">
+    <div id="el-s23-lauraBubble" class="speech-bubble ${lauraPointer}" style="${styleObjToCss(coords.lauraBubble || { top: '48%', left: '48%', width: '44%' })}">
       <span class="speaker-name" style="background: var(--forest-green-light);">LAURA</span>
       <div class="speech-text" style="margin-top: 4px;">
         ${lauraText}
@@ -1644,7 +1573,7 @@ function renderScreen23(container) {
     </div>
 
     <!-- Legal Alert Card (Bottom Central) -->
-    <div id="el-s23-legalCard" class="cream-card designer-target" style="${styleObjToCss(coords.legalCard || { top: '78%', left: '50%', transform: 'translateX(-50%)', width: '84%' })}">
+    <div id="el-s23-legalCard" class="cream-card" style="${styleObjToCss(coords.legalCard || { top: '78%', left: '50%', transform: 'translateX(-50%)', width: '84%' })}">
       <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <i data-lucide="scale" style="width: 20px; height: 20px; color: var(--forest-green);"></i>
         <span>${legalTitle}</span>
@@ -1660,19 +1589,55 @@ function renderScreen23(container) {
   }
 }
 
-// Screen 24: Module 2 Intro - Setting the Task & Sprayer Inspection
+// Screen 24: Module 2 Intro & Why Calibration Matters (Benefits & Consequences Scroll View)
 function renderScreen24(container) {
-  const title = t('s24_title', 'MÓDULO 2: DEFINIÇÃO DA TAREFA E INSPEÇÃO DO PULVERIZADOR');
-  const body = t('s24_body', 'Neste módulo, ajudamos a Laura a definir os parâmetros práticos de trabalho: velocidade do trator, débito pretendido e a escolha correta dos bicos de pulverização.');
+  const title = t('s24_title', 'PORQUÊ CALIBRAR? BENEFÍCIOS E CONSEQUÊNCIAS');
+  const benefitsTitle = t('s24_benefits_title', 'BENEFÍCIOS DE UMA BOA CALIBRAÇÃO');
+  const consequencesTitle = t('s24_consequences_title', 'CONSEQUÊNCIAS DE UMA MÁ CALIBRAÇÃO');
+
+  const b1 = t('s24_b1', 'Proteção eficaz da cultura contra pragas e doenças');
+  const b2 = t('s24_b2', 'Redução de desperdícios de produto e poupança financeira');
+  const b3 = t('s24_b3', 'Proteção do operador, do solo e das águas subterrâneas');
+  const b4 = t('s24_b4', 'Cumprimento integral dos requisitos legais ISO / Nacionais');
+
+  const c1 = t('s24_c1', 'Subdosagem: Perda de colheita por falta de eficácia do tratamento');
+  const c2 = t('s24_c2', 'Sobredosagem: Fitotoxicidade na vinha e resíduos acima do limite');
+  const c3 = t('s24_c3', 'Deriva severa: Poluição ambiental e contaminação de vizinhos');
+  const c4 = t('s24_c4', 'Desperdício de combustível e desgaste prematuro de bicos');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s24-card" style="position: absolute; top: 20%; left: 6%; width: 88%;">
-      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-        <i data-lucide="wrench" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
-        <span>${title}</span>
+    <div class="cream-card" id="el-s24-card" style="position: absolute; top: 5%; left: 5%; width: 90%; max-height: 88%; overflow-y: auto; padding-bottom: 20px; box-sizing: border-box;">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px;">
+        <i data-lucide="wrench" style="width: 20px; height: 20px; color: var(--forest-green);"></i>
+        <span style="font-size: 0.9rem;">${title}</span>
       </div>
-      <div class="cream-card-body" style="margin-top: 12px; font-weight: 600; line-height: 1.45; text-align: center;">
-        ${body}
+
+      <!-- Benefits Section (Green Icons) -->
+      <div style="background: #E8F5E9; border: 1.5px solid #2E7D32; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;">
+        <div style="font-family: var(--font-header); font-weight: 900; font-size: 0.82rem; color: #1B5E20; text-transform: uppercase; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <i data-lucide="check-circle" style="width: 16px; height: 16px; color: #2E7D32;"></i>
+          <span>${benefitsTitle}</span>
+        </div>
+        <ul style="margin: 0; padding-left: 18px; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: #1B5E20; line-height: 1.45;">
+          <li>${b1}</li>
+          <li>${b2}</li>
+          <li>${b3}</li>
+          <li>${b4}</li>
+        </ul>
+      </div>
+
+      <!-- Consequences Section (Red Danger Icons) -->
+      <div style="background: #FFEBEE; border: 1.5px solid #C62828; border-radius: 12px; padding: 10px 12px;">
+        <div style="font-family: var(--font-header); font-weight: 900; font-size: 0.82rem; color: #B71C1C; text-transform: uppercase; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <i data-lucide="alert-triangle" style="width: 16px; height: 16px; color: #C62828;"></i>
+          <span>${consequencesTitle}</span>
+        </div>
+        <ul style="margin: 0; padding-left: 18px; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; color: #B71C1C; line-height: 1.45;">
+          <li>${c1}</li>
+          <li>${c2}</li>
+          <li>${c3}</li>
+          <li>${c4}</li>
+        </ul>
       </div>
     </div>
   `;
@@ -1688,7 +1653,7 @@ function renderScreen25(container) {
   const body = t('s25_body', 'A velocidade real do trator na vinha difere frequentemente da leitura do velocímetro. Devemos medir o tempo exato para percorrer uma distância conhecida (ex: 50 m ou 100 m).');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s25-card" style="position: absolute; top: 18%; left: 6%; width: 88%;">
+    <div class="cream-card" id="el-s25-card" style="position: absolute; top: 18%; left: 6%; width: 88%;">
       <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <i data-lucide="gauge" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
         <span>${title}</span>
@@ -1716,7 +1681,7 @@ function renderScreen26(container) {
   const subtitle = t('s26_subtitle', 'Percorra 50 m na vinha e cronometre o tempo de deslocação.');
 
   container.innerHTML = `
-    <div class="chrono-container designer-target" id="el-s26-chronoCard" style="top: 10%; left: 5%; width: 90%; position: absolute;">
+    <div class="chrono-container" id="el-s26-chronoCard" style="top: 10%; left: 5%; width: 90%; position: absolute;">
       <div style="font-family: var(--font-header); font-weight: 900; font-size: 1.05rem; color: var(--forest-green); text-transform: uppercase;">
         ${title}
       </div>
@@ -1785,7 +1750,7 @@ function renderScreen27(container) {
   const formulaText = 'Q_total = (250 × 5.0 × 2.8) / 600 = 5.83 L/min';
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s27-card" style="position: absolute; top: 16%; left: 6%; width: 88%;">
+    <div class="cream-card" id="el-s27-card" style="position: absolute; top: 16%; left: 6%; width: 88%;">
       <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <i data-lucide="calculator" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
         <span>${title}</span>
@@ -1811,7 +1776,7 @@ function renderScreen28(container) {
   const formulaText = 'q = Q_total / 6 = 5.83 / 6 = 0.97 L/min';
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s28-card" style="position: absolute; top: 16%; left: 6%; width: 88%;">
+    <div class="cream-card" id="el-s28-card" style="position: absolute; top: 16%; left: 6%; width: 88%;">
       <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <i data-lucide="droplet" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
         <span>${title}</span>
@@ -1879,7 +1844,7 @@ function renderScreen29(container) {
   const subtitle = t('s29_subtitle', 'Selecione a cor do bico e ajuste a pressão de trabalho.');
 
   container.innerHTML = `
-    <div class="iso-table-card designer-target" id="el-s29-isoCard" style="top: 5%; left: 4%; width: 92%; position: absolute;">
+    <div class="iso-table-card" id="el-s29-isoCard" style="top: 5%; left: 4%; width: 92%; position: absolute;">
       <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase; text-align: center;">
         ${title}
       </div>
@@ -1947,7 +1912,7 @@ function renderScreen36(container) {
   const body = t('s36_body', 'Depois de definir os parâmetros teóricos e selecionar os bicos, a Laura deve verificar fisicamente o pulverizador no terreno antes de iniciar a aplicação.');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s36-card" style="position: absolute; top: 18%; left: 6%; width: 88%;">
+    <div class="cream-card" id="el-s36-card" style="position: absolute; top: 18%; left: 6%; width: 88%;">
       <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <i data-lucide="check-square" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
         <span>${title}</span>
@@ -1968,7 +1933,7 @@ function renderScreen37(container) {
   const title = t('s37_title', 'OS 4 PILARES DA INSPEÇÃO DE CAMPO');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s37-card" style="position: absolute; top: 8%; left: 5%; width: 90%;">
+    <div class="cream-card" id="el-s37-card" style="position: absolute; top: 8%; left: 5%; width: 90%;">
       <div class="cream-card-header" style="text-align: center; margin-bottom: 8px;">
         ${title}
       </div>
@@ -2003,7 +1968,7 @@ function renderScreen38(container) {
   const subtitle = t('s38_subtitle', 'Recolha a água emitida por 1 bico durante 1 minuto a 8.0 bar.');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s38-cupCard" style="top: 8%; left: 5%; width: 90%; position: absolute; text-align: center;">
+    <div class="cream-card" id="el-s38-cupCard" style="top: 8%; left: 5%; width: 90%; position: absolute; text-align: center;">
       <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase;">
         ${title}
       </div>
@@ -2071,7 +2036,7 @@ function renderScreen42(container) {
   const subtitle = t('s42_subtitle', 'Ajuste a inclinação do defletor de ar até alinhar as fitas com a copa.');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s42-ribbonCard" style="top: 8%; left: 5%; width: 90%; position: absolute; text-align: center;">
+    <div class="cream-card" id="el-s42-ribbonCard" style="top: 8%; left: 5%; width: 90%; position: absolute; text-align: center;">
       <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase;">
         ${title}
       </div>
@@ -2218,7 +2183,7 @@ function renderScreen46(container) {
   const subtitle = t('s46_subtitle', 'Inspecione e classifique as 3 amostras foliares na vinha.');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s46-wspCard" style="top: 5%; left: 4%; width: 92%; position: absolute; text-align: center;">
+    <div class="cream-card" id="el-s46-wspCard" style="top: 5%; left: 4%; width: 92%; position: absolute; text-align: center;">
       <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase;">
         ${title}
       </div>
@@ -2271,7 +2236,7 @@ function renderGenericScreenPlaceholder(container, slideId) {
   const title = t(`s${String(slideId).padStart(2, '0')}_chapter_title`, 'Calibration Challenge');
 
   container.innerHTML = `
-    <div class="cream-card designer-target" id="el-s${slideId}-generic" style="position: absolute; top: 20%; left: 10%; width: 80%; text-align: center;">
+    <div class="cream-card" id="el-s${slideId}-generic" style="position: absolute; top: 20%; left: 10%; width: 80%; text-align: center;">
       <div class="cream-card-header">${title}</div>
       <div class="cream-card-body" style="margin-top: 10px;">
         ${screenWord} ${slideId} ${ofWord} ${gameState.totalSlides}
@@ -2280,413 +2245,23 @@ function renderGenericScreenPlaceholder(container, slideId) {
   `;
 }
 
-// Smart Best Fit Algorithm: Refines CURRENT element position to clean, centered, safe layout with Font Scaling
-function applySmartBestFit(container, slideId) {
-  const targets = container.querySelectorAll('.designer-target');
-  const parentRect = container.getBoundingClientRect();
-  const slideKey = 's' + String(slideId).padStart(2, '0');
-
-  if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
-
-  targets.forEach(el => {
-    const rect = el.getBoundingClientRect();
-    let curTop = ((rect.top - parentRect.top) / parentRect.height) * 100;
-    let curLeft = ((rect.left - parentRect.left) / parentRect.width) * 100;
-    let curWidth = (rect.width / parentRect.width) * 100;
-
-    // 1. Safe Margin Check (keep within 4% - 96%)
-    if (curLeft < 4) curLeft = 4;
-    if (curLeft + curWidth > 96) curLeft = Math.max(4, 96 - curWidth);
-
-    // 2. Horizontal Centering Check (If element is near center, snap to perfect center)
-    const elementCenterX = curLeft + (curWidth / 2);
-    if (elementCenterX > 40 && elementCenterX < 60) {
-      curLeft = (100 - curWidth) / 2;
-    }
-
-    // 3. Round to clean 1-decimal percentage
-    const refinedTop = (Math.round(curTop * 2) / 2).toFixed(1) + '%';
-    const refinedLeft = (Math.round(curLeft * 2) / 2).toFixed(1) + '%';
-    const refinedWidth = (Math.round(curWidth * 2) / 2).toFixed(1) + '%';
-    const refinedFontSize = '1.05rem';
-
-    // Apply smoothly
-    el.style.transition = 'all 0.25s ease';
-    el.style.top = refinedTop;
-    el.style.left = refinedLeft;
-    el.style.right = 'auto';
-    el.style.width = refinedWidth;
-    el.style.fontSize = refinedFontSize;
-
-    el.querySelectorAll('.cream-card-body, .speech-text, p, span, div, .s01-subtitle-text, .s02-body-p, .stepper-label, .attr-text').forEach(child => {
-      child.style.fontSize = refinedFontSize;
-    });
-
-    setTimeout(() => el.style.transition = '', 300);
-
-    const elKey = el.id.replace(`el-${slideKey}-`, '');
-    if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
-    UI_COORDINATES_MAP[slideKey][elKey].top = refinedTop;
-    UI_COORDINATES_MAP[slideKey][elKey].left = refinedLeft;
-    UI_COORDINATES_MAP[slideKey][elKey].width = refinedWidth;
-    UI_COORDINATES_MAP[slideKey][elKey].fontSize = refinedFontSize;
-  });
-
-  saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-}
-
-// Display Toast Notification for Designer Mode Actions
-function showDesignerToast(message, type = 'success') {
-  let toast = document.getElementById('designer-toast-notification');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'designer-toast-notification';
-    toast.style.cssText = `
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 18px;
-      background: #1E4222;
-      color: #FFFFFF;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 800;
-      border-radius: 30px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-      z-index: 10000;
-      border: 2px solid #FFCC66;
-      transition: all 0.3s ease;
-      text-align: center;
-      max-width: 90%;
-      pointer-events: none;
-    `;
-    document.getElementById('game-container').appendChild(toast);
-  }
-
-  if (type === 'success') {
-    toast.style.background = '#1E4222';
-    toast.style.borderColor = '#FFCC66';
-  } else if (type === 'warning') {
-    toast.style.background = '#C62828';
-    toast.style.borderColor = '#FFFFFF';
-  }
-
-  toast.innerHTML = message;
-  toast.style.opacity = '1';
-
-  setTimeout(() => {
-    toast.style.opacity = '0';
-  }, 3800);
-}
-
-// Setup Interactive Designer Mode Controls (Drag, Arrow Keys, Tail Pointer, Real-time Font Sizes, Auto-Balance, Save & Fixed Reset)
-function setupDesignerModeControls(container, slideId) {
-  const targets = container.querySelectorAll('.designer-target');
-  if (targets.length === 0) return;
-
-  const slideKey = 's' + String(slideId).padStart(2, '0');
-
-  // Add floating designer toolbar
-  let toolbar = document.getElementById('designer-toolbar');
-  if (!toolbar) {
-    toolbar = document.createElement('div');
-    toolbar.id = 'designer-toolbar';
-    toolbar.className = 'designer-toolbar';
-    document.getElementById('game-container').appendChild(toolbar);
-  }
-
-  function updateToolbar(activeEl) {
-    const elInfo = activeEl ? activeEl.id : 'Clique em qualquer elemento';
-    const isBubble = activeEl && activeEl.classList.contains('speech-bubble');
-
-    toolbar.innerHTML = `
-      <div class="designer-toolbar-row">
-        <span><strong>${slideKey.toUpperCase()}</strong>: <em>${elInfo}</em></span>
-        <span style="font-size:0.7rem; color:#FFCC66;">Arrastar / Setas do Teclado</span>
-      </div>
-
-      ${isBubble ? `
-        <div class="designer-toolbar-row">
-          <span>Seta de Fala:</span>
-          <div class="designer-btn-group">
-            <button class="designer-btn ${activeEl.classList.contains('pointer-left') ? 'active' : ''}" id="btn-tail-left">👈 Esquerda</button>
-            <button class="designer-btn ${activeEl.classList.contains('pointer-right') ? 'active' : ''}" id="btn-tail-right">👉 Direita</button>
-            <button class="designer-btn ${activeEl.classList.contains('pointer-top') ? 'active' : ''}" id="btn-tail-top">☝️ Topo</button>
-            <button class="designer-btn ${activeEl.classList.contains('pointer-bottom') ? 'active' : ''}" id="btn-tail-bottom">👇 Baixo</button>
-            <button class="designer-btn ${!activeEl.className.includes('pointer-') ? 'active' : ''}" id="btn-tail-none">🚫 Nenhuma</button>
-          </div>
-        </div>
-      ` : ''}
-
-      <div class="designer-toolbar-row">
-        <div class="designer-btn-group">
-          <span>Largura:</span>
-          <button class="designer-btn" id="btn-width-minus">-</button>
-          <button class="designer-btn" id="btn-width-plus">+</button>
-
-          <span style="margin-left:6px;">Fonte:</span>
-          <button class="designer-btn" id="btn-font-minus">A-</button>
-          <button class="designer-btn" id="btn-font-plus">A+</button>
-        </div>
-
-        <div class="designer-btn-group">
-          <button id="btn-best-fit" class="designer-btn designer-btn-success">✨ Auto-Ajustar</button>
-          <button id="btn-save-coords" class="designer-btn designer-btn-primary">💾 Save</button>
-          <button id="btn-reset-coords" class="designer-btn designer-btn-danger" title="Resetar posição desta tela para os padrões">🔄 Reset</button>
-        </div>
-      </div>
-    `;
-
-    // Bind Tail Pointer Controls
-    if (isBubble) {
-      const setTail = (tailClass) => {
-        activeEl.classList.remove('pointer-left', 'pointer-right', 'pointer-top', 'pointer-bottom');
-        if (tailClass) activeEl.classList.add(tailClass);
-
-        const elKey = activeEl.id.replace(`el-${slideKey}-`, '');
-        if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
-        if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
-        UI_COORDINATES_MAP[slideKey][elKey].pointer = tailClass || 'pointer-none';
-        localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-        
-        saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-
-        updateToolbar(activeEl);
-      };
-
-      document.getElementById('btn-tail-left')?.addEventListener('click', () => setTail('pointer-left'));
-      document.getElementById('btn-tail-right')?.addEventListener('click', () => setTail('pointer-right'));
-      document.getElementById('btn-tail-top')?.addEventListener('click', () => setTail('pointer-top'));
-      document.getElementById('btn-tail-bottom')?.addEventListener('click', () => setTail('pointer-bottom'));
-      document.getElementById('btn-tail-none')?.addEventListener('click', () => setTail(''));
-    }
-
-    // Bind Width & Real-Time Font Size Adjustments
-    document.getElementById('btn-width-minus')?.addEventListener('click', () => adjustWidth(activeEl, -2));
-    document.getElementById('btn-width-plus')?.addEventListener('click', () => adjustWidth(activeEl, 2));
-
-    document.getElementById('btn-font-minus')?.addEventListener('click', () => adjustFontSize(activeEl, -0.06));
-    document.getElementById('btn-font-plus')?.addEventListener('click', () => adjustFontSize(activeEl, 0.06));
-
-    // Bind Best Fit Button
-    document.getElementById('btn-best-fit')?.addEventListener('click', () => {
-      applySmartBestFit(container, slideId);
-      updateToolbar(gameState.selectedDesignerElement);
-      showDesignerToast('✨ Posições alinhadas automaticamente!', 'success');
-    });
-
-    // Bind 1-Click Save Button with Instant Server Write & Automatic Git Commit / Push
-    const saveBtn = document.getElementById('btn-save-coords');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', () => {
-        saveBtn.innerText = '⏳ Guardando...';
-        saveBtn.disabled = true;
-
-        localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          const backendUrl = getBackendUrl();
-          fetch(`${backendUrl}/api/save-coordinates`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(UI_COORDINATES_MAP)
-          })
-          .then(res => res.json())
-          .then(data => {
-            saveBtn.innerText = '✅ Guardado!';
-            setTimeout(() => {
-              saveBtn.innerText = '💾 Save';
-              saveBtn.disabled = false;
-            }, 2000);
-
-            if (data.pushed) {
-              showDesignerToast('✅ Posições guardadas em app.js e enviadas para o GitHub com sucesso!', 'success');
-            } else {
-              showDesignerToast('✅ Posições guardadas com sucesso no ficheiro app.js!', 'success');
-            }
-          })
-          .catch(err => {
-            console.error('Save error:', err);
-            saveBtn.innerText = '💾 Save';
-            saveBtn.disabled = false;
-            showDesignerToast('⚠️ Guardado localmente no navegador', 'warning');
-          });
-        } else {
-          saveBtn.innerText = '💾 Save';
-          saveBtn.disabled = false;
-          showDesignerToast('⚠️ Modo Localhost necessário para atualizar o GitHub', 'warning');
-        }
-      });
-    }
-
-    // Bind Fixed Reset Button
-    document.getElementById('btn-reset-coords')?.addEventListener('click', () => {
-      if (INITIAL_UI_COORDINATES_MAP[slideKey]) {
-        UI_COORDINATES_MAP[slideKey] = JSON.parse(JSON.stringify(INITIAL_UI_COORDINATES_MAP[slideKey]));
-      }
-      const savedCoords = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_COORDS) || '{}');
-      delete savedCoords[slideKey];
-      localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(savedCoords));
-      
-      showDesignerToast('🔄 Posições restauradas para o padrão inicial', 'info');
-      renderCurrentSlide();
-    });
-  }
-
-  function adjustWidth(activeEl, delta) {
-    if (!activeEl) return;
-    const parentRect = container.getBoundingClientRect();
-    const rect = activeEl.getBoundingClientRect();
-    let curWidth = (rect.width / parentRect.width) * 100;
-    curWidth = Math.max(30, Math.min(96, curWidth + delta)).toFixed(1);
-
-    activeEl.style.width = curWidth + '%';
-
-    const elKey = activeEl.id.replace(`el-${slideKey}-`, '');
-    if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
-    if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
-    UI_COORDINATES_MAP[slideKey][elKey].width = curWidth + '%';
-    localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-
-    saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-
-    updateToolbar(activeEl);
-  }
-
-  function adjustFontSize(activeEl, delta) {
-    if (!activeEl) return;
-    const currentSize = parseFloat(window.getComputedStyle(activeEl).fontSize) || 16;
-    const newRem = Math.max(0.7, Math.min(1.8, (currentSize / 16) + delta)).toFixed(2) + 'rem';
-
-    // Apply directly in real-time to active element AND its text children
-    activeEl.style.fontSize = newRem;
-    activeEl.querySelectorAll('.cream-card-body, .speech-text, p, span, div, .s01-subtitle-text, .s02-body-p, .stepper-label, .attr-text').forEach(child => {
-      child.style.fontSize = newRem;
-    });
-
-    const elKey = activeEl.id.replace(`el-${slideKey}-`, '');
-    if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
-    if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
-    UI_COORDINATES_MAP[slideKey][elKey].fontSize = newRem;
-    saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-
-    updateToolbar(activeEl);
-  }
-
-  updateToolbar(gameState.selectedDesignerElement);
-
-  targets.forEach(el => {
-    el.classList.add('designer-element-active');
-
-    el.addEventListener('click', (e) => {
-      e.stopPropagation();
-      targets.forEach(t => t.style.outline = '2px dashed #FFCC66');
-      el.style.outline = '3px solid #2E7D32';
-      gameState.selectedDesignerElement = el;
-      updateToolbar(el);
-    });
-
-    let isDragging = false;
-    let startX, startY, startTop, startLeft;
-
-    el.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      const rect = el.getBoundingClientRect();
-      const parentRect = container.getBoundingClientRect();
-
-      startTop = ((rect.top - parentRect.top) / parentRect.height) * 100;
-      startLeft = ((rect.left - parentRect.left) / parentRect.width) * 100;
-
-      targets.forEach(t => t.style.outline = '2px dashed #FFCC66');
-      el.style.outline = '3px solid #2E7D32';
-      gameState.selectedDesignerElement = el;
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging || gameState.selectedDesignerElement !== el) return;
-      const parentRect = container.getBoundingClientRect();
-      const deltaX = ((e.clientX - startX) / parentRect.width) * 100;
-      const deltaY = ((e.clientY - startY) / parentRect.height) * 100;
-
-      const newTop = Math.max(0, Math.min(90, (startTop + deltaY))).toFixed(1) + '%';
-      const newLeft = Math.max(0, Math.min(90, (startLeft + deltaX))).toFixed(1) + '%';
-
-      el.style.top = newTop;
-      el.style.left = newLeft;
-      el.style.right = 'auto';
-
-      if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
-      const elKey = el.id.replace(`el-${slideKey}-`, '');
-      if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
-      UI_COORDINATES_MAP[slideKey][elKey].top = newTop;
-      UI_COORDINATES_MAP[slideKey][elKey].left = newLeft;
-      UI_COORDINATES_MAP[slideKey][elKey].width = el.style.width || '54%';
-
-      localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-      updateToolbar(el);
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (isDragging) {
-        saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-      }
-      isDragging = false;
-    });
-  });
-
-  // Global Arrow Key Nudge Handler
-  window.onkeydown = (e) => {
-    if (!gameState.designerMode || !gameState.selectedDesignerElement) return;
-    const el = gameState.selectedDesignerElement;
-    const parentRect = container.getBoundingClientRect();
-    const rect = el.getBoundingClientRect();
-
-    let curTop = ((rect.top - parentRect.top) / parentRect.height) * 100;
-    let curLeft = ((rect.left - parentRect.left) / parentRect.width) * 100;
-
-    const step = e.shiftKey ? 2.0 : 0.5;
-
-    if (e.key === 'ArrowUp') curTop -= step;
-    else if (e.key === 'ArrowDown') curTop += step;
-    else if (e.key === 'ArrowLeft') curLeft -= step;
-    else if (e.key === 'ArrowRight') curRight += step;
-    else return;
-
-    e.preventDefault();
-    const newTop = curTop.toFixed(1) + '%';
-    const newLeft = curLeft.toFixed(1) + '%';
-
-    el.style.top = newTop;
-    el.style.left = newLeft;
-    el.style.right = 'auto';
-
-    if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
-    const elKey = el.id.replace(`el-${slideKey}-`, '');
-    if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
-    UI_COORDINATES_MAP[slideKey][elKey].top = newTop;
-    UI_COORDINATES_MAP[slideKey][elKey].left = newLeft;
-
-    saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
-
-    updateToolbar(el);
-  };
-}
-
-// Render Integrated Elegant Bottom Navigation Bar (Hide NEXT/BACK on Screen 1)
+// Render Integrated Elegant Bottom Navigation Bar (#1E4222 Forest Green with Montserrat Buttons & Screen Counter)
 function renderBottomNavBar() {
   const navContainer = document.getElementById('bottom-nav');
+  if (!navContainer) return;
+
   const slideId = gameState.currentSlide;
 
   const isScreen1 = slideId === 1;
   const isBackDisabled = slideId <= 1;
 
-  // Lock NEXT button on Quiz screens until answered
+  // Lock NEXT and BACK buttons on Quiz screens until answered
   const isQuizScreen = Boolean(QUIZ_CONFIG_MAP[slideId]);
   const isQuizUnanswered = isQuizScreen && !gameState.quizAnswers[slideId];
-  const isNextDisabled = slideId >= gameState.totalSlides || isQuizUnanswered;
+  
+  // On active unanswered quiz screens, both BACK and NEXT get disabled
+  const isBackNavDisabled = isBackDisabled || isQuizUnanswered;
+  const isNextNavDisabled = slideId >= gameState.totalSlides || isQuizUnanswered;
 
   const backLabel = t('ui_back', 'BACK');
   const nextLabel = t('ui_next', 'NEXT');
@@ -2698,24 +2273,20 @@ function renderBottomNavBar() {
   navContainer.innerHTML = `
     <div style="min-width: 110px;">
       ${!isScreen1 ? `
-        <button id="nav-back" class="nav-btn" ${isBackDisabled ? 'disabled' : ''}>
+        <button id="nav-back" class="nav-btn" ${isBackNavDisabled ? 'disabled' : ''}>
           ◀ ${backLabel}
         </button>
       ` : ''}
     </div>
 
     <div class="nav-center-info">
-      <span class="screen-counter">${screenLabel} ${slideId} ${ofLabel} ${gameState.totalSlides}</span>
+      <span class="screen-counter">${screenLabel} ${slideId} ${ofLabel} 157</span>
       <span class="nav-breadcrumbs">${chapterTitle}</span>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 10px; min-width: 110px; justify-content: flex-end;">
-      <button id="nav-mute" class="btn-sound-toggle" title="Sound">
-        ${gameState.audioMuted ? '🔇' : '🔊'}
-      </button>
-
+    <div style="display: flex; align-items: center; min-width: 110px; justify-content: flex-end;">
       ${!isScreen1 ? `
-        <button id="nav-next" class="nav-btn" ${isNextDisabled ? 'disabled' : ''}>
+        <button id="nav-next" class="nav-btn" ${isNextNavDisabled ? 'disabled' : ''}>
           ${nextLabel} ▶
         </button>
       ` : ''}
@@ -2724,10 +2295,10 @@ function renderBottomNavBar() {
 
   const backBtn = document.getElementById('nav-back');
   const nextBtn = document.getElementById('nav-next');
-  const muteBtn = document.getElementById('nav-mute');
 
-  if (backBtn && !isBackDisabled && !isScreen1) {
+  if (backBtn && !isBackNavDisabled && !isScreen1) {
     backBtn.addEventListener('click', () => {
+      initAudioEngine();
       if (gameState.currentSlide === 23) {
         const quiz4Ans = gameState.quizAnswers[20];
         if (quiz4Ans && quiz4Ans.correct === false) {
@@ -2741,15 +2312,10 @@ function renderBottomNavBar() {
     });
   }
 
-  if (nextBtn && !isNextDisabled && !isScreen1) {
-    nextBtn.addEventListener('click', () => goToSlide(gameState.currentSlide + 1));
-  }
-
-  if (muteBtn) {
-    muteBtn.addEventListener('click', () => {
-      gameState.audioMuted = !gameState.audioMuted;
-      localStorage.setItem(STORAGE_KEY_MUTE, String(gameState.audioMuted));
-      renderBottomNavBar();
+  if (nextBtn && !isNextNavDisabled && !isScreen1) {
+    nextBtn.addEventListener('click', () => {
+      initAudioEngine();
+      goToSlide(gameState.currentSlide + 1);
     });
   }
 }
@@ -2777,39 +2343,6 @@ function updateResponsiveScale() {
   container.style.setProperty('--scale-factor', scale.toFixed(3));
 }
 
-// Dev Debug HUD Tool for Real-Time Coordinates Calibration
-function initDebugHUD() {
-  if (window.location.hostname !== 'localhost' && !window.location.search.includes('debug=true')) return;
-
-  const container = document.getElementById('game-container');
-  if (!container) return;
-
-  let hud = document.getElementById('dev-coords-hud');
-  if (!hud) {
-    hud = document.createElement('div');
-    hud.id = 'dev-coords-hud';
-    hud.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.85); color: #fff; padding: 10px; font-family: monospace; font-size: 11px; z-index: 9999; border-radius: 6px; pointer-events: none;';
-    hud.innerHTML = 'DEV HUD: Click screen for coords';
-    container.appendChild(hud);
-  }
-
-  let grid = document.getElementById('dev-coords-grid');
-  if (!grid) {
-    grid = document.createElement('div');
-    grid.id = 'dev-coords-grid';
-    grid.style.cssText = 'position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; border: 2px red dashed; box-sizing: border-box; z-index: 9998;';
-    container.appendChild(grid);
-  }
-
-  container.addEventListener('click', (e) => {
-    const rect = container.getBoundingClientRect();
-    const xPct = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-    const yPct = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-    if (hud) hud.innerHTML = `Coords: left: ${xPct}%; top: ${yPct}%;`;
-    console.log(`COORDS: left: ${xPct}%, top: ${yPct}%`);
-  });
-}
-
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
   updateViewportHeight();
@@ -2818,9 +2351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.addEventListener('orientationchange', updateResponsiveScale);
 
   preloadBackdropImages();
-  loadCustomCoordinates();
   renderTopBar();
-  initDebugHUD();
 
   // 1. Carrega sempre as traduções na inicialização para o modal ficar traduzido
   await loadTranslations(gameState.activeLanguage);
