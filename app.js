@@ -450,7 +450,7 @@ function goToSlide(slideNum) {
   renderCurrentSlide();
 }
 
-// Render Top Bar (#FFCC66 Gold Bar with 3 Isolated Flow Zones: Left Logo+Badge, Center Absolute Title, Right Lang+Mute)
+// Render Top Bar (#FFCC66 Gold Bar with Modern Custom Language Selector Component)
 function renderTopBar() {
   const topBar = document.getElementById('top-bar');
   if (!topBar) return;
@@ -458,10 +458,15 @@ function renderTopBar() {
   const soundIcon = gameState.audioMuted ? 'volume-x' : 'volume-2';
   const isCompactMobile = window.innerWidth <= 480;
 
+  const currentLangObj = SUPPORTED_LANGUAGES.find(l => l.code === gameState.activeLanguage) || SUPPORTED_LANGUAGES[0];
+  const shortCode = currentLangObj.shortDisplay || currentLangObj.code.split('-')[0].toUpperCase();
+  const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
+  const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
+
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
-      <span class="top-bar-version-badge">v2.1.2 • 26.08.2026</span>
+      <span class="top-bar-version-badge">v2.1.3 • 26.08.2026</span>
     </div>
 
     <div class="top-bar-center">
@@ -469,13 +474,29 @@ function renderTopBar() {
     </div>
     
     <div class="top-bar-right">
-      <select id="lang-select" class="top-bar-lang-select" title="${t('ui_select_language', 'Language')}">
-        ${SUPPORTED_LANGUAGES.map(l => `
-          <option value="${l.code}" ${l.code === gameState.activeLanguage ? 'selected' : ''}>
-            ${isCompactMobile ? (l.shortDisplay || l.code.split('-')[0].toUpperCase()) : l.display}
-          </option>
-        `).join('')}
-      </select>
+      <!-- Modern Custom Language Selector Pill Dropdown -->
+      <div class="top-bar-lang-wrapper">
+        <button id="lang-custom-btn" class="top-bar-lang-btn" title="${t('ui_select_language', 'Language')}">
+          <i data-lucide="globe" style="width: calc(14px * var(--scale-factor, 1)); height: calc(14px * var(--scale-factor, 1)); color: #1E4222;"></i>
+          <span>${langLabel}</span>
+          <i data-lucide="chevron-down" style="width: calc(13px * var(--scale-factor, 1)); height: calc(13px * var(--scale-factor, 1)); color: #1E4222;"></i>
+        </button>
+
+        <div id="lang-menu" class="lang-dropdown-menu">
+          ${SUPPORTED_LANGUAGES.map(l => {
+            const isSel = l.code === gameState.activeLanguage;
+            const itemCode = l.shortDisplay || l.code.split('-')[0].toUpperCase();
+            const itemName = l.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
+            const itemText = isCompactMobile ? itemCode : `${itemCode} • ${itemName}`;
+            return `
+              <div class="lang-option-item ${isSel ? 'selected' : ''}" data-lang="${l.code}">
+                <span>${itemText}</span>
+                ${isSel ? '<i data-lucide="check" style="width: 14px; height: 14px;"></i>' : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
 
       <button id="nav-mute" class="btn-sound-toggle" title="Sound">
         <i data-lucide="${soundIcon}" style="width: calc(18px * var(--scale-factor, 1)); height: calc(18px * var(--scale-factor, 1)); color: #FFCC66;"></i>
@@ -483,9 +504,30 @@ function renderTopBar() {
     </div>
   `;
 
-  document.getElementById('lang-select')?.addEventListener('change', (e) => {
-    const selectedLang = e.target.value;
-    loadTranslations(selectedLang);
+  // Custom Dropdown Event Listeners
+  const langBtn = document.getElementById('lang-custom-btn');
+  const langMenu = document.getElementById('lang-menu');
+
+  langBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    initAudioEngine();
+    langMenu?.classList.toggle('active');
+  });
+
+  document.querySelectorAll('.lang-option-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const selectedLang = item.getAttribute('data-lang');
+      langMenu?.classList.remove('active');
+      if (selectedLang && selectedLang !== gameState.activeLanguage) {
+        loadTranslations(selectedLang);
+      }
+    });
+  });
+
+  // Close dropdown menu when clicking outside
+  document.addEventListener('click', () => {
+    langMenu?.classList.remove('active');
   });
 
   document.getElementById('nav-mute')?.addEventListener('click', () => {
