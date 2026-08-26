@@ -83,10 +83,10 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s05": {
     "bubble": {
-      "top": "46.0%",
-      "left": "6.0%",
-      "width": "88.0%",
-      "pointer": "bubble-tail-top-left"
+      "top": "48.0%",
+      "left": "5.0%",
+      "width": "62.0%",
+      "pointer": "bubble-tail-top-mia"
     }
   },
   "s06": {
@@ -466,8 +466,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.009" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.009' : 'v2.1.4.009 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.010" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.010' : 'v2.1.4.010 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -930,8 +930,10 @@ function renderScreen5(container) {
     .map(p => `<p class="speech-p" style="margin-bottom: 10px; line-height: 1.38; font-weight: 600;">${p}</p>`)
     .join('');
 
+  const bubbleClass = (coords.bubble && coords.bubble.pointer) || 'bubble-tail-top-mia';
+
   container.innerHTML = `
-    <div id="el-s05-bubble" class="speech-bubble bubble-tail-top-left" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '46%', left: '6%', width: '88%' })}">
+    <div id="el-s05-bubble" class="speech-bubble ${bubbleClass}" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '48%', left: '5%', width: '62%' })}">
       <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; color: #1F2220;">
         ${formattedHtml}

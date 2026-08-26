@@ -590,7 +590,41 @@ button,
   overflow: visible !important;
 }
 
-/* Balão com cauda apontando no topo para a boca da Mia */
+/* Balão com cauda apontando no topo com precisão para a boca da Mia (70%) */
+.bubble-tail-top-mia {
+  position: absolute;
+  overflow: visible !important;
+}
+
+.bubble-tail-top-mia::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  left: 70%;
+  border-width: 0 12px 14px 12px;
+  border-style: solid;
+  border-color: transparent transparent rgba(247, 245, 238, 0.95) transparent;
+  display: block;
+  width: 0;
+  height: 0;
+  z-index: 20;
+}
+
+.bubble-tail-top-mia::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: calc(70% - 1px);
+  border-width: 0 13px 16px 13px;
+  border-style: solid;
+  border-color: transparent transparent rgba(30, 66, 34, 0.45) transparent;
+  display: block;
+  width: 0;
+  height: 0;
+  z-index: 19;
+}
+
+/* Balão com cauda apontando no topo para a boca da Mia (42%) */
 .bubble-tail-top-left {
   position: absolute;
   overflow: visible !important;
