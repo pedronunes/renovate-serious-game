@@ -526,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.031" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.031' : 'v2.1.4.031 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.032" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.032' : 'v2.1.4.032 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1793,22 +1793,6 @@ function renderQuizScreen(container, slideId) {
     ? [...previous.selected] 
     : (previous?.selected ? [previous.selected] : []);
 
-  // Helper function to extract option letter badge (supporting Latin A-D & Greek Α-Δ / Alpha-Delta) and clean body text
-  const parseQuizOption = (rawText, defaultKey) => {
-    if (!rawText) return { badgeLetter: defaultKey, cleanText: '' };
-    const match = rawText.match(/^([A-Z\u0370-\u03FFa-z\u03b1-\u03c90-9])[\.\)\s]+(.*)/u);
-    if (match) {
-      return {
-        badgeLetter: match[1].toUpperCase(),
-        cleanText: match[2].trim()
-      };
-    }
-    return {
-      badgeLetter: defaultKey,
-      cleanText: rawText.replace(/^[A-D\u0391-\u0394][\.\s]*/u, '').trim()
-    };
-  };
-
   container.innerHTML = `
     <!-- Quiz Container Layout strictly matching reference image & Design Bible v6 -->
     <div id="el-${slideKey}-card" class="quiz-main-container" style="${styleObjToCss(coords.card || { top: '3.5%', left: '4.0%', width: '92.0%' })}">
@@ -1942,18 +1926,15 @@ function renderQuizFeedbackScreen(container, slideId) {
   const statusText = fb.isCorrect ? t('ui_correct', 'CORRETO') : t('ui_incorrect', 'INCORRETO');
   const infoText = t(fb.infoKey, '');
 
-  const continueText = t('ui_next', 'SEGUINTE');
-  const retryText = t('ui_retry', 'TENTAR NOVAMENTE');
-
-  // Determine options to display:
+  // Determine options to display strictly matching reference images
   let optionsToDisplay = [];
   if (cfg && cfg.options) {
     if (fb.isCorrect) {
-      // Display correct options
+      // Display correct option(s)
       const targetCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption];
       optionsToDisplay = cfg.options.filter(opt => targetCorrect.includes(opt.key));
     } else {
-      // Display incorrect options (user selected or non-correct options)
+      // Display incorrect option(s) selected by user or non-correct options
       const userSelected = gameState.quizAnswers[parentQuizSlide]?.selected;
       const selectedArr = Array.isArray(userSelected) ? userSelected : (userSelected ? [userSelected] : []);
       const targetCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption];
@@ -1967,11 +1948,11 @@ function renderQuizFeedbackScreen(container, slideId) {
   }
 
   container.innerHTML = `
-    <!-- Quiz Feedback Container strictly matching uploaded mockups & Design Bible v6 -->
+    <!-- Quiz Feedback Container strictly matching uploaded mockups media_1787783849503 & media_1787783851660 -->
     <div id="el-${slideKey}-card" class="quiz-main-container feedback-main-container" style="${styleObjToCss(coords.card || { top: '3.0%', left: '4.0%', width: '92.0%' })}">
       
       <!-- Top Standalone Question Mark Emblem & Category Header (Consistent with Question Screen) -->
-      <div class="quiz-header-wrapper" style="margin-bottom: calc(16px * var(--scale-factor, 1));">
+      <div class="quiz-header-wrapper" style="margin-bottom: calc(14px * var(--scale-factor, 1));">
         <div class="quiz-emblem-icon-standalone">
           <span class="quiz-standalone-qmark">?</span>
         </div>
@@ -1980,7 +1961,7 @@ function renderQuizFeedbackScreen(container, slideId) {
 
       <!-- Prominent Question Box Card -->
       ${questionText ? `
-        <div class="quiz-question-card" style="margin-bottom: calc(14px * var(--scale-factor, 1));">
+        <div class="quiz-question-card" style="margin-bottom: calc(12px * var(--scale-factor, 1));">
           <div class="quiz-question-text">${questionText}</div>
         </div>
       ` : ''}
@@ -2018,34 +1999,8 @@ function renderQuizFeedbackScreen(container, slideId) {
         </div>
       </div>
 
-      <!-- Action Button (Next / Retry) -->
-      <div class="quiz-action-wrapper">
-        ${fb.isCorrect ? `
-          <button id="btn-feedback-action" class="btn-submit-answer btn-feedback-next">
-            <span>${continueText}</span>
-            <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
-          </button>
-        ` : `
-          <button id="btn-feedback-action" class="btn-submit-answer btn-feedback-retry">
-            <i data-lucide="rotate-ccw" style="width: 20px; height: 20px;"></i>
-            <span>${retryText}</span>
-          </button>
-        `}
-      </div>
-
     </div>
   `;
-
-  // Bind Action Button click
-  document.getElementById('btn-feedback-action')?.addEventListener('click', () => {
-    initAudioEngine();
-    playFeedbackSound('click');
-    if (fb.isCorrect) {
-      goToSlide(fb.nextSlide);
-    } else {
-      goToSlide(fb.retrySlide);
-    }
-  });
 
   // Trigger Lucide Icons
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
