@@ -137,19 +137,15 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s09": {
     "bubble": {
-      "top": "9.0%",
-      "right": "5%",
-      "width": "46%",
-      "pointer": "pointer-left",
-      "fontSize": "0.95rem",
-      "left": "47.0%"
+      "top": "6.0%",
+      "left": "46.0%",
+      "width": "48.0%",
+      "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "50.0%",
-      "right": "5%",
-      "width": "88%",
-      "fontSize": "0.92rem",
-      "left": "7.4%"
+      "top": "34.0%",
+      "left": "6.0%",
+      "width": "88.0%"
     }
   },
   "s10": {
@@ -466,8 +462,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.011" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.011' : 'v2.1.4.011 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.012" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.012' : 'v2.1.4.012 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -561,10 +557,12 @@ function renderTopBar() {
 // Helper to convert style object to inline CSS string
 function styleObjToCss(styleObj = {}) {
   const cssStyles = [];
+  const hasLeft = styleObj.left !== undefined;
   const isAbsolute = styleObj.top !== undefined || styleObj.left !== undefined || styleObj.right !== undefined;
 
   Object.entries(styleObj).forEach(([k, v]) => {
-    if (k === 'pointer') return; // Ignora o ponteiro visual da cauda do balão no CSS inline
+    if (k === 'pointer' || k === 'fontSize') return;
+    if (k === 'right' && hasLeft) return; // Omit right if left is present to prevent CSS geometry conflict
     const cssKey = k.replace(/([A-Z])/g, '-$1').toLowerCase();
     cssStyles.push(`${cssKey}:${v}`);
   });
