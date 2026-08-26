@@ -105,9 +105,9 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s07": {
     "card": {
-      "top": "18.0%",
-      "left": "46.0%",
-      "width": "48.0%"
+      "top": "26.0%",
+      "left": "8.0%",
+      "width": "84.0%"
     }
   },
   "s08": {
@@ -130,28 +130,28 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s09": {
     "bubble": {
-      "top": "6.0%",
+      "top": "10.0%",
       "left": "46.0%",
       "width": "48.0%",
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "34.0%",
+      "top": "40.0%",
       "left": "6.0%",
       "width": "88.0%"
     }
   },
   "s10": {
     "bubble": {
-      "top": "8.0%",
+      "top": "10.0%",
       "left": "46.0%",
       "width": "48.0%",
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "34.0%",
-      "left": "6.0%",
-      "width": "88.0%"
+      "top": "38.0%",
+      "left": "5.0%",
+      "width": "90.0%"
     }
   },
   "s23": {
@@ -464,8 +464,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.015" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.015' : 'v2.1.4.015 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.016" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.016' : 'v2.1.4.016 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -986,26 +986,37 @@ function renderScreen6(container) {
   }
 }
 
-// Screen 7: Chapter 1 Start Announcement Card (Matching Serious Game Design System)
+// Screen 7: Chapter 1 Start Announcement Card (Centered as Primary Focus)
 function renderScreen7(container) {
   const coords = UI_COORDINATES_MAP.s07 || INITIAL_UI_COORDINATES_MAP.s07;
   
   const rawChapterTitle = t('s07_chapter_01_title', '1. Understanding the calibration process and its importance');
   const cleanTitle = rawChapterTitle.replace(/^1[\.\s]*/, '').trim();
 
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '26.0%';
+  const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '8.0%';
+  const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '84.0%';
+
   container.innerHTML = `
-    <!-- Chapter 1 Translucent Card positioned on the right side of Mia -->
-    <div id="el-s07-card" class="cream-card" style="${styleObjToCss(coords.card || { top: '18%', left: '46%', width: '48%' })}">
-      <div style="text-align: center; padding: 10px 4px;">
+    <!-- Chapter 1 Translucent Card Centered on Screen -->
+    <div id="el-s07-card" class="cream-card" style="position: absolute; top: ${cardTop}; left: ${cardLeft}; width: ${cardWidth}; text-align: center;">
+      <div style="padding: 16px 8px;">
         
+        <!-- Top Round Icon Badge with Number 1 -->
+        <div style="display: flex; justify-content: center; margin-bottom: 18px;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #1E4222 0%, #2A5A2E 100%); border: 3px solid #FFCC66; box-shadow: 0 6px 18px rgba(30, 66, 34, 0.35); font-size: 2.4rem; font-weight: 900; color: #FFFFFF; font-family: var(--font-header);">
+            1
+          </div>
+        </div>
+
         <!-- Chapter Badge -->
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: #1E4222; color: #FFFFFF; font-weight: 900; padding: 6px 16px; border-radius: 20px; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1.5px solid #FFCC66; box-shadow: 0 4px 12px rgba(30, 66, 34, 0.25); margin-bottom: 14px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: #1E4222; color: #FFFFFF; font-weight: 900; padding: 6px 16px; border-radius: 20px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1.5px solid #FFCC66; box-shadow: 0 4px 12px rgba(30, 66, 34, 0.25); margin-bottom: 16px;">
           <i data-lucide="book-open" style="width: 18px; height: 18px; stroke: #FFCC66;"></i>
           <span>${t('ui_chapter', 'CAPÍTULO')} 1</span>
         </div>
 
         <!-- Floating Chapter Title Header -->
-        <div style="font-size: 1.25rem; line-height: 1.42; color: #1E4222; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em;">
+        <div style="font-size: 1.35rem; line-height: 1.42; color: #1E4222; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em;">
           ${cleanTitle}
         </div>
 
@@ -1021,11 +1032,34 @@ function renderScreen7(container) {
 // Screen 8: Mia's Tip & 3 Pillars (On SeriousGame_tela8.jpg with Enlarged Titles & Enlarged Lucide Icons)
 function renderScreen8(container) {
   const coords = UI_COORDINATES_MAP.s08 || INITIAL_UI_COORDINATES_MAP.s08;
-  const bubbleClass = (coords.bubble && coords.bubble.pointer && coords.bubble.pointer !== 'pointer-left') ? coords.bubble.pointer : 'bubble-tail-left';
+
+  const speech = t('s08_dialogue_mia', 'Laura, before we touch the sprayer, we need a clear goal. Do you know what guarantees a successful treatment?');
+  const tipTitle = t('s08_tip_title', "Mia's Tip");
+  const tipText = t('s08_tip_text', "Too much spray wastes product and harms the environment. Too little won't protect your crops!");
+
+  const secTitle = t('s08_section_title', 'The 3 Pillars of Effectiveness');
+  const p1Title = t('s08_pillar_01_title', 'Correct spray volume rate (L/ha)');
+  const p1Text = t('s08_pillar_01_text', 'Tailored to the specific area of your vineyard.');
+  const p2Title = t('s08_pillar_02_title', 'Exact concentration');
+  const p2Text = t('s08_pillar_02_text', 'The right mix of the plant protection product.');
+  const p3Title = t('s08_pillar_03_title', 'Precise application');
+  const p3Text = t('s08_pillar_03_text', 'Ensuring the exact dose safely reaches the target.');
+
+  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '8.0%';
+  const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
+  const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
+
+  const tipTop = (coords.tip && coords.tip.top) ? coords.tip.top : '34.0%';
+  const tipLeft = (coords.tip && coords.tip.left) ? coords.tip.left : '46.0%';
+  const tipWidth = (coords.tip && coords.tip.width) ? coords.tip.width : '48.0%';
+
+  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '54.0%';
+  const pillarsLeft = (coords.pillars && coords.pillars.left) ? coords.pillars.left : '6.0%';
+  const pillarsWidth = (coords.pillars && coords.pillars.width) ? coords.pillars.width : '88.0%';
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s08-bubble" class="speech-bubble ${bubbleClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s08-bubble" class="speech-bubble bubble-tail-left" style="position: absolute; top: ${bubbleTop}; left: ${bubbleLeft}; width: ${bubbleWidth}; min-height: max-content;">
       <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
@@ -1033,50 +1067,50 @@ function renderScreen8(container) {
     </div>
 
     <!-- Mia's Tip Box -->
-    <div id="el-s08-tip" class="tip-card" style="${styleObjToCss(coords.tip || { top: '26%', right: '5%', width: '58%' })}">
+    <div id="el-s08-tip" class="tip-card" style="position: absolute; top: ${tipTop}; left: ${tipLeft}; width: ${tipWidth};">
       <div class="tip-card-header" style="display: flex; align-items: center; gap: 8px; font-weight: 900; color: #855300; font-size: 1.05rem;">
         <i data-lucide="lightbulb" style="width: 24px; height: 24px; stroke: #D97706;"></i>
         <span>${tipTitle}</span>
       </div>
-      <div class="tip-card-text" style="font-size: 0.98rem; line-height: 1.45; margin-top: 6px; font-weight: 600; color: #452A00;">
+      <div class="tip-card-text" style="font-size: 0.95rem; line-height: 1.42; margin-top: 6px; font-weight: 600; color: #452A00;">
         ${tipText}
       </div>
     </div>
 
-    <!-- 3 Pillars of Effectiveness Translucent Card with Enlarged Header Title, Subtitles and Icons -->
-    <div id="el-s08-pillars" class="cream-card" style="${styleObjToCss(coords.pillars || { top: '48%', right: '5%', width: '58%' })}">
+    <!-- 3 Pillars of Effectiveness Translucent Card -->
+    <div id="el-s08-pillars" class="cream-card" style="position: absolute; top: ${pillarsTop}; left: ${pillarsLeft}; width: ${pillarsWidth};">
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 8px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
         ${secTitle}
       </div>
       
-      <div class="pillars-list" style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="pillars-list" style="display: flex; flex-direction: column; gap: 12px;">
         <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="droplet" style="width: 32px; height: 32px; stroke: #1E4222; stroke-width: 2.2;"></i>
+          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="droplet" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
           </div>
           <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.15rem; display: block; margin-bottom: 2px;">${p1Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.96rem; color: #333333; line-height: 1.4; font-weight: 500;">${p1Text}</span>
+            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p1Title}</span>
+            <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p1Text}</span>
           </div>
         </div>
 
         <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="flask-conical" style="width: 32px; height: 32px; stroke: #1E4222; stroke-width: 2.2;"></i>
+          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="flask-conical" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
           </div>
           <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.15rem; display: block; margin-bottom: 2px;">${p2Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.96rem; color: #333333; line-height: 1.4; font-weight: 500;">${p2Text}</span>
+            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p2Title}</span>
+            <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p2Text}</span>
           </div>
         </div>
 
         <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="target" style="width: 32px; height: 32px; stroke: #1E4222; stroke-width: 2.2;"></i>
+          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i data-lucide="target" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
           </div>
           <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.15rem; display: block; margin-bottom: 2px;">${p3Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.96rem; color: #333333; line-height: 1.4; font-weight: 500;">${p3Text}</span>
+            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p3Title}</span>
+            <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p3Text}</span>
           </div>
         </div>
       </div>
@@ -1190,7 +1224,6 @@ function renderScreen9(container) {
 // Screen 10: The 4 Key Parameters (Exact Reproduction of /docs/tela10.png with Enlarged Topic Illustration Images)
 function renderScreen10(container) {
   const coords = UI_COORDINATES_MAP.s10 || INITIAL_UI_COORDINATES_MAP.s10;
-  const pointerClass = (coords.bubble && coords.bubble.pointer) || 'pointer-left';
 
   const speech = t('s10_dialogue_mia', 'To set the correct spray volume, we need to adjust four key operational parameters.');
   const secTitle = t('s10_section_title', 'The 4 Key Parameters');
@@ -1204,9 +1237,17 @@ function renderScreen10(container) {
 
   const cleanParamTitle = (str) => str.replace(/^\d+[\.\s]*/, '');
 
+  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '10.0%';
+  const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
+  const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
+
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '38.0%';
+  const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '5.0%';
+  const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '90.0%';
+
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia (Holding 4 Fingers Up!) -->
-    <div id="el-s10-bubble" class="speech-bubble bubble-tail-left" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+    <div id="el-s10-bubble" class="speech-bubble bubble-tail-left" style="position: absolute; top: ${bubbleTop}; left: ${bubbleLeft}; width: ${bubbleWidth}; min-height: max-content;">
       <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
@@ -1214,7 +1255,7 @@ function renderScreen10(container) {
     </div>
 
     <!-- The 4 Key Parameters Translucent Cream Card -->
-    <div id="el-s10-card" class="cream-card" style="${styleObjToCss(coords.card || { top: '26%', right: '5%', width: '58%' })}">
+    <div id="el-s10-card" class="cream-card" style="position: absolute; top: ${cardTop}; left: ${cardLeft}; width: ${cardWidth};">
       
       <!-- Card Header -->
       <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.02em; text-align: center;">
