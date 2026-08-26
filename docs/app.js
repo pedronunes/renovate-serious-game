@@ -123,7 +123,7 @@ const INITIAL_UI_COORDINATES_MAP = {
       "width": "48.0%"
     },
     "pillars": {
-      "top": "54.0%",
+      "top": "58.0%",
       "left": "6.0%",
       "width": "88.0%"
     }
@@ -136,7 +136,7 @@ const INITIAL_UI_COORDINATES_MAP = {
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "40.0%",
+      "top": "42.0%",
       "left": "6.0%",
       "width": "88.0%"
     }
@@ -149,7 +149,7 @@ const INITIAL_UI_COORDINATES_MAP = {
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "38.0%",
+      "top": "40.0%",
       "left": "5.0%",
       "width": "90.0%"
     }
@@ -325,6 +325,7 @@ function t(key, fallback = '') {
 }
 
 // Load Translation Dictionary
+// Load Translation Dictionary
 async function loadTranslations(langCode) {
   try {
     const response = await fetch(`./public/locales/${langCode}.json`);
@@ -337,7 +338,6 @@ async function loadTranslations(langCode) {
     localStorage.setItem(STORAGE_KEY_LANG, langCode);
     
     renderTopBar();
-    renderCurrentSlide();
   } catch (err) {
     console.error('Translation error:', err);
   }
@@ -372,9 +372,7 @@ function checkSessionRecovery() {
     const saved = JSON.parse(savedRaw);
     if (saved && saved.slide && saved.slide > 1) {
       if (saved.lang) gameState.activeLanguage = saved.lang;
-      loadTranslations(gameState.activeLanguage).then(() => {
-        showRecoveryModal(saved);
-      });
+      showRecoveryModal(saved);
       return true;
     }
   } catch (e) {
@@ -385,6 +383,7 @@ function checkSessionRecovery() {
 
 function showRecoveryModal(savedData) {
   const container = document.getElementById('modal-container');
+  if (!container) return;
   
   const resumeTitle = t('ui_resume_session', 'Resume Session');
   const restartTitle = t('ui_start_over', 'Start Over');
@@ -402,11 +401,11 @@ function showRecoveryModal(savedData) {
           ${promptText}
         </div>
         <div class="modal-actions">
-          <button id="btn-resume-session" class="btn-modal btn-modal-primary">
+          <button id="btn-resume-session" class="btn-modal btn-modal-primary" type="button">
             <i data-lucide="play" style="width: 18px; height: 18px; stroke: #FFCC66;"></i>
             <span>${resumeTitle}</span>
           </button>
-          <button id="btn-restart-session" class="btn-modal btn-modal-secondary">
+          <button id="btn-restart-session" class="btn-modal btn-modal-secondary" type="button">
             <i data-lucide="rotate-ccw" style="width: 16px; height: 16px; stroke: #D97706;"></i>
             <span>${restartTitle}</span>
           </button>
@@ -419,23 +418,31 @@ function showRecoveryModal(savedData) {
     window.lucide.createIcons();
   }
 
-  document.getElementById('btn-resume-session').addEventListener('click', async () => {
-    gameState.currentSlide = savedData.slide;
-    gameState.maxUnlockedSlide = savedData.maxUnlocked || savedData.slide;
-    gameState.quizAnswers = savedData.answers || {};
-    if (savedData.lang) gameState.activeLanguage = savedData.lang;
-    container.innerHTML = '';
-    await loadTranslations(gameState.activeLanguage);
-    renderCurrentSlide();
-  });
+  const btnResume = document.getElementById('btn-resume-session');
+  if (btnResume) {
+    btnResume.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      gameState.currentSlide = savedData.slide;
+      gameState.maxUnlockedSlide = savedData.maxUnlocked || savedData.slide;
+      gameState.quizAnswers = savedData.answers || {};
+      if (savedData.lang) gameState.activeLanguage = savedData.lang;
+      container.innerHTML = '';
+      renderCurrentSlide();
+    });
+  }
 
-  document.getElementById('btn-restart-session').addEventListener('click', async () => {
-    localStorage.removeItem(STORAGE_KEY_PROGRESS);
-    container.innerHTML = '';
-    gameState.currentSlide = 1;
-    await loadTranslations(gameState.activeLanguage);
-    renderCurrentSlide();
-  });
+  const btnRestart = document.getElementById('btn-restart-session');
+  if (btnRestart) {
+    btnRestart.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      localStorage.removeItem(STORAGE_KEY_PROGRESS);
+      container.innerHTML = '';
+      gameState.currentSlide = 1;
+      renderCurrentSlide();
+    });
+  }
 }
 
 // Navigation Engine
@@ -464,8 +471,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.016" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.016' : 'v2.1.4.016 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.017" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.017' : 'v2.1.4.017 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -1000,23 +1007,23 @@ function renderScreen7(container) {
   container.innerHTML = `
     <!-- Chapter 1 Translucent Card Centered on Screen -->
     <div id="el-s07-card" class="cream-card" style="position: absolute; top: ${cardTop}; left: ${cardLeft}; width: ${cardWidth}; text-align: center;">
-      <div style="padding: 16px 8px;">
+      <div style="padding: 20px 10px;">
         
         <!-- Top Round Icon Badge with Number 1 -->
-        <div style="display: flex; justify-content: center; margin-bottom: 18px;">
-          <div style="display: inline-flex; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #1E4222 0%, #2A5A2E 100%); border: 3px solid #FFCC66; box-shadow: 0 6px 18px rgba(30, 66, 34, 0.35); font-size: 2.4rem; font-weight: 900; color: #FFFFFF; font-family: var(--font-header);">
+        <div style="display: flex; justify-content: center; margin-bottom: 22px;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 78px; height: 78px; border-radius: 50%; background: linear-gradient(135deg, #1E4222 0%, #2A5A2E 100%); border: 3px solid #FFCC66; box-shadow: 0 8px 20px rgba(30, 66, 34, 0.4); font-size: 2.5rem; font-weight: 900; color: #FFFFFF; font-family: var(--font-header);">
             1
           </div>
         </div>
 
-        <!-- Chapter Badge -->
-        <div style="display: inline-flex; align-items: center; gap: 8px; background: #1E4222; color: #FFFFFF; font-weight: 900; padding: 6px 16px; border-radius: 20px; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; border: 1.5px solid #FFCC66; box-shadow: 0 4px 12px rgba(30, 66, 34, 0.25); margin-bottom: 16px;">
-          <i data-lucide="book-open" style="width: 18px; height: 18px; stroke: #FFCC66;"></i>
+        <!-- Chapter Badge with Increased Prominence and Larger Font -->
+        <div style="display: inline-flex; align-items: center; gap: 10px; background: #1E4222; color: #FFFFFF; font-weight: 900; padding: 8px 22px; border-radius: 24px; font-size: 1.12rem; text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid #FFCC66; box-shadow: 0 5px 14px rgba(30, 66, 34, 0.3); margin-bottom: 20px;">
+          <i data-lucide="book-open" style="width: 20px; height: 20px; stroke: #FFCC66; stroke-width: 2.5;"></i>
           <span>${t('ui_chapter', 'CAPÍTULO')} 1</span>
         </div>
 
         <!-- Floating Chapter Title Header -->
-        <div style="font-size: 1.35rem; line-height: 1.42; color: #1E4222; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em;">
+        <div style="font-size: 1.38rem; line-height: 1.45; color: #1E4222; font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; padding: 0 6px;">
           ${cleanTitle}
         </div>
 
@@ -1053,7 +1060,7 @@ function renderScreen8(container) {
   const tipLeft = (coords.tip && coords.tip.left) ? coords.tip.left : '46.0%';
   const tipWidth = (coords.tip && coords.tip.width) ? coords.tip.width : '48.0%';
 
-  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '54.0%';
+  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '58.0%';
   const pillarsLeft = (coords.pillars && coords.pillars.left) ? coords.pillars.left : '6.0%';
   const pillarsWidth = (coords.pillars && coords.pillars.width) ? coords.pillars.width : '88.0%';
 
@@ -1146,11 +1153,11 @@ function renderScreen9(container) {
   const infoTitle = t('s09_info_title', 'Remember');
   const infoText = t('s09_info_text', 'Calibration is the practical and reliable way to achieve the right spray volume rate in your vineyard or orchard.');
 
-  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '6.0%';
+  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '10.0%';
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '34.0%';
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '42.0%';
   const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '6.0%';
   const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '88.0%';
 
@@ -1241,7 +1248,7 @@ function renderScreen10(container) {
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '38.0%';
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '40.0%';
   const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '5.0%';
   const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '90.0%';
 

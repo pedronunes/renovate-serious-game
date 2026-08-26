@@ -553,6 +553,12 @@ button,
   padding: calc(14px * var(--scale-factor, 1)) calc(16px * var(--scale-factor, 1)) !important;
   width: 100%;
   box-sizing: border-box;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cream-card:hover {
+  transform: translateY(-3px) scale(1.006);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.20);
 }
 
 .cream-card-header {
@@ -588,6 +594,12 @@ button,
   width: 100%;
   box-sizing: border-box;
   overflow: visible !important;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.speech-bubble:hover {
+  transform: translateY(-2px) scale(1.005);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
 }
 
 /* Balão com cauda apontando no topo com precisão para a boca da Mia (70%) */
@@ -1336,7 +1348,7 @@ button,
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   display: flex;
@@ -1353,9 +1365,15 @@ button,
   box-shadow: 0 4px 14px rgba(30, 66, 34, 0.35);
 }
 
-.btn-modal-primary:hover, .btn-modal-primary:active {
+.btn-modal-primary:hover {
   background: linear-gradient(135deg, #2A5A2E 0%, #1E4222 100%);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(30, 66, 34, 0.45);
+  filter: brightness(1.08);
+}
+
+.btn-modal-primary:active {
+  transform: translateY(0px) scale(0.97);
 }
 
 .btn-modal-secondary {
@@ -1365,9 +1383,27 @@ button,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.btn-modal-secondary:hover, .btn-modal-secondary:active {
+.btn-modal-secondary:hover {
   background-color: #FFFFFF;
   border-color: #D97706;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 16px rgba(133, 83, 0, 0.2);
+}
+
+.btn-modal-secondary:active {
+  transform: translateY(0px) scale(0.97);
+}
+
+/* Pillar Items & Interactive Lists Hover Effect */
+.pillar-item {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.pillar-item:hover {
+  transform: translateX(5px);
+  background: rgba(30, 66, 34, 0.05);
 }
 
 
