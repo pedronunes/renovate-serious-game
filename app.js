@@ -9,18 +9,18 @@ const STORAGE_KEY_MUTE = 'renovate_game_muted';
 const STORAGE_KEY_CUSTOM_COORDS = 'renovate_custom_coordinates_v2';
 
 const SUPPORTED_LANGUAGES = [
-  { code: 'en-GB', display: 'en-GB English' },
-  { code: 'es-ES', display: 'es-ES Español' },
-  { code: 'fr-FR', display: 'fr-FR Français' },
-  { code: 'it-IT', display: 'it-IT Italiano' },
-  { code: 'nl-BE', display: 'nl-BE Nederlands (BE)' },
-  { code: 'cs-CZ', display: 'cs-CZ Čeština' },
-  { code: 'pt-PT', display: 'pt-PT Português' },
-  { code: 'pl-PL', display: 'pl-PL Polski' },
-  { code: 'el-CY', display: 'el-CY Ελληνικά (CY)' },
-  { code: 'de-DE', display: 'de-DE Deutsch' },
-  { code: 'nl-NL', display: 'nl-NL Nederlands (NL)' },
-  { code: 'el-GR', display: 'el-GR Ελληνικά (GR)' }
+  { code: 'en-GB', display: 'en-GB English', shortDisplay: 'EN' },
+  { code: 'es-ES', display: 'es-ES Español', shortDisplay: 'ES' },
+  { code: 'fr-FR', display: 'fr-FR Français', shortDisplay: 'FR' },
+  { code: 'it-IT', display: 'it-IT Italiano', shortDisplay: 'IT' },
+  { code: 'nl-BE', display: 'nl-BE Nederlands (BE)', shortDisplay: 'NL' },
+  { code: 'cs-CZ', display: 'cs-CZ Čeština', shortDisplay: 'CS' },
+  { code: 'pt-PT', display: 'pt-PT Português', shortDisplay: 'PT' },
+  { code: 'pl-PL', display: 'pl-PL Polski', shortDisplay: 'PL' },
+  { code: 'el-CY', display: 'el-CY Ελληνικά (CY)', shortDisplay: 'EL' },
+  { code: 'de-DE', display: 'de-DE Deutsch', shortDisplay: 'DE' },
+  { code: 'nl-NL', display: 'nl-NL Nederlands (NL)', shortDisplay: 'NL' },
+  { code: 'el-GR', display: 'el-GR Ελληνικά (GR)', shortDisplay: 'EL' }
 ];
 
 // Factory Default Coordinates Map (Master Blueprint with Hardcoded Polished Positions)
@@ -450,33 +450,35 @@ function goToSlide(slideNum) {
   renderCurrentSlide();
 }
 
-// Render Top Bar (#FFCC66 Gold Bar with Logo, Title, Version Badge, Language Selector & Mute Toggle)
+// Render Top Bar (#FFCC66 Gold Bar with 3 Isolated Flow Zones: Left Logo+Badge, Center Absolute Title, Right Lang+Mute)
 function renderTopBar() {
   const topBar = document.getElementById('top-bar');
   if (!topBar) return;
 
   const soundIcon = gameState.audioMuted ? 'volume-x' : 'volume-2';
+  const isCompactMobile = window.innerWidth <= 480;
 
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
-      <div class="top-bar-title-wrapper">
-        <span class="top-bar-app-title">Serious Game RENOVATE</span>
-        <span class="top-bar-version-badge">v1.0.4 • 25.08.2026</span>
-      </div>
+      <span class="top-bar-version-badge">v2.1.2 • 26.08.2026</span>
+    </div>
+
+    <div class="top-bar-center">
+      <span class="top-bar-app-title">Serious Game RENOVATE</span>
     </div>
     
-    <div class="top-bar-lang-container" style="display: flex; align-items: center; gap: 8px;">
+    <div class="top-bar-right">
       <select id="lang-select" class="top-bar-lang-select" title="${t('ui_select_language', 'Language')}">
         ${SUPPORTED_LANGUAGES.map(l => `
           <option value="${l.code}" ${l.code === gameState.activeLanguage ? 'selected' : ''}>
-            ${l.display}
+            ${isCompactMobile ? (l.shortDisplay || l.code.split('-')[0].toUpperCase()) : l.display}
           </option>
         `).join('')}
       </select>
 
       <button id="nav-mute" class="btn-sound-toggle" title="Sound">
-        <i data-lucide="${soundIcon}" style="width: 18px; height: 18px; color: #FFCC66;"></i>
+        <i data-lucide="${soundIcon}" style="width: calc(18px * var(--scale-factor, 1)); height: calc(18px * var(--scale-factor, 1)); color: #FFCC66;"></i>
       </button>
     </div>
   `;
@@ -2331,16 +2333,22 @@ updateViewportHeight();
 window.addEventListener('resize', updateViewportHeight);
 window.addEventListener('orientationchange', updateViewportHeight);
 
-// Calculate Responsive Scale Factor dynamically for smartphones, tablets & laptops
 function updateResponsiveScale() {
-  updateViewportHeight();
   const container = document.getElementById('game-container');
   if (!container) return;
 
-  const width = container.clientWidth;
-  // Reference target width is 420px (standard 9:16 vertical viewport)
-  const scale = Math.min(1.25, Math.max(0.68, width / 420));
-  container.style.setProperty('--scale-factor', scale.toFixed(3));
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+
+  const currentWidth = container.clientWidth || 420;
+  
+  // Dual-Layer Scale Factor: Baseline width is 420px. Scale factor scales smoothly
+  // up to 1.25 max for 100vh height utilization while keeping typography and UI overlays sharp and uncollided.
+  const scaleFactor = Math.min(1.25, Math.max(0.80, currentWidth / 420));
+
+  document.documentElement.style.setProperty('--scale-factor', scaleFactor.toFixed(3));
+
+  renderTopBar();
 }
 
 // Initialize Application
