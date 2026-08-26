@@ -450,28 +450,43 @@ function goToSlide(slideNum) {
   renderCurrentSlide();
 }
 
-// Render Top Bar (#FFCC66 Gold Bar with Modern Custom Language Selector Component)
+// Render Top Bar (#FFCC66 Gold Bar with Mobile Adaptive Flow)
 function renderTopBar() {
   const topBar = document.getElementById('top-bar');
   if (!topBar) return;
 
   const soundIcon = gameState.audioMuted ? 'volume-x' : 'volume-2';
-  const isCompactMobile = window.innerWidth <= 480;
+  const screenWidth = window.innerWidth;
+  const isCompactMobile = screenWidth <= 480;
+  const isMobile = screenWidth <= 768;
 
   const currentLangObj = SUPPORTED_LANGUAGES.find(l => l.code === gameState.activeLanguage) || SUPPORTED_LANGUAGES[0];
   const shortCode = currentLangObj.shortDisplay || currentLangObj.code.split('-')[0].toUpperCase();
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
+  // Format version badge: compact "v2.1.4" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4' : 'v2.1.4 • 26.08.2026';
+  
+  // Format center title for small mobile screens to prevent overlap
+  let centerTitleText = 'Serious Game RENOVATE';
+  if (screenWidth <= 380) {
+    centerTitleText = ''; // Hide on ultra-narrow phones so logo, lang & mute never collide
+  } else if (screenWidth <= 540) {
+    centerTitleText = 'SERIOUS GAME';
+  }
+
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
-      <span class="top-bar-version-badge">v2.1.4 • 26.08.2026</span>
+      <span class="top-bar-version-badge">${versionText}</span>
     </div>
 
-    <div class="top-bar-center">
-      <span class="top-bar-app-title">Serious Game RENOVATE</span>
-    </div>
+    ${centerTitleText ? `
+      <div class="top-bar-center">
+        <span class="top-bar-app-title">${centerTitleText}</span>
+      </div>
+    ` : ''}
     
     <div class="top-bar-right">
       <!-- Modern Custom Language Selector Pill Dropdown -->
