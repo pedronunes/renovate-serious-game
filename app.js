@@ -118,13 +118,13 @@ const INITIAL_UI_COORDINATES_MAP = {
       "pointer": "bubble-tail-left"
     },
     "tip": {
-      "top": "32.0%",
-      "left": "46.0%",
+      "top": "46.0%",
+      "left": "45.6%",
       "width": "48.0%"
     },
     "pillars": {
-      "top": "62.0%",
-      "left": "6.0%",
+      "top": "67.8%",
+      "left": "5.9%",
       "width": "88.0%"
     }
   },
@@ -136,7 +136,7 @@ const INITIAL_UI_COORDINATES_MAP = {
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "47.0%",
+      "top": "60.5%",
       "left": "6.0%",
       "width": "88.0%"
     }
@@ -149,8 +149,8 @@ const INITIAL_UI_COORDINATES_MAP = {
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "44.0%",
-      "left": "5.0%",
+      "top": "47.3%",
+      "left": "4.5%",
       "width": "90.0%"
     }
   },
@@ -472,8 +472,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.020" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.020' : 'v2.1.4.020 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.021" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.021' : 'v2.1.4.021 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -487,11 +487,6 @@ function renderTopBar() {
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
       <span class="top-bar-version-badge">${versionText}</span>
-      ${isLocalhost() ? `
-        <button id="btn-toggle-design-mode" class="btn-designer-toggle ${gameState.customDesignMode ? 'active' : ''}">
-          ${gameState.customDesignMode ? 'Exit Design' : 'Design'}
-        </button>
-      ` : ''}
     </div>
 
     ${centerTitleText ? `
@@ -564,10 +559,6 @@ function renderTopBar() {
     renderTopBar();
   });
 
-  document.getElementById('btn-toggle-design-mode')?.addEventListener('click', () => {
-    toggleDesignMode();
-  });
-
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
   }
@@ -610,12 +601,24 @@ function createExternalDesignerPanel() {
       <span>RENOVATE - Calibrador</span>
       <span style="font-size: 0.8rem; background: #FFCC66; color: #1E4222; padding: 2px 6px; border-radius: 4px; font-weight: 900;">${currentSlideKey}</span>
     </h3>
+    <button id="btn-toggle-design-mode-ext" class="designer-external-btn btn-designer-toggle ${gameState.customDesignMode ? 'active' : ''}" type="button" style="margin-bottom: 10px; margin-top: 0;">
+      ${gameState.customDesignMode ? 'DESATIVAR MODO DESIGN' : 'ATIVAR MODO DESIGN'}
+    </button>
     <textarea id="designer-json-textarea" readonly></textarea>
     <button id="btn-designer-copy" class="designer-external-btn btn-designer-copy" type="button">Copy to Clipboard</button>
     <button id="btn-designer-save-code" class="designer-external-btn btn-designer-save-code" type="button">Save directly to Code</button>
   `;
 
   updateExternalDesignerJsonTextarea();
+
+  // Toggle Design Mode Button Listener
+  const toggleBtn = document.getElementById('btn-toggle-design-mode-ext');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleDesignMode();
+    });
+  }
 
   // Copy to Clipboard Event Listener
   const copyBtn = document.getElementById('btn-designer-copy');
@@ -796,13 +799,11 @@ function disableDragAndDrop() {
 
 function toggleDesignMode() {
   gameState.customDesignMode = !gameState.customDesignMode;
-  renderTopBar();
+  createExternalDesignerPanel();
 
   if (gameState.customDesignMode) {
-    createExternalDesignerPanel();
     enableDragAndDrop();
   } else {
-    removeExternalDesignerPanel();
     disableDragAndDrop();
   }
 }
@@ -1304,12 +1305,12 @@ function renderScreen8(container) {
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const tipTop = (coords.tip && coords.tip.top) ? coords.tip.top : '34.0%';
-  const tipLeft = (coords.tip && coords.tip.left) ? coords.tip.left : '46.0%';
+  const tipTop = (coords.tip && coords.tip.top) ? coords.tip.top : '46.0%';
+  const tipLeft = (coords.tip && coords.tip.left) ? coords.tip.left : '45.6%';
   const tipWidth = (coords.tip && coords.tip.width) ? coords.tip.width : '48.0%';
 
-  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '62.0%';
-  const pillarsLeft = (coords.pillars && coords.pillars.left) ? coords.pillars.left : '6.0%';
+  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '67.8%';
+  const pillarsLeft = (coords.pillars && coords.pillars.left) ? coords.pillars.left : '5.9%';
   const pillarsWidth = (coords.pillars && coords.pillars.width) ? coords.pillars.width : '88.0%';
 
   container.innerHTML = `
@@ -1405,7 +1406,7 @@ function renderScreen9(container) {
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '47.0%';
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '60.5%';
   const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '6.0%';
   const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '88.0%';
 
@@ -1496,8 +1497,8 @@ function renderScreen10(container) {
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '44.0%';
-  const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '5.0%';
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '47.3%';
+  const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '4.5%';
   const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '90.0%';
 
   container.innerHTML = `
@@ -2723,5 +2724,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!hasSession) {
     // Se não houver sessão anterior, renderiza o ecrã inicial (Tela 1)
     renderCurrentSlide();
+  }
+
+  // 3. Monta o painel de calibração exterior se for ambiente localhost
+  if (isLocalhost()) {
+    createExternalDesignerPanel();
   }
 });
