@@ -465,8 +465,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4' : 'v2.1.4 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.002" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.002' : 'v2.1.4.002 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
