@@ -543,32 +543,33 @@ button,
 
 /* Cream PDF Style Card System */
 .cream-card {
-  background: var(--cream-bg);
+  background: rgba(247, 245, 238, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1.5px solid var(--cream-card-border);
-  border-radius: calc(16px * var(--scale-factor, 1)) !important;
+  border-radius: calc(14px * var(--scale-factor, 1)) !important;
   box-shadow: var(--shadow-card);
   color: var(--text-dark);
-  padding: calc(16px * var(--scale-factor, 1)) !important;
+  padding: calc(14px * var(--scale-factor, 1)) calc(16px * var(--scale-factor, 1)) !important;
   width: 100%;
-  max-height: calc(100% - 20px);
-  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .cream-card-header {
   font-family: var(--font-header);
-  font-size: clamp(0.95rem, calc(1.2rem * var(--scale-factor, 1)), 1.35rem);
+  font-size: clamp(0.92rem, calc(1.1rem * var(--scale-factor, 1)), 1.3rem);
   font-weight: 900;
   color: var(--forest-green);
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: calc(8px * var(--scale-factor, 1));
   letter-spacing: 0.4px;
-  padding-bottom: 6px;
+  padding-bottom: calc(5px * var(--scale-factor, 1));
   border-bottom: 2px solid var(--renovate-gold);
 }
 
 .cream-card-body {
   font-family: var(--font-body);
-  font-size: clamp(0.82rem, calc(0.96rem * var(--scale-factor, 1)), 1.08rem);
+  font-size: clamp(0.82rem, calc(0.94rem * var(--scale-factor, 1)), 1.05rem);
   line-height: 1.45;
   color: var(--text-dark);
   font-weight: 600;

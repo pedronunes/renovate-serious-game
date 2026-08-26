@@ -75,9 +75,9 @@ const INITIAL_UI_COORDINATES_MAP = {
   },
   "s04": {
     "textContainer": {
-      "top": "10.5%",
-      "left": "6%",
-      "width": "58%",
+      "top": "5.5%",
+      "left": "5%",
+      "width": "55%",
       "fontSize": "1.05rem"
     }
   },
@@ -465,8 +465,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.004" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.004' : 'v2.1.4.004 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.005" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.005' : 'v2.1.4.005 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -891,12 +891,14 @@ function renderScreen4(container) {
     p2 = '';
   }
 
+  const cardStyle = styleObjToCss(coords.textContainer || coords.card || { top: '5.5%', left: '5%', width: '55%' });
+
   container.innerHTML = `
     <!-- Upper Left Text Container with Translucent Cream Card styling for crisp contrast -->
-    <div id="el-s04-textContainer" class="cream-card" style="background: rgba(247, 247, 242, 0.88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); ${styleObjToCss(coords.textContainer || coords.card || { top: '9%', left: '6%', width: '58%' })}">
-      <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.02em;">${title}</div>
-      <div class="cream-card-body" style="font-size: 1.05rem; font-weight: 600; color: #1F2220; line-height: 1.42;">
-        <p style="margin-bottom: 8px;">${p1}</p>
+    <div id="el-s04-textContainer" class="cream-card" style="${cardStyle}">
+      <div class="cream-card-header">${title}</div>
+      <div class="cream-card-body">
+        <p style="margin-bottom: 6px;">${p1}</p>
         ${p2 ? `<p style="margin-bottom: 0;">${p2}</p>` : ''}
       </div>
     </div>
