@@ -586,36 +586,42 @@ button,
   font-size: calc(0.95rem * var(--scale-factor, 1)) !important;
   color: var(--text-dark);
   width: 100%;
-  max-height: calc(100% - 20px);
-  overflow-y: auto;
   box-sizing: border-box;
+  overflow: visible !important;
 }
 
 /* Balão com cauda apontando no topo para a boca da Mia */
+.bubble-tail-top-left {
+  position: absolute;
+  overflow: visible !important;
+}
+
 .bubble-tail-top-left::after {
   content: "";
   position: absolute;
-  top: -11px;
+  top: -14px;
   left: 42%;
-  border-width: 0 10px 11px 10px;
+  border-width: 0 12px 14px 12px;
   border-style: solid;
-  border-color: transparent transparent rgba(247, 245, 238, 0.94) transparent;
+  border-color: transparent transparent rgba(247, 245, 238, 0.96) transparent;
   display: block;
   width: 0;
-  z-index: 10;
+  height: 0;
+  z-index: 20;
 }
 
 .bubble-tail-top-left::before {
   content: "";
   position: absolute;
-  top: -13px;
+  top: -16px;
   left: calc(42% - 1px);
-  border-width: 0 11px 12px 11px;
+  border-width: 0 13px 16px 13px;
   border-style: solid;
-  border-color: transparent transparent rgba(30, 66, 34, 0.35) transparent;
+  border-color: transparent transparent rgba(30, 66, 34, 0.45) transparent;
   display: block;
   width: 0;
-  z-index: 9;
+  height: 0;
+  z-index: 19;
 }
 
 /* Balão com cauda apontando para a esquerda (Mia - lado esquerdo) */
