@@ -466,8 +466,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.010" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.010' : 'v2.1.4.010 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.011" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.011' : 'v2.1.4.011 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -1019,24 +1019,12 @@ function renderScreen7(container) {
 // Screen 8: Mia's Tip & 3 Pillars (On SeriousGame_tela8.jpg with Enlarged Titles & Enlarged Lucide Icons)
 function renderScreen8(container) {
   const coords = UI_COORDINATES_MAP.s08 || INITIAL_UI_COORDINATES_MAP.s08;
-  const pointerClass = (coords.bubble && coords.bubble.pointer) || 'pointer-left';
-
-  const speech = t('s08_dialogue_mia', 'Laura, before we touch the sprayer, we need a clear goal. Do you know what guarantees a successful treatment?');
-  const tipTitle = t('s08_tip_title', "Mia's Tip");
-  const tipText = t('s08_tip_text', "Too much spray wastes product and harms the environment. Too little won't protect your crops!");
-
-  const secTitle = t('s08_section_title', 'The 3 Pillars of Effectiveness');
-  const p1Title = t('s08_pillar_01_title', 'Correct spray volume rate (L/ha)');
-  const p1Text = t('s08_pillar_01_text', 'Tailored to the specific area of your vineyard.');
-  const p2Title = t('s08_pillar_02_title', 'Exact concentration');
-  const p2Text = t('s08_pillar_02_text', 'The right mix of the plant protection product.');
-  const p3Title = t('s08_pillar_03_title', 'Precise application');
-  const p3Text = t('s08_pillar_03_text', 'Ensuring the exact dose safely reaches the target.');
+  const bubbleClass = (coords.bubble && coords.bubble.pointer && coords.bubble.pointer !== 'pointer-left') ? coords.bubble.pointer : 'bubble-tail-left';
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s08-bubble" class="speech-bubble ${pointerClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
-      <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
+    <div id="el-s08-bubble" class="speech-bubble ${bubbleClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+      <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
       </div>
@@ -1125,8 +1113,8 @@ function renderScreen9(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia -->
-    <div id="el-s09-bubble" class="speech-bubble ${pointerClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
-      <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
+    <div id="el-s09-bubble" class="speech-bubble bubble-tail-left" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+      <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; color: #1F2220;">
         ${formattedSpeech}
       </div>
@@ -1209,8 +1197,8 @@ function renderScreen10(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble Top Right pointing left at Mia (Holding 4 Fingers Up!) -->
-    <div id="el-s10-bubble" class="speech-bubble ${pointerClass}" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
-      <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 6px; font-size: 1.05rem;">MIA</div>
+    <div id="el-s10-bubble" class="speech-bubble bubble-tail-left" style="${styleObjToCss(coords.bubble || { top: '6%', right: '5%', width: '58%' })}">
+      <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; line-height: 1.45; font-weight: 600; color: #1F2220;">
         ${speech}
       </div>
