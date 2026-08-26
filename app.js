@@ -538,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.037" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.037' : 'v2.1.4.037 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.038" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.038' : 'v2.1.4.038 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1714,7 +1714,7 @@ RAW_QUIZ_SPECS.forEach((spec, idx) => {
     quizNum,
     statusKey: `${sCorrKey}_feedback_status`,
     infoKey: `${sCorrKey}_info_text`,
-    nextSlide: spec.correctSlide + 1
+    nextSlide: spec.incorrectSlide + 1
   };
   FEEDBACK_TO_QUIZ_SLIDE[spec.correctSlide] = spec.quizSlide;
 
@@ -1724,6 +1724,7 @@ RAW_QUIZ_SPECS.forEach((spec, idx) => {
     quizNum,
     statusKey: `${sIncorrKey}_feedback_status`,
     infoKey: `${sIncorrKey}_info_text`,
+    nextSlide: spec.incorrectSlide + 1,
     retrySlide: spec.quizSlide
   };
   FEEDBACK_TO_QUIZ_SLIDE[spec.incorrectSlide] = spec.quizSlide;
@@ -1913,19 +1914,11 @@ function renderQuizFeedbackScreen(container, slideId) {
 
   if (cfg && cfg.options) {
     if (fb.isCorrect) {
-      // Correct screen: ALWAYS show ALL correct options
+      // Correct screen: show correct options
       optionsToDisplay = cfg.options.filter(opt => targetCorrect.includes(opt.key));
     } else {
-      // Incorrect screen: ALWAYS show ALL user selected options
-      const userSelected = gameState.quizAnswers[parentQuizSlide]?.selected;
-      const selectedArr = Array.isArray(userSelected) ? userSelected : (userSelected ? [userSelected] : []);
-      
-      if (selectedArr.length > 0) {
-        optionsToDisplay = cfg.options.filter(opt => selectedArr.includes(opt.key));
-      } else {
-        // Fallback if no selection saved: show non-correct options
-        optionsToDisplay = cfg.options.filter(opt => !targetCorrect.includes(opt.key));
-      }
+      // Incorrect screen: ALWAYS show ALL options (A, B, C, D) signaling correct and incorrect choices!
+      optionsToDisplay = [...cfg.options];
     }
     
     // Sort options strictly by alphabetical order (A, B, C, D)
@@ -2790,14 +2783,9 @@ function renderBottomNavBar() {
       initAudioEngine();
       const currentId = gameState.currentSlide;
       const fb = QUIZ_FEEDBACK_MAP[currentId];
-      if (fb) {
-        if (fb.isCorrect && fb.nextSlide) {
-          goToSlide(fb.nextSlide);
-          return;
-        } else if (!fb.isCorrect && fb.retrySlide) {
-          goToSlide(fb.retrySlide);
-          return;
-        }
+      if (fb && fb.nextSlide) {
+        goToSlide(fb.nextSlide);
+        return;
       }
       goToSlide(currentId + 1);
     });
