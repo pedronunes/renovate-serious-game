@@ -475,57 +475,55 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.023" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.023' : 'v2.1.4.023 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.024" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.024' : 'v2.1.4.024 • 26.08.2026';
   
-  // Format center title for small mobile screens to prevent overlap
-  let centerTitleText = 'Serious Game RENOVATE';
+  // Format app title text beside logo
+  let appTitleText = 'Serious Game RENOVATE';
   if (screenWidth <= 380) {
-    centerTitleText = ''; // Hide on ultra-narrow phones so logo, lang & mute never collide
+    appTitleText = 'RENOVATE';
   } else if (screenWidth <= 540) {
-    centerTitleText = 'SERIOUS GAME';
+    appTitleText = 'SERIOUS GAME';
   }
 
   topBar.innerHTML = `
     <div class="top-bar-left">
       <img src="./public/images/RENOVATE-logo.svg" alt="RENOVATE Logo" class="top-bar-logo" onerror="this.src='./public/images/RENOVATE-logo.png'">
-      <span class="top-bar-version-badge">${versionText}</span>
+      <span class="top-bar-app-title">${appTitleText}</span>
     </div>
-
-    ${centerTitleText ? `
-      <div class="top-bar-center">
-        <span class="top-bar-app-title">${centerTitleText}</span>
-      </div>
-    ` : ''}
     
     <div class="top-bar-right">
-      <!-- Modern Custom Language Selector Pill Dropdown -->
-      <div class="top-bar-lang-wrapper">
-        <button id="lang-custom-btn" class="top-bar-lang-btn" title="${t('ui_select_language', 'Language')}">
-          <i data-lucide="globe" style="width: calc(14px * var(--scale-factor, 1)); height: calc(14px * var(--scale-factor, 1)); color: #1E4222;"></i>
-          <span>${langLabel}</span>
-          <i data-lucide="chevron-down" style="width: calc(13px * var(--scale-factor, 1)); height: calc(13px * var(--scale-factor, 1)); color: #1E4222;"></i>
-        </button>
+      <div class="top-bar-right-controls">
+        <!-- Modern Custom Language Selector Pill Dropdown -->
+        <div class="top-bar-lang-wrapper">
+          <button id="lang-custom-btn" class="top-bar-lang-btn" title="${t('ui_select_language', 'Language')}">
+            <i data-lucide="globe" style="width: calc(14px * var(--scale-factor, 1)); height: calc(14px * var(--scale-factor, 1)); color: #1E4222;"></i>
+            <span>${langLabel}</span>
+            <i data-lucide="chevron-down" style="width: calc(13px * var(--scale-factor, 1)); height: calc(13px * var(--scale-factor, 1)); color: #1E4222;"></i>
+          </button>
 
-        <div id="lang-menu" class="lang-dropdown-menu">
-          ${SUPPORTED_LANGUAGES.map(l => {
-            const isSel = l.code === gameState.activeLanguage;
-            const itemCode = l.shortDisplay || l.code.split('-')[0].toUpperCase();
-            const itemName = l.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
-            const itemText = isCompactMobile ? itemCode : `${itemCode} • ${itemName}`;
-            return `
-              <div class="lang-option-item ${isSel ? 'selected' : ''}" data-lang="${l.code}">
-                <span>${itemText}</span>
-                ${isSel ? '<i data-lucide="check" style="width: 14px; height: 14px;"></i>' : ''}
-              </div>
-            `;
-          }).join('')}
+          <div id="lang-menu" class="lang-dropdown-menu">
+            ${SUPPORTED_LANGUAGES.map(l => {
+              const isSel = l.code === gameState.activeLanguage;
+              const itemCode = l.shortDisplay || l.code.split('-')[0].toUpperCase();
+              const itemName = l.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
+              const itemText = isCompactMobile ? itemCode : `${itemCode} • ${itemName}`;
+              return `
+                <div class="lang-option-item ${isSel ? 'selected' : ''}" data-lang="${l.code}">
+                  <span>${itemText}</span>
+                  ${isSel ? '<i data-lucide="check" style="width: 14px; height: 14px;"></i>' : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
         </div>
+
+        <button id="nav-mute" class="btn-sound-toggle" title="Sound">
+          <i data-lucide="${soundIcon}" style="width: calc(18px * var(--scale-factor, 1)); height: calc(18px * var(--scale-factor, 1)); color: #FFCC66;"></i>
+        </button>
       </div>
 
-      <button id="nav-mute" class="btn-sound-toggle" title="Sound">
-        <i data-lucide="${soundIcon}" style="width: calc(18px * var(--scale-factor, 1)); height: calc(18px * var(--scale-factor, 1)); color: #FFCC66;"></i>
-      </button>
+      <div class="top-bar-version-badge">${versionText}</div>
     </div>
   `;
 
