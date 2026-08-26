@@ -465,8 +465,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.005" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.005' : 'v2.1.4.005 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.006" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.006' : 'v2.1.4.006 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -867,7 +867,7 @@ function renderScreen3(container) {
   }
 }
 
-// Screen 4: The Situation (Exact floating text style as Screen 2/3, with enlarged title and body text)
+// Screen 4: The Situation (Exact floating text style as Screen 2 & 3 - Floating directly on sky!)
 function renderScreen4(container) {
   const coords = UI_COORDINATES_MAP.s04 || INITIAL_UI_COORDINATES_MAP.s04;
   const title = t('s04_screen_title', 'THE SITUATION');
@@ -891,16 +891,14 @@ function renderScreen4(container) {
     p2 = '';
   }
 
-  const cardStyle = styleObjToCss(coords.textContainer || coords.card || { top: '5.5%', left: '5%', width: '55%' });
+  const textStyle = styleObjToCss(coords.textContainer || { top: '5.5%', left: '5%', width: '56%' });
 
   container.innerHTML = `
-    <!-- Upper Left Text Container with Translucent Cream Card styling for crisp contrast -->
-    <div id="el-s04-textContainer" class="cream-card" style="${cardStyle}">
-      <div class="cream-card-header">${title}</div>
-      <div class="cream-card-body">
-        <p style="margin-bottom: 6px;">${p1}</p>
-        ${p2 ? `<p style="margin-bottom: 0;">${p2}</p>` : ''}
-      </div>
+    <!-- Upper Left Text Container directly on sky (Identical to Screen 2 & 3 floating typography!) -->
+    <div id="el-s04-textContainer" class="s02-text-container" style="${textStyle}">
+      <div class="s02-title">${title}</div>
+      <div class="s02-body-p">${p1}</div>
+      ${p2 ? `<div class="s02-body-p">${p2}</div>` : ''}
     </div>
   `;
 }
