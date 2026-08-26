@@ -1179,11 +1179,16 @@ button,
   height: clamp(22px, calc(28px * var(--scale-factor, 1)), 34px);
 }
 
-/* Correct Option Card with Green Glow & Green Letter Circle */
+/* Correct Option Card with Green Glow & Green Letter Circle (#E8F5E9 background, #166534 text - Design Bible v6) */
 .feedback-option-card.feedback-card-glow-correct {
   background: #E8F5E9 !important;
   border: 2.5px solid #2E7D32 !important;
   box-shadow: 0 0 20px rgba(46, 125, 50, 0.45), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.feedback-option-card.feedback-card-glow-correct .quiz-option-text {
+  color: #166534 !important;
+  font-weight: 800 !important;
 }
 
 .quiz-option-badge.badge-correct-green {
@@ -1193,11 +1198,16 @@ button,
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4) !important;
 }
 
-/* Incorrect Option Card with Red Glow & Red Letter Circle */
+/* Incorrect Option Card with Soft Red Glow & Red Letter Circle (#FEF2F2 background, #991B1B text - Design Bible v6) */
 .feedback-option-card.feedback-card-glow-incorrect {
-  background: #FFEBEE !important;
+  background: #FEF2F2 !important;
   border: 2.5px solid #D32F2F !important;
   box-shadow: 0 0 20px rgba(211, 47, 47, 0.45), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.feedback-option-card.feedback-card-glow-incorrect .quiz-option-text {
+  color: #991B1B !important;
+  font-weight: 800 !important;
 }
 
 .quiz-option-badge.badge-incorrect-red {
@@ -1205,6 +1215,24 @@ button,
   color: #FFFFFF !important;
   border: 2.5px solid #FFFFFF !important;
   box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4) !important;
+}
+
+/* Section 5: Smooth Transitions cubic-bezier(0.25, 1, 0.5, 1) & 10px Slide-Up Fade-In */
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cream-card,
+.speech-bubble,
+.quiz-main-container {
+  animation: slideUpFadeIn 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Explanation Box with Prominent Info Icon (i) */

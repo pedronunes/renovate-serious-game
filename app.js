@@ -538,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.036" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.036' : 'v2.1.4.036 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.037" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.037' : 'v2.1.4.037 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1745,7 +1745,34 @@ function parseQuizOption(rawText, defaultKey) {
   };
 }
 
-// Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20, 30, 33, 39, 43)
+// Function to evaluate quiz submission and determine Scenario 1 (CORRECT), Scenario 2 (INCORRECT), or Scenario 3 (PARTIAL)
+function evaluateQuizSubmission(selectedOptions, correctOptions) {
+  const correctSet = new Set(Array.isArray(correctOptions) ? correctOptions : [correctOptions]);
+  const selectedSet = new Set(Array.isArray(selectedOptions) ? selectedOptions : [selectedOptions]);
+  
+  let correctCount = 0;
+  let incorrectCount = 0;
+  
+  selectedSet.forEach(opt => {
+    if (correctSet.has(opt)) {
+      correctCount++;
+    } else {
+      incorrectCount++;
+    }
+  });
+  
+  const totalCorrectNeeded = correctSet.size;
+  
+  if (incorrectCount === 0 && correctCount === totalCorrectNeeded) {
+    return 'CORRECT';   // Cenário 1: 100% Sucesso
+  } else if (correctCount === 0) {
+    return 'INCORRECT'; // Cenário 2: 100% Insucesso
+  } else {
+    return 'PARTIAL';   // Cenário 3: Sucesso e Erros Misturados
+  }
+}
+
+// Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20, 30, 33, 39, 43...)
 function renderQuizScreen(container, slideId) {
   const cfg = QUIZ_CONFIG_MAP[slideId];
   if (!cfg) return;
@@ -1835,26 +1862,22 @@ function renderQuizScreen(container, slideId) {
     submitBtn?.addEventListener('click', () => {
       if (selectedOptions.length === 0) return;
 
-      let isCorrect = false;
-      const targetCorrect = cfg.correctOption;
+      const resultStatus = evaluateQuizSubmission(selectedOptions, cfg.correctOption);
+      const isCorrect = (resultStatus === 'CORRECT');
 
-      if (Array.isArray(targetCorrect)) {
-        const sortedTarget = [...targetCorrect].sort().join(',');
-        const sortedSelected = [...selectedOptions].sort().join(',');
-        isCorrect = (sortedTarget === sortedSelected);
-      } else {
-        isCorrect = selectedOptions.length === 1 && selectedOptions[0] === targetCorrect;
-      }
-
-      gameState.quizAnswers[slideId] = { selected: selectedOptions, correct: isCorrect };
+      gameState.quizAnswers[slideId] = { 
+        selected: selectedOptions, 
+        correct: isCorrect,
+        status: resultStatus 
+      };
       saveProgress();
 
       if (isCorrect) {
         playFeedbackSound('correct');
-        goToSlide(cfg.correctSlide);
+        goToSlide(cfg.correctSlide); // Cenário 1 -> Tela de Resposta Correta
       } else {
         playFeedbackSound('incorrect');
-        goToSlide(cfg.incorrectSlide);
+        goToSlide(cfg.incorrectSlide); // Cenários 2 & 3 -> Tela de Resposta Errada
       }
     });
   }
