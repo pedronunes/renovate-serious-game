@@ -27,7 +27,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
 
   <!-- Cache-Busted Master Stylesheet v2.1.4 -->
-  <link rel="stylesheet" href="styles.css?v=2.1.4.003">
+  <link rel="stylesheet" href="styles.css?v=2.1.4.004">
 </head>
 <body>
 
@@ -52,13 +52,13 @@
   <div id="modal-container"></div>
 
   <!-- Cache-Busted Main Game Engine v2.1.4 -->
-  <script src="app.js?v=2.1.4.003"></script>
+  <script src="app.js?v=2.1.4.004"></script>
 
   <!-- Service Worker Registration for PWA Standalone App Experience -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.1.4.003')
+        navigator.serviceWorker.register('./sw.js?v=2.1.4.004')
           .then(reg => {
             console.log('PWA ServiceWorker active v2.1.4:', reg.scope);
             reg.onupdatefound = () => {
