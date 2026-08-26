@@ -526,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.030" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.030' : 'v2.1.4.030 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.031" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.031' : 'v2.1.4.031 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1910,72 +1910,142 @@ function renderQuizScreen(container, slideId) {
   }
 }
 
-// Render Quiz Feedback Screen (Correct / Incorrect - Screens 12, 13, 15, 16, 18, 19, 21, 22)
+// Mapping Feedback Slides to Parent Quiz Question Slides
+const FEEDBACK_TO_QUIZ_SLIDE = {
+  12: 11, 13: 11,
+  15: 14, 16: 14,
+  18: 17, 19: 17,
+  21: 20, 22: 20,
+  31: 30, 32: 30,
+  34: 33, 35: 33,
+  40: 39, 41: 39,
+  44: 43, 45: 43,
+  47: 46, 48: 46
+};
+
+// Render Quiz Feedback Screen (Correct / Incorrect - Screens 12, 13, 15, 16, 18, 19, 21, 22, 31, 32, 34, 35, 40, 41, 44, 45, 47, 48)
 function renderQuizFeedbackScreen(container, slideId) {
   const fb = QUIZ_FEEDBACK_MAP[slideId];
   if (!fb) return;
 
+  const parentQuizSlide = FEEDBACK_TO_QUIZ_SLIDE[slideId];
+  const cfg = parentQuizSlide ? QUIZ_CONFIG_MAP[parentQuizSlide] : null;
+
   const slideKey = 's' + String(slideId).padStart(2, '0');
   const coords = UI_COORDINATES_MAP[slideKey] || {
-    card: { top: '15%', left: '6%', width: '88%' }
+    card: { top: '3.0%', left: '4.0%', width: '92.0%' }
   };
 
-  const statusText = t(fb.statusKey, fb.isCorrect ? 'Correto' : 'Incorreto');
+  const titleText = cfg ? t(cfg.titleKey, 'CALIBRATION OF A SPRAYER') : 'CALIBRATION OF A SPRAYER';
+  const questionText = cfg ? t(cfg.questionKey, 'Quiz Question') : '';
+
+  const statusText = fb.isCorrect ? t('ui_correct', 'CORRETO') : t('ui_incorrect', 'INCORRETO');
   const infoText = t(fb.infoKey, '');
-  const optionText = fb.optionKey ? t(fb.optionKey, '') : '';
 
   const continueText = t('ui_next', 'SEGUINTE');
   const retryText = t('ui_retry', 'TENTAR NOVAMENTE');
 
-  if (fb.isCorrect) {
-    container.innerHTML = `
-      <div id="el-${slideKey}-card" class="feedback-card-correct" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
-        <div class="feedback-badge-correct">
-          <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
-          <span>${statusText}!</span>
-        </div>
-
-        ${optionText ? `
-          <div style="font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.05rem; color: #1E4222; margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.85); border-radius: 12px; border-left: 4px solid #2E7D32;">
-            ${optionText}
-          </div>
-        ` : ''}
-
-        <div class="feedback-explanation">
-          ${infoText}
-        </div>
-
-        <button id="btn-feedback-action" class="btn-start-challenge-pill" style="margin-top: 14px; font-size: 1.1rem; padding: 10px 24px;">
-          ${continueText} ▶
-        </button>
-      </div>
-    `;
-
-    document.getElementById('btn-feedback-action')?.addEventListener('click', () => {
-      goToSlide(fb.nextSlide);
-    });
-  } else {
-    container.innerHTML = `
-      <div id="el-${slideKey}-card" class="feedback-card-incorrect" style="${styleObjToCss(coords.card || { top: '15%', left: '6%', width: '88%' })}">
-        <div class="feedback-badge-incorrect">
-          <i data-lucide="x-circle" style="width: 24px; height: 24px;"></i>
-          <span>${statusText}</span>
-        </div>
-
-        <div class="feedback-explanation" style="border-left: 4px solid #C62828;">
-          ${infoText}
-        </div>
-
-        <button id="btn-feedback-action" class="btn-start-challenge-pill" style="margin-top: 14px; font-size: 1.1rem; padding: 10px 24px; background: linear-gradient(180deg, #D32F2F 0%, #B71C1C 100%);">
-          🔄 ${retryText}
-        </button>
-      </div>
-    `;
-
-    document.getElementById('btn-feedback-action')?.addEventListener('click', () => {
-      goToSlide(fb.retrySlide);
-    });
+  // Determine options to display:
+  let optionsToDisplay = [];
+  if (cfg && cfg.options) {
+    if (fb.isCorrect) {
+      // Display correct options
+      const targetCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption];
+      optionsToDisplay = cfg.options.filter(opt => targetCorrect.includes(opt.key));
+    } else {
+      // Display incorrect options (user selected or non-correct options)
+      const userSelected = gameState.quizAnswers[parentQuizSlide]?.selected;
+      const selectedArr = Array.isArray(userSelected) ? userSelected : (userSelected ? [userSelected] : []);
+      const targetCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption];
+      
+      if (selectedArr.length > 0) {
+        optionsToDisplay = cfg.options.filter(opt => selectedArr.includes(opt.key));
+      } else {
+        optionsToDisplay = cfg.options.filter(opt => !targetCorrect.includes(opt.key));
+      }
+    }
   }
+
+  container.innerHTML = `
+    <!-- Quiz Feedback Container strictly matching uploaded mockups & Design Bible v6 -->
+    <div id="el-${slideKey}-card" class="quiz-main-container feedback-main-container" style="${styleObjToCss(coords.card || { top: '3.0%', left: '4.0%', width: '92.0%' })}">
+      
+      <!-- Top Standalone Question Mark Emblem & Category Header (Consistent with Question Screen) -->
+      <div class="quiz-header-wrapper" style="margin-bottom: calc(16px * var(--scale-factor, 1));">
+        <div class="quiz-emblem-icon-standalone">
+          <span class="quiz-standalone-qmark">?</span>
+        </div>
+        <div class="quiz-category-title">${titleText.toUpperCase()}</div>
+      </div>
+
+      <!-- Prominent Question Box Card -->
+      ${questionText ? `
+        <div class="quiz-question-card" style="margin-bottom: calc(14px * var(--scale-factor, 1));">
+          <div class="quiz-question-text">${questionText}</div>
+        </div>
+      ` : ''}
+
+      <!-- Feedback Status Badge Label: "CORRETO" / "INCORRETO" -->
+      <div class="feedback-status-wrapper">
+        <div class="feedback-status-badge ${fb.isCorrect ? 'status-correct' : 'status-incorrect'}">
+          ${statusText.toUpperCase()}
+        </div>
+      </div>
+
+      <!-- Feedback Option Cards (Green Glow for Correct, Red Glow for Incorrect) -->
+      ${optionsToDisplay.length > 0 ? `
+        <div class="quiz-options-list feedback-options-list">
+          ${optionsToDisplay.map(opt => {
+            const rawOptText = t(opt.textKey, opt.key);
+            const parsed = parseQuizOption(rawOptText, opt.key);
+            return `
+              <div class="quiz-option-card feedback-option-card ${fb.isCorrect ? 'feedback-card-glow-correct' : 'feedback-card-glow-incorrect'}">
+                <div class="quiz-option-badge ${fb.isCorrect ? 'badge-correct-green' : 'badge-incorrect-red'}">${parsed.badgeLetter}</div>
+                <div class="quiz-option-text">${parsed.cleanText}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      ` : ''}
+
+      <!-- Explanation Card with Prominent Info Icon (i) -->
+      <div class="quiz-explanation-card">
+        <div class="explanation-info-icon">
+          <i data-lucide="info"></i>
+        </div>
+        <div class="explanation-text-body">
+          ${infoText}
+        </div>
+      </div>
+
+      <!-- Action Button (Next / Retry) -->
+      <div class="quiz-action-wrapper">
+        ${fb.isCorrect ? `
+          <button id="btn-feedback-action" class="btn-submit-answer btn-feedback-next">
+            <span>${continueText}</span>
+            <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+          </button>
+        ` : `
+          <button id="btn-feedback-action" class="btn-submit-answer btn-feedback-retry">
+            <i data-lucide="rotate-ccw" style="width: 20px; height: 20px;"></i>
+            <span>${retryText}</span>
+          </button>
+        `}
+      </div>
+
+    </div>
+  `;
+
+  // Bind Action Button click
+  document.getElementById('btn-feedback-action')?.addEventListener('click', () => {
+    initAudioEngine();
+    playFeedbackSound('click');
+    if (fb.isCorrect) {
+      goToSlide(fb.nextSlide);
+    } else {
+      goToSlide(fb.retrySlide);
+    }
+  });
 
   // Trigger Lucide Icons
   if (window.lucide && typeof window.lucide.createIcons === 'function') {

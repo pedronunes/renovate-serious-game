@@ -1086,17 +1086,118 @@ button,
   box-shadow: none;
 }
 
-/* Feedback Cards */
-.feedback-card-correct {
-  background: #F0FDF4;
-  border: 2px solid #166534;
-  border-radius: 18px;
-  box-shadow: var(--shadow-card);
-  padding: calc(16px * var(--scale-factor, 1)) calc(18px * var(--scale-factor, 1));
+/* Feedback Cards (Fidelidade Estrita aos Mockups media_1787783141660 & media_1787783216617) */
+.feedback-status-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: calc(14px * var(--scale-factor, 1));
+}
+
+.feedback-status-badge {
+  font-family: var(--font-header);
+  font-size: clamp(1.15rem, calc(1.40rem * var(--scale-factor, 1)), 1.80rem);
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
   text-align: center;
-  width: 100%;
-  max-height: calc(100% - 10px);
-  overflow-y: auto;
+  padding: 4px 16px;
+  border-radius: 12px;
+}
+
+.feedback-status-badge.status-correct {
+  color: #2E7D32;
+  text-shadow: 0 0 12px rgba(46, 125, 50, 0.4);
+}
+
+.feedback-status-badge.status-incorrect {
+  color: #D32F2F;
+  text-shadow: 0 0 12px rgba(211, 47, 47, 0.4);
+}
+
+/* Correct Option Card with Green Glow & Green Letter Circle */
+.feedback-option-card.feedback-card-glow-correct {
+  background: #E8F5E9 !important;
+  border: 2.5px solid #2E7D32 !important;
+  box-shadow: 0 0 20px rgba(46, 125, 50, 0.45), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.quiz-option-badge.badge-correct-green {
+  background: #2E7D32 !important;
+  color: #FFFFFF !important;
+  border: 2.5px solid #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4) !important;
+}
+
+/* Incorrect Option Card with Red Glow & Red Letter Circle */
+.feedback-option-card.feedback-card-glow-incorrect {
+  background: #FFEBEE !important;
+  border: 2.5px solid #D32F2F !important;
+  box-shadow: 0 0 20px rgba(211, 47, 47, 0.45), 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.quiz-option-badge.badge-incorrect-red {
+  background: #D32F2F !important;
+  color: #FFFFFF !important;
+  border: 2.5px solid #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4) !important;
+}
+
+/* Explanation Box with Prominent Info Icon (i) */
+.quiz-explanation-card {
+  position: relative;
+  background-color: var(--cream-bg, #F7F7F2);
+  border: 1.5px solid var(--forest-green);
+  border-radius: calc(16px * var(--scale-factor, 1));
+  padding: calc(14px * var(--scale-factor, 1)) calc(16px * var(--scale-factor, 1));
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  margin-top: calc(6px * var(--scale-factor, 1));
+  margin-bottom: calc(10px * var(--scale-factor, 1));
+  display: flex;
+  align-items: flex-start;
+  gap: calc(12px * var(--scale-factor, 1));
+}
+
+.explanation-info-icon {
+  width: calc(34px * var(--scale-factor, 1));
+  height: calc(34px * var(--scale-factor, 1));
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 50%;
+  background: var(--forest-green);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(30, 66, 34, 0.3);
+  margin-top: 2px;
+}
+
+.explanation-info-icon i {
+  stroke: #FFFFFF;
+  stroke-width: 2.6;
+  width: calc(20px * var(--scale-factor, 1));
+  height: calc(20px * var(--scale-factor, 1));
+}
+
+.explanation-text-body {
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, calc(0.96rem * var(--scale-factor, 1)), 1.12rem);
+  font-weight: 700;
+  color: var(--text-dark, #1A1A1A);
+  line-height: 1.40;
+}
+
+/* Action Button Variants for Feedback */
+.btn-feedback-retry {
+  background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%) !important;
+  border: 2px solid #FFCDD2 !important;
+}
+
+.btn-feedback-retry:hover {
+  background: linear-gradient(135deg, #B71C1C 0%, #D32F2F 100%) !important;
+  box-shadow: 0 8px 22px rgba(211, 47, 47, 0.45) !important;
 }
 
 .feedback-card-incorrect {
