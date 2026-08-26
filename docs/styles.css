@@ -591,6 +591,33 @@ button,
   box-sizing: border-box;
 }
 
+/* Balão com cauda apontando no topo para a boca da Mia */
+.bubble-tail-top-left::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  left: 42%;
+  border-width: 0 10px 11px 10px;
+  border-style: solid;
+  border-color: transparent transparent rgba(247, 245, 238, 0.94) transparent;
+  display: block;
+  width: 0;
+  z-index: 10;
+}
+
+.bubble-tail-top-left::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  left: calc(42% - 1px);
+  border-width: 0 11px 12px 11px;
+  border-style: solid;
+  border-color: transparent transparent rgba(30, 66, 34, 0.35) transparent;
+  display: block;
+  width: 0;
+  z-index: 9;
+}
+
 /* Balão com cauda apontando para a esquerda (Mia - lado esquerdo) */
 .bubble-tail-left::after {
   content: "";
