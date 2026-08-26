@@ -388,7 +388,10 @@ function checkSessionRecovery() {
   try {
     const saved = JSON.parse(savedRaw);
     if (saved && saved.slide && saved.slide > 1) {
-      showRecoveryModal(saved);
+      if (saved.lang) gameState.activeLanguage = saved.lang;
+      loadTranslations(gameState.activeLanguage).then(() => {
+        showRecoveryModal(saved);
+      });
       return true;
     }
   } catch (e) {
@@ -465,8 +468,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.006" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.006' : 'v2.1.4.006 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.007" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.007' : 'v2.1.4.007 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -930,8 +933,8 @@ function renderScreen5(container) {
     .join('');
 
   container.innerHTML = `
-    <div id="el-s05-bubble" class="speech-bubble ${pointerClass}" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '8%', right: '5%', width: '58%' })}">
-      <div class="speaker-name" style="font-weight: 900; color: #1E4222; margin-bottom: 8px; font-size: 1.05rem;">MIA</div>
+    <div id="el-s05-bubble" class="speech-bubble bubble-tail-left" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '8%', right: '5%', width: '58%' })}">
+      <div class="speaker-name">MIA</div>
       <div class="speech-text" style="font-size: 1.02rem; color: #1F2220;">
         ${formattedHtml}
       </div>
@@ -2327,7 +2330,8 @@ function renderBottomNavBar() {
   const screenLabel = t('ui_screen', 'Screen');
   const ofLabel = t('ui_of', 'of');
 
-  const chapterTitle = t(`s${String(slideId).padStart(2, '0')}_chapter_title`, 'Calibration Challenge');
+  const defaultChapterTitle = t('ui_calibration_challenge', t('s01_chapter_title', 'Calibration Challenge'));
+  const chapterTitle = t(`s${String(slideId).padStart(2, '0')}_chapter_title`, defaultChapterTitle);
 
   navContainer.innerHTML = `
     <div style="min-width: 110px;">
