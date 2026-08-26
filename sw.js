@@ -3,13 +3,13 @@
   Network-First Strategy for Core App Logic, Automatic Cache Purge & Instant Client Claim
 */
 
-const CACHE_NAME = 'renovate-serious-game-v2.1.4.022';
+const CACHE_NAME = 'renovate-serious-game-v2.1.4.023';
 
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=2.1.4.022',
-  './app.js?v=2.1.4.022',
+  './styles.css?v=2.1.4.023',
+  './app.js?v=2.1.4.023',
   './manifest.json',
   './public/images/RENOVATE-logo.svg',
   './public/images/RENOVATE-logo.png',

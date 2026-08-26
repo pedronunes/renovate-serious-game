@@ -326,8 +326,7 @@ function t(key, fallback = '') {
 }
 
 // Load Translation Dictionary
-// Load Translation Dictionary
-async function loadTranslations(langCode) {
+async function loadTranslations(langCode, renderSlide = true) {
   try {
     const response = await fetch(`./public/locales/${langCode}.json`);
     if (!response.ok) {
@@ -337,8 +336,12 @@ async function loadTranslations(langCode) {
     gameState.activeTranslations = data;
     gameState.activeLanguage = langCode;
     localStorage.setItem(STORAGE_KEY_LANG, langCode);
+    saveProgress();
     
     renderTopBar();
+    if (renderSlide) {
+      renderCurrentSlide();
+    }
   } catch (err) {
     console.error('Translation error:', err);
   }
@@ -472,8 +475,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.022" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.022' : 'v2.1.4.022 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.023" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.023' : 'v2.1.4.023 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -2717,7 +2720,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderTopBar();
 
   // 1. Carrega sempre as traduções na inicialização para o modal ficar traduzido
-  await loadTranslations(gameState.activeLanguage);
+  await loadTranslations(gameState.activeLanguage, false);
 
   // 2. Verifica a existência de progresso guardado
   const hasSession = checkSessionRecovery();
