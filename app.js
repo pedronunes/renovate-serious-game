@@ -526,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.026" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.026' : 'v2.1.4.026 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.027" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.027' : 'v2.1.4.027 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1773,17 +1773,17 @@ const QUIZ_FEEDBACK_MAP = {
   48: { isCorrect: false, quizNum: 9, statusKey: 's48_feedback_status', infoKey: 's48_info_text', retrySlide: 46 }
 };
 
-// Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20)
+// Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20, 30, 33, 39, 43)
 function renderQuizScreen(container, slideId) {
   const cfg = QUIZ_CONFIG_MAP[slideId];
   if (!cfg) return;
 
   const slideKey = 's' + String(slideId).padStart(2, '0');
   const coords = UI_COORDINATES_MAP[slideKey] || {
-    card: { top: '8%', left: '5%', width: '90%' }
+    card: { top: '5.0%', left: '4.0%', width: '92.0%' }
   };
 
-  const titleText = t(cfg.titleKey, 'Calibration of a Sprayer');
+  const titleText = t(cfg.titleKey, 'CALIBRATION OF A SPRAYER');
   const questionText = t(cfg.questionKey, 'Quiz Question');
   const submitText = t('ui_confirm_answer', 'CONFIRMAR RESPOSTA');
 
@@ -1794,31 +1794,38 @@ function renderQuizScreen(container, slideId) {
   const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
 
   container.innerHTML = `
-    <div id="el-${slideKey}-card" class="quiz-container" style="${styleObjToCss(coords.card || { top: '8%', left: '5%', width: '90%' })}">
+    <!-- Quiz Container Layout strictly matching uploaded mockup & Design Bible v6 -->
+    <div id="el-${slideKey}-card" class="quiz-main-container" style="${styleObjToCss(coords.card || { top: '5.0%', left: '4.0%', width: '92.0%' })}">
       
-      <div>
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-          <span class="quiz-category-badge">QUIZ #${cfg.quizNum}</span>
-          <span style="font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 700; color: #1E4222;">${titleText}</span>
+      <!-- Top Circular Question Mark Emblem Badge & Category Header -->
+      <div class="quiz-header-wrapper">
+        <div class="quiz-emblem-circle">
+          <i data-lucide="help-circle" class="quiz-emblem-icon"></i>
         </div>
-
-        <div class="quiz-question-title">${questionText}</div>
-
-        <div class="quiz-options-list">
-          ${cfg.options.map(opt => {
-            const rawOptText = t(opt.textKey, opt.key);
-            const isSel = selectedOption === opt.key;
-            return `
-              <div class="quiz-option-card ${isSel ? 'selected' : ''}" data-key="${opt.key}">
-                <div class="quiz-option-badge">${opt.key}</div>
-                <div class="quiz-option-text">${cleanOptionText(rawOptText)}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
+        <div class="quiz-category-title">${titleText.toUpperCase()}</div>
       </div>
 
-      <div>
+      <!-- Prominent Question Box Card -->
+      <div class="quiz-question-card">
+        <div class="quiz-question-text">${questionText}</div>
+      </div>
+
+      <!-- Option Cards A, B, C, D List -->
+      <div class="quiz-options-list">
+        ${cfg.options.map(opt => {
+          const rawOptText = t(opt.textKey, opt.key);
+          const isSel = selectedOption === opt.key;
+          return `
+            <div class="quiz-option-card ${isSel ? 'selected' : ''}" data-key="${opt.key}">
+              <div class="quiz-option-badge">${opt.key}</div>
+              <div class="quiz-option-text">${cleanOptionText(rawOptText)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Action Button: Confirm Answer -->
+      <div class="quiz-action-wrapper">
         <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${!selectedOption ? 'disabled' : ''}>
           <span>${submitText}</span>
           <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
@@ -1835,6 +1842,7 @@ function renderQuizScreen(container, slideId) {
   optionCards.forEach(card => {
     const handleSelect = () => {
       initAudioEngine();
+      playFeedbackSound('click');
       optionCards.forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedOption = card.getAttribute('data-key');
