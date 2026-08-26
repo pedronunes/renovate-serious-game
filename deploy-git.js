@@ -40,6 +40,10 @@ try {
   console.log('🎉 PUBLICAÇÃO CONCLUÍDA COM SUCESSO NO GITHUB PAGES!');
   console.log('======================================================');
   console.log('👉 URL Oficial: https://pedronunes.github.io/renovate-serious-game/\n');
+  console.log('⏱ TEMPO DE ESPERA ESTIMADO:');
+  console.log('   - O GitHub Pages demora cerca de 30 a 60 segundos a processar a atualização no servidor.');
+  console.log('   - Aguarde cerca de 1 minuto antes de abrir a ligação.');
+  console.log('   - Se já tiver a página aberta, prima [Ctrl + F5] no PC ou feche e reabra a app no telemóvel para limpar a cache!\n');
 
 } catch (error) {
   console.error('❌ Erro durante o processo de deploy:', error.message);
