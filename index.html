@@ -27,7 +27,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
 
   <!-- Cache-Busted Master Stylesheet v2.1.4 -->
-  <link rel="stylesheet" href="styles.css?v=2.1.4.024">
+  <link rel="stylesheet" href="styles.css?v=2.1.4.025">
 </head>
 <body>
 
@@ -51,14 +51,23 @@
 
   </div>
 
+  <!-- Mobile Landscape Orientation Blocker (Template C - Design Bible v6) -->
+  <div id="orientation-blocker">
+    <div class="blocker-content">
+      <div class="rotate-icon">📱🔄</div>
+      <h2>Por favor, rode o seu dispositivo</h2>
+      <p>O Serious Game RENOVATE corre exclusivamente na orientação vertical para garantir a melhor experiência pedagógica.</p>
+    </div>
+  </div>
+
   <!-- Cache-Busted Main Game Engine v2.1.4 -->
-  <script src="app.js?v=2.1.4.024"></script>
+  <script src="app.js?v=2.1.4.025"></script>
 
   <!-- Service Worker Registration for PWA Standalone App Experience -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.1.4.024')
+        navigator.serviceWorker.register('./sw.js?v=2.1.4.025')
           .then(reg => {
             console.log('PWA ServiceWorker active v2.1.4:', reg.scope);
             reg.onupdatefound = () => {

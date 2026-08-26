@@ -273,7 +273,7 @@ function getAudioContext() {
   return initAudioEngine();
 }
 
-// Procedural Offline Synthesizer for Quiz Feedback Sounds
+// Procedural Offline Web Audio API Synthesizer (Design Bible v6 - Section 6)
 function playFeedbackSound(type) {
   if (gameState.audioMuted) return;
   const ctx = initAudioEngine();
@@ -285,30 +285,80 @@ function playFeedbackSound(type) {
 
   const now = ctx.currentTime;
 
-  if (type === 'correct' || type === 'ding') {
-    // "Ding" agudo e brilhante: oscilador sine a 880Hz (Lá5), ganho 0.3 -> 0.01 em 0.15s
+  if (type === 'click' || type === 'tap') {
+    // A. Clique de Botão Normal (Wooden Click - Secção 6.A): 1200Hz sine, ataque 0.002s, decaimento 0.05s
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, now);
-    gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    osc.frequency.setValueAtTime(1200, now);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.25, now + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.15);
-  } else if (type === 'incorrect' || type === 'buzz') {
-    // "Buzz" grave e áspero: oscilador sawtooth a 110Hz (Lá2), ganho 0.4 -> 0.01 em 0.3s
+    osc.stop(now + 0.05);
+
+  } else if (type === 'correct' || type === 'harp' || type === 'success' || type === 'ding') {
+    // B. Resposta Correta nos Quizzes (Harp Chord / Ascending Arpeggio - Secção 6.B): C5, E5, G5, C6
+    const freqs = [523.25, 659.25, 783.99, 1046.50];
+    freqs.forEach((freq, idx) => {
+      const noteTime = now + (idx * 0.055);
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, noteTime);
+      gain.gain.setValueAtTime(0.001, noteTime);
+      gain.gain.linearRampToValueAtTime(0.18, noteTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.55);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.55);
+    });
+
+  } else if (type === 'incorrect' || type === 'buzz' || type === 'error') {
+    // C. Resposta Incorreta (Dull Metallic Buzz - Secção 6.C): 150Hz e 153Hz desafinados + Lowpass 400Hz
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(400, now);
+    filter.connect(ctx.destination);
+
+    [150, 153].forEach(freq => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.30);
+      osc.connect(gain);
+      gain.connect(filter);
+      osc.start(now);
+      osc.stop(now + 0.30);
+    });
+
+  } else if (type === 'tick' || type === 'timer' || type === 'alert') {
+    // D. Cronómetro e Alertas (Metallic Clock Tick - Secção 6.D): Bandpass 3000Hz, decaimento 0.01s
     const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
     const gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(110, now);
-    gain.gain.setValueAtTime(0.4, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-    osc.connect(gain);
+    
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(3000, now);
+    
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(3000, now);
+    filter.Q.setValueAtTime(8, now);
+    
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.01);
+    
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
+    
     osc.start(now);
-    osc.stop(now + 0.3);
+    osc.stop(now + 0.01);
   }
 }
 
@@ -452,6 +502,7 @@ function showRecoveryModal(savedData) {
 // Navigation Engine
 function goToSlide(slideNum) {
   if (slideNum < 1 || slideNum > gameState.totalSlides) return;
+  playFeedbackSound('click');
   gameState.currentSlide = slideNum;
   if (slideNum > gameState.maxUnlockedSlide) {
     gameState.maxUnlockedSlide = slideNum;
@@ -475,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.024" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.024' : 'v2.1.4.024 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.025" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.025' : 'v2.1.4.025 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
