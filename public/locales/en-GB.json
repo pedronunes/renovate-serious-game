@@ -17,6 +17,7 @@
   "ui_correct": "CORRECT!",
   "ui_incorrect": "INCORRECT",
   "ui_retry": "RETRY",
+  "ui_confirm_answer": "CONFIRM ANSWER",
   "s01_chapter_title": "Calibration Challenge",
   "s01_s01_chapter_title": "Calibration Challenge",
   "s01_body_text": "Help Laura calibrate her sprayer before treating her vineyard.",

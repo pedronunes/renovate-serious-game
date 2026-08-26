@@ -526,8 +526,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.029" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.029' : 'v2.1.4.029 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.030" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.030' : 'v2.1.4.030 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1793,7 +1793,21 @@ function renderQuizScreen(container, slideId) {
     ? [...previous.selected] 
     : (previous?.selected ? [previous.selected] : []);
 
-  const cleanOptionText = (str) => str.replace(/^[A-D][\.\s]*/, '').trim();
+  // Helper function to extract option letter badge (supporting Latin A-D & Greek Α-Δ / Alpha-Delta) and clean body text
+  const parseQuizOption = (rawText, defaultKey) => {
+    if (!rawText) return { badgeLetter: defaultKey, cleanText: '' };
+    const match = rawText.match(/^([A-Z\u0370-\u03FFa-z\u03b1-\u03c90-9])[\.\)\s]+(.*)/u);
+    if (match) {
+      return {
+        badgeLetter: match[1].toUpperCase(),
+        cleanText: match[2].trim()
+      };
+    }
+    return {
+      badgeLetter: defaultKey,
+      cleanText: rawText.replace(/^[A-D\u0391-\u0394][\.\s]*/u, '').trim()
+    };
+  };
 
   container.innerHTML = `
     <!-- Quiz Container Layout strictly matching reference image & Design Bible v6 -->
@@ -1812,21 +1826,22 @@ function renderQuizScreen(container, slideId) {
         <div class="quiz-question-text">${questionText}</div>
       </div>
 
-      <!-- Option Cards A, B, C, D List (Multi-select toggle + Protruding Badges) -->
+      <!-- Option Cards A, B, C, D List (Multi-select toggle + Greek & Latin Badges) -->
       <div class="quiz-options-list">
         ${cfg.options.map(opt => {
           const rawOptText = t(opt.textKey, opt.key);
+          const parsed = parseQuizOption(rawOptText, opt.key);
           const isSel = selectedOptions.includes(opt.key);
           return `
             <div class="quiz-option-card ${isSel ? 'selected' : ''}" data-key="${opt.key}">
-              <div class="quiz-option-badge">${opt.key}</div>
-              <div class="quiz-option-text">${cleanOptionText(rawOptText)}</div>
+              <div class="quiz-option-badge">${parsed.badgeLetter}</div>
+              <div class="quiz-option-text">${parsed.cleanText}</div>
             </div>
           `;
         }).join('')}
       </div>
 
-      <!-- Action Button: Confirm Answer -->
+      <!-- Action Button: Confirm Answer (Width dynamic according to active language) -->
       <div class="quiz-action-wrapper">
         <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${selectedOptions.length === 0 ? 'disabled' : ''}>
           <span>${submitText}</span>

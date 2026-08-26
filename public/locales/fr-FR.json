@@ -17,6 +17,7 @@
   "ui_correct": "CORRECT !",
   "ui_incorrect": "INCORRECT",
   "ui_retry": "RÉESSAYER",
+  "ui_confirm_answer": "CONFIRMER LA RÉPONSE",
   "s01_chapter_title": "Défi de calibration",
   "s01_s01_chapter_title": "Défi de calibration",
   "s01_body_text": "Aidez Laura à calibrer son pulvérisateur avant de traiter son vignoble.",
