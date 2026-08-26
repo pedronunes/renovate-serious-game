@@ -1064,6 +1064,11 @@ button,
   transform: translateY(-50%) scale(1.10);
 }
 
+.quiz-option-card.locked {
+  pointer-events: none;
+  opacity: 0.88;
+}
+
 .quiz-option-text {
   font-family: var(--font-body);
   font-size: clamp(0.82rem, calc(0.95rem * var(--scale-factor, 1)), 1.10rem);

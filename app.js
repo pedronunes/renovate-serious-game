@@ -538,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.034" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.034' : 'v2.1.4.034 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.035" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.035' : 'v2.1.4.035 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1647,143 +1647,87 @@ function renderScreen10(container) {
   }
 }
 
-// Master Configuration for Interactive Quizzes (Screens 11, 14, 17, 20)
-const QUIZ_CONFIG_MAP = {
-  11: {
-    quizNum: 1,
-    correctOption: 'C',
-    correctSlide: 12,
-    incorrectSlide: 13,
-    titleKey: 's11_quiz_title',
-    questionKey: 's11_quiz_question',
-    options: [
-      { key: 'A', textKey: 's11_quiz_option_a' },
-      { key: 'B', textKey: 's11_quiz_option_b' },
-      { key: 'C', textKey: 's11_quiz_option_c' },
-      { key: 'D', textKey: 's11_quiz_option_d' }
-    ]
-  },
-  14: {
-    quizNum: 2,
-    correctOption: 'D',
-    correctSlide: 15,
-    incorrectSlide: 16,
-    titleKey: 's14_quiz_title',
-    questionKey: 's14_quiz_question',
-    options: [
-      { key: 'A', textKey: 's14_quiz_option_a' },
-      { key: 'B', textKey: 's14_quiz_option_b' },
-      { key: 'C', textKey: 's14_quiz_option_c' },
-      { key: 'D', textKey: 's14_quiz_option_d' }
-    ]
-  },
-  17: {
-    quizNum: 3,
-    correctOption: 'B',
-    correctSlide: 18,
-    incorrectSlide: 19,
-    titleKey: 's17_quiz_title',
-    questionKey: 's17_quiz_question',
-    options: [
-      { key: 'A', textKey: 's17_quiz_option_a' },
-      { key: 'B', textKey: 's17_quiz_option_b' },
-      { key: 'C', textKey: 's17_quiz_option_c' },
-      { key: 'D', textKey: 's17_quiz_option_d' }
-    ]
-  },
-  20: {
-    quizNum: 4,
-    correctOption: 'A',
-    correctSlide: 21,
-    incorrectSlide: 22,
-    titleKey: 's20_quiz_title',
-    questionKey: 's20_quiz_question',
-    options: [
-      { key: 'A', textKey: 's20_quiz_option_a' },
-      { key: 'B', textKey: 's20_quiz_option_b' },
-      { key: 'C', textKey: 's20_quiz_option_c' },
-      { key: 'D', textKey: 's20_quiz_option_d' }
-    ]
-  },
-  30: {
-    quizNum: 5,
-    correctOption: 'A',
-    correctSlide: 31,
-    incorrectSlide: 32,
-    titleKey: 's30_quiz_title',
-    questionKey: 's30_quiz_question',
-    options: [
-      { key: 'A', textKey: 's30_quiz_option_a' },
-      { key: 'B', textKey: 's30_quiz_option_b' },
-      { key: 'C', textKey: 's30_quiz_option_c' },
-      { key: 'D', textKey: 's30_quiz_option_d' }
-    ]
-  },
-  33: {
-    quizNum: 6,
-    correctOption: 'A',
-    correctSlide: 34,
-    incorrectSlide: 35,
-    titleKey: 's33_quiz_title',
-    questionKey: 's33_quiz_question',
-    options: [
-      { key: 'A', textKey: 's33_quiz_option_a' },
-      { key: 'B', textKey: 's33_quiz_option_b' },
-      { key: 'C', textKey: 's33_quiz_option_c' },
-      { key: 'D', textKey: 's33_quiz_option_d' }
-    ]
-  },
-  39: {
-    quizNum: 7,
-    correctOption: ['A', 'B', 'C'],
-    correctSlide: 40,
-    incorrectSlide: 41,
-    titleKey: 's39_quiz_title',
-    questionKey: 's39_quiz_question',
-    options: [
-      { key: 'A', textKey: 's39_quiz_option_a' },
-      { key: 'B', textKey: 's39_quiz_option_b' },
-      { key: 'C', textKey: 's39_quiz_option_c' },
-      { key: 'D', textKey: 's39_quiz_option_d' }
-    ]
-  },
-  43: {
-    quizNum: 8,
-    correctOption: 'A',
-    correctSlide: 44,
-    incorrectSlide: 45,
-    titleKey: 's43_quiz_title',
-    questionKey: 's43_quiz_question',
-    options: [
-      { key: 'A', textKey: 's43_quiz_option_a' },
-      { key: 'B', textKey: 's43_quiz_option_b' },
-      { key: 'C', textKey: 's43_quiz_option_c' },
-      { key: 'D', textKey: 's43_quiz_option_d' }
-    ]
-  }
-};
+// Master Specification for All 34 Interactive Quizzes and 68 Feedback Screens
+const RAW_QUIZ_SPECS = [
+  { quizSlide: 11, correctSlide: 12, incorrectSlide: 13, correct: 'C' },
+  { quizSlide: 14, correctSlide: 15, incorrectSlide: 16, correct: ['A', 'D'] },
+  { quizSlide: 17, correctSlide: 18, incorrectSlide: 19, correct: ['B', 'D'] },
+  { quizSlide: 20, correctSlide: 21, incorrectSlide: 22, correct: ['A', 'C'] },
+  { quizSlide: 25, correctSlide: 26, incorrectSlide: 27, correct: ['B', 'C', 'D'] },
+  { quizSlide: 28, correctSlide: 29, incorrectSlide: 30, correct: ['B', 'D'] },
+  { quizSlide: 31, correctSlide: 32, incorrectSlide: 33, correct: ['A', 'D'] },
+  { quizSlide: 37, correctSlide: 38, incorrectSlide: 39, correct: ['B', 'D'] },
+  { quizSlide: 40, correctSlide: 41, incorrectSlide: 42, correct: 'B' },
+  { quizSlide: 43, correctSlide: 44, incorrectSlide: 45, correct: ['B', 'D'] },
+  { quizSlide: 49, correctSlide: 50, incorrectSlide: 51, correct: 'A' },
+  { quizSlide: 52, correctSlide: 53, incorrectSlide: 54, correct: ['A', 'C', 'D'] },
+  { quizSlide: 55, correctSlide: 56, incorrectSlide: 57, correct: 'A' },
+  { quizSlide: 58, correctSlide: 59, incorrectSlide: 60, correct: ['A', 'D'] },
+  { quizSlide: 61, correctSlide: 62, incorrectSlide: 63, correct: ['A', 'B', 'C'] },
+  { quizSlide: 64, correctSlide: 65, incorrectSlide: 66, correct: ['B', 'C'] },
+  { quizSlide: 70, correctSlide: 71, incorrectSlide: 72, correct: 'B' },
+  { quizSlide: 73, correctSlide: 74, incorrectSlide: 75, correct: 'B' },
+  { quizSlide: 76, correctSlide: 77, incorrectSlide: 78, correct: 'B' },
+  { quizSlide: 83, correctSlide: 84, incorrectSlide: 85, correct: 'B' },
+  { quizSlide: 86, correctSlide: 87, incorrectSlide: 88, correct: 'A' },
+  { quizSlide: 89, correctSlide: 90, incorrectSlide: 91, correct: 'B' },
+  { quizSlide: 92, correctSlide: 93, incorrectSlide: 94, correct: 'C' },
+  { quizSlide: 98, correctSlide: 99, incorrectSlide: 100, correct: 'D' },
+  { quizSlide: 102, correctSlide: 103, incorrectSlide: 104, correct: 'B' },
+  { quizSlide: 107, correctSlide: 108, incorrectSlide: 109, correct: 'C' },
+  { quizSlide: 119, correctSlide: 120, incorrectSlide: 121, correct: 'C' },
+  { quizSlide: 124, correctSlide: 125, incorrectSlide: 126, correct: 'B' },
+  { quizSlide: 129, correctSlide: 130, incorrectSlide: 131, correct: 'B' },
+  { quizSlide: 136, correctSlide: 137, incorrectSlide: 138, correct: ['A', 'B', 'C'] },
+  { quizSlide: 141, correctSlide: 142, incorrectSlide: 143, correct: 'B' },
+  { quizSlide: 144, correctSlide: 145, incorrectSlide: 146, correct: 'C' },
+  { quizSlide: 149, correctSlide: 150, incorrectSlide: 151, correct: 'B' },
+  { quizSlide: 154, correctSlide: 155, incorrectSlide: 156, correct: 'D' }
+];
 
-// Master Configuration for Quiz Feedback Screens (Screens 12, 13, 15, 16, 18, 19, 21, 22, 31, 32, 34, 35, 40, 41, 44, 45, 47, 48)
-const QUIZ_FEEDBACK_MAP = {
-  12: { isCorrect: true, quizNum: 1, statusKey: 's12_feedback_status', infoKey: 's12_info_text', optionKey: 's12_quiz_correct_option', nextSlide: 14 },
-  13: { isCorrect: false, quizNum: 1, statusKey: 's13_feedback_status', infoKey: 's13_info_text', retrySlide: 11 },
-  15: { isCorrect: true, quizNum: 2, statusKey: 's15_feedback_status', infoKey: 's15_info_text', optionKey: 's15_quiz_correct_d', nextSlide: 17 },
-  16: { isCorrect: false, quizNum: 2, statusKey: 's16_feedback_status', infoKey: 's16_info_text', retrySlide: 14 },
-  18: { isCorrect: true, quizNum: 3, statusKey: 's18_feedback_status', infoKey: 's18_info_text', optionKey: 's18_quiz_correct_b', nextSlide: 20 },
-  19: { isCorrect: false, quizNum: 3, statusKey: 's19_feedback_status', infoKey: 's19_info_text', retrySlide: 17 },
-  21: { isCorrect: true, quizNum: 4, statusKey: 's21_feedback_status', infoKey: 's21_info_text', optionKey: 's21_quiz_correct_a', nextSlide: 23 },
-  22: { isCorrect: false, quizNum: 4, statusKey: 's22_feedback_status', infoKey: 's22_info_text', retrySlide: 20 },
-  31: { isCorrect: true, quizNum: 5, statusKey: 's31_feedback_status', infoKey: 's31_info_text', optionKey: 's31_quiz_correct_a', nextSlide: 33 },
-  32: { isCorrect: false, quizNum: 5, statusKey: 's32_feedback_status', infoKey: 's32_info_text', retrySlide: 30 },
-  34: { isCorrect: true, quizNum: 6, statusKey: 's34_feedback_status', infoKey: 's34_info_text', optionKey: 's34_quiz_correct_a', nextSlide: 36 },
-  35: { isCorrect: false, quizNum: 6, statusKey: 's35_feedback_status', infoKey: 's35_info_text', retrySlide: 33 },
-  40: { isCorrect: true, quizNum: 7, statusKey: 's40_feedback_status', infoKey: 's40_info_text', optionKey: 's40_quiz_correct_a', nextSlide: 42 },
-  41: { isCorrect: false, quizNum: 7, statusKey: 's41_feedback_status', infoKey: 's41_info_text', retrySlide: 39 },
-  44: { isCorrect: true, quizNum: 8, statusKey: 's44_feedback_status', infoKey: 's44_info_text', optionKey: 's44_quiz_correct_a', nextSlide: 46 },
-  45: { isCorrect: false, quizNum: 8, statusKey: 's45_feedback_status', infoKey: 's45_info_text', retrySlide: 43 },
-  47: { isCorrect: true, quizNum: 9, statusKey: 's47_feedback_status', infoKey: 's47_info_text', optionKey: 's47_quiz_correct_a', nextSlide: 49 },
-  48: { isCorrect: false, quizNum: 9, statusKey: 's48_feedback_status', infoKey: 's48_info_text', retrySlide: 46 }
-};
+const QUIZ_CONFIG_MAP = {};
+const QUIZ_FEEDBACK_MAP = {};
+const FEEDBACK_TO_QUIZ_SLIDE = {};
+
+RAW_QUIZ_SPECS.forEach((spec, idx) => {
+  const quizNum = idx + 1;
+  const sQuizKey = `s${String(spec.quizSlide).padStart(2, '0')}`;
+  
+  QUIZ_CONFIG_MAP[spec.quizSlide] = {
+    quizNum,
+    correctOption: spec.correct,
+    correctSlide: spec.correctSlide,
+    incorrectSlide: spec.incorrectSlide,
+    titleKey: `${sQuizKey}_quiz_title`,
+    questionKey: `${sQuizKey}_quiz_question`,
+    options: [
+      { key: 'A', textKey: `${sQuizKey}_quiz_option_a` },
+      { key: 'B', textKey: `${sQuizKey}_quiz_option_b` },
+      { key: 'C', textKey: `${sQuizKey}_quiz_option_c` },
+      { key: 'D', textKey: `${sQuizKey}_quiz_option_d` }
+    ]
+  };
+
+  const sCorrKey = `s${String(spec.correctSlide).padStart(2, '0')}`;
+  QUIZ_FEEDBACK_MAP[spec.correctSlide] = {
+    isCorrect: true,
+    quizNum,
+    statusKey: `${sCorrKey}_feedback_status`,
+    infoKey: `${sCorrKey}_info_text`,
+    nextSlide: spec.correctSlide + 1
+  };
+  FEEDBACK_TO_QUIZ_SLIDE[spec.correctSlide] = spec.quizSlide;
+
+  const sIncorrKey = `s${String(spec.incorrectSlide).padStart(2, '0')}`;
+  QUIZ_FEEDBACK_MAP[spec.incorrectSlide] = {
+    isCorrect: false,
+    quizNum,
+    statusKey: `${sIncorrKey}_feedback_status`,
+    infoKey: `${sIncorrKey}_info_text`,
+    retrySlide: spec.quizSlide
+  };
+  FEEDBACK_TO_QUIZ_SLIDE[spec.incorrectSlide] = spec.quizSlide;
+});
 
 // Helper function to extract option letter badge (supporting Latin A-D & Greek Α-Δ / Alpha-Delta) and clean body text
 function parseQuizOption(rawText, defaultKey) {
@@ -1815,8 +1759,9 @@ function renderQuizScreen(container, slideId) {
   const questionText = t(cfg.questionKey, 'Quiz Question');
   const submitText = t('ui_confirm_answer', 'CONFIRMAR RESPOSTA');
 
-  // Check if previously selected (array of option keys for multi-choice support)
+  // Check if previously answered & locked
   const previous = gameState.quizAnswers[slideId];
+  const isAlreadyAnswered = Boolean(previous);
   let selectedOptions = Array.isArray(previous?.selected) 
     ? [...previous.selected] 
     : (previous?.selected ? [previous.selected] : []);
@@ -1838,14 +1783,14 @@ function renderQuizScreen(container, slideId) {
         <div class="quiz-question-text">${questionText}</div>
       </div>
 
-      <!-- Option Cards A, B, C, D List (Multi-select toggle + Greek & Latin Badges) -->
+      <!-- Option Cards A, B, C, D List (Multi-select toggle + Greek & Latin Badges + Locked after attempt) -->
       <div class="quiz-options-list">
         ${cfg.options.map(opt => {
           const rawOptText = t(opt.textKey, opt.key);
           const parsed = parseQuizOption(rawOptText, opt.key);
           const isSel = selectedOptions.includes(opt.key);
           return `
-            <div class="quiz-option-card ${isSel ? 'selected' : ''}" data-key="${opt.key}">
+            <div class="quiz-option-card ${isSel ? 'selected' : ''} ${isAlreadyAnswered ? 'locked' : ''}" data-key="${opt.key}">
               <div class="quiz-option-badge">${parsed.badgeLetter}</div>
               <div class="quiz-option-text">${parsed.cleanText}</div>
             </div>
@@ -1855,41 +1800,39 @@ function renderQuizScreen(container, slideId) {
 
       <!-- Action Button: Confirm Answer (Width dynamic according to active language) -->
       <div class="quiz-action-wrapper">
-        <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${selectedOptions.length === 0 ? 'disabled' : ''}>
-          <span>${submitText}</span>
-          <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+        <button id="btn-submit-quiz-${slideId}" class="btn-submit-answer" ${(selectedOptions.length === 0 || isAlreadyAnswered) ? 'disabled' : ''}>
+          <span>${isAlreadyAnswered ? t('ui_submitted', 'RESPOSTA SUBMETIDA') : submitText}</span>
+          <i data-lucide="${isAlreadyAnswered ? 'check' : 'arrow-right'}" style="width: 20px; height: 20px;"></i>
         </button>
       </div>
 
     </div>
   `;
 
-  // Bind option selection events (toggle selection for multi-choice support)
-  const optionCards = container.querySelectorAll('.quiz-option-card');
-  const submitBtn = document.getElementById(`btn-submit-quiz-${slideId}`);
+  // Bind option selection & submit events ONLY if not already answered
+  if (!isAlreadyAnswered) {
+    const optionCards = container.querySelectorAll('.quiz-option-card');
+    const submitBtn = document.getElementById(`btn-submit-quiz-${slideId}`);
 
-  optionCards.forEach(card => {
-    const handleSelect = () => {
-      initAudioEngine();
-      playFeedbackSound('click');
-      const optKey = card.getAttribute('data-key');
-      
-      if (selectedOptions.includes(optKey)) {
-        selectedOptions = selectedOptions.filter(k => k !== optKey);
-        card.classList.remove('selected');
-      } else {
-        selectedOptions.push(optKey);
-        card.classList.add('selected');
-      }
+    optionCards.forEach(card => {
+      card.addEventListener('click', () => {
+        initAudioEngine();
+        playFeedbackSound('click');
+        const optKey = card.getAttribute('data-key');
+        
+        if (selectedOptions.includes(optKey)) {
+          selectedOptions = selectedOptions.filter(k => k !== optKey);
+          card.classList.remove('selected');
+        } else {
+          selectedOptions.push(optKey);
+          card.classList.add('selected');
+        }
 
-      if (submitBtn) submitBtn.disabled = selectedOptions.length === 0;
-    };
-    card.addEventListener('click', handleSelect);
-  });
+        if (submitBtn) submitBtn.disabled = selectedOptions.length === 0;
+      });
+    });
 
-  // Bind submit button event
-  if (submitBtn) {
-    submitBtn.addEventListener('click', () => {
+    submitBtn?.addEventListener('click', () => {
       if (selectedOptions.length === 0) return;
 
       let isCorrect = false;
@@ -1922,19 +1865,6 @@ function renderQuizScreen(container, slideId) {
   }
 }
 
-// Mapping Feedback Slides to Parent Quiz Question Slides
-const FEEDBACK_TO_QUIZ_SLIDE = {
-  12: 11, 13: 11,
-  15: 14, 16: 14,
-  18: 17, 19: 17,
-  21: 20, 22: 20,
-  31: 30, 32: 30,
-  34: 33, 35: 33,
-  40: 39, 41: 39,
-  44: 43, 45: 43,
-  47: 46, 48: 46
-};
-
 // Render Quiz Feedback Screen (Correct / Incorrect - Screens 12, 13, 15, 16, 18, 19, 21, 22, 31, 32, 34, 35, 40, 41, 44, 45, 47, 48)
 function renderQuizFeedbackScreen(container, slideId) {
   const fb = QUIZ_FEEDBACK_MAP[slideId];
@@ -1956,20 +1886,21 @@ function renderQuizFeedbackScreen(container, slideId) {
 
   // Determine options to display strictly matching reference images
   let optionsToDisplay = [];
+  const targetCorrect = cfg ? (Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption]) : [];
+
   if (cfg && cfg.options) {
     if (fb.isCorrect) {
-      // Display correct option(s)
-      const targetCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption];
+      // Correct screen: ALWAYS show ALL correct options
       optionsToDisplay = cfg.options.filter(opt => targetCorrect.includes(opt.key));
     } else {
-      // Display incorrect option(s) selected by user or non-correct options
+      // Incorrect screen: ALWAYS show ALL user selected options
       const userSelected = gameState.quizAnswers[parentQuizSlide]?.selected;
       const selectedArr = Array.isArray(userSelected) ? userSelected : (userSelected ? [userSelected] : []);
-      const targetCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption : [cfg.correctOption];
       
       if (selectedArr.length > 0) {
         optionsToDisplay = cfg.options.filter(opt => selectedArr.includes(opt.key));
       } else {
+        // Fallback if no selection saved: show non-correct options
         optionsToDisplay = cfg.options.filter(opt => !targetCorrect.includes(opt.key));
       }
     }
@@ -2007,9 +1938,12 @@ function renderQuizFeedbackScreen(container, slideId) {
           ${optionsToDisplay.map(opt => {
             const rawOptText = t(opt.textKey, opt.key);
             const parsed = parseQuizOption(rawOptText, opt.key);
+            const isThisOptCorrect = targetCorrect.includes(opt.key);
+            const glowClass = isThisOptCorrect ? 'feedback-card-glow-correct' : 'feedback-card-glow-incorrect';
+            const badgeClass = isThisOptCorrect ? 'badge-correct-green' : 'badge-incorrect-red';
             return `
-              <div class="quiz-option-card feedback-option-card ${fb.isCorrect ? 'feedback-card-glow-correct' : 'feedback-card-glow-incorrect'}">
-                <div class="quiz-option-badge ${fb.isCorrect ? 'badge-correct-green' : 'badge-incorrect-red'}">${parsed.badgeLetter}</div>
+              <div class="quiz-option-card feedback-option-card ${glowClass}">
+                <div class="quiz-option-badge ${badgeClass}">${parsed.badgeLetter}</div>
                 <div class="quiz-option-text">${parsed.cleanText}</div>
               </div>
             `;

@@ -1,6 +1,6 @@
 {
   "name": "renovate-serious-game",
-  "version": "2.1.4.034",
+  "version": "2.1.4.035",
   "description": "RENOVATE Serious Game on pesticide sprayer calibration",
   "main": "extract-translations.js",
   "scripts": {
