@@ -170,6 +170,40 @@ const INITIAL_UI_COORDINATES_MAP = {
       "fontSize": "1.05rem",
       "left": "5.0%"
     }
+  },
+  "s23": {
+    "miaBubble": {
+      "top": "15.0%",
+      "left": "8.0%",
+      "width": "44.0%",
+      "pointer": "pointer-left"
+    },
+    "lauraBubble": {
+      "top": "48.0%",
+      "left": "48.0%",
+      "width": "44.0%",
+      "pointer": "pointer-right"
+    },
+    "legalCard": {
+      "top": "78.0%",
+      "left": "50.0%",
+      "transform": "translateX(-50%)",
+      "width": "84.0%"
+    }
+  },
+  "s36": {
+    "card": {
+      "top": "18.0%",
+      "left": "6.0%",
+      "width": "88.0%"
+    }
+  },
+  "s37": {
+    "card": {
+      "top": "10.0%",
+      "left": "5.0%",
+      "width": "90.0%"
+    }
   }
 };
 
@@ -201,6 +235,40 @@ function preloadBackdropImages() {
   });
 }
 
+// Helper to resolve backend server URL (Port 3000) dynamically if frontend runs on another port
+function getBackendUrl() {
+  const backendPort = '3000';
+  return window.location.port === backendPort ? '' : `http://localhost:${backendPort}`;
+}
+
+// Save custom designer coordinates to localStorage and sync with local Node server
+function saveCustomCoordinatesLocally(coordsMap = UI_COORDINATES_MAP, endpoint = '/api/sync-coords', showToast = false) {
+  localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(coordsMap));
+  
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const backendUrl = getBackendUrl();
+    return fetch(`${backendUrl}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(coordsMap)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        if (showToast) showDesignerToast('✓ Coordenadas guardadas e sincronizadas com app.js!', 'success');
+      } else {
+        if (showToast) showDesignerToast('⚠️ Erro ao sincronizar com app.js no servidor local.', 'warning');
+      }
+      return data;
+    })
+    .catch(e => {
+      console.error('Sync error:', e);
+      if (showToast) showDesignerToast('⚠️ Servidor local na porta 3000 indisponível para gravação.', 'warning');
+      return { success: false, error: e.message };
+    });
+  }
+}
+
 // Load Saved Custom Coordinates from localStorage & auto-sync to local server
 function loadCustomCoordinates() {
   const saved = localStorage.getItem(STORAGE_KEY_CUSTOM_COORDS) || localStorage.getItem('renovate_custom_coordinates');
@@ -212,14 +280,7 @@ function loadCustomCoordinates() {
         UI_COORDINATES_MAP[k] = { ...UI_COORDINATES_MAP[k], ...parsed[k] };
       });
 
-      // Auto-sync saved designer coordinates to server file app.js on localhost
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        fetch('/api/sync-coords', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(UI_COORDINATES_MAP)
-        }).catch(e => console.error('Auto-sync error:', e));
-      }
+      saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
     } catch (e) {
       console.error('Error parsing custom coordinates:', e);
     }
@@ -239,53 +300,91 @@ const gameState = {
   selectedDesignerElement: null
 };
 
-// Web Audio API Synthesizer (Ding & Buzz)
+// Web Audio API Central Context & Safe Initialization Engine
 let audioCtx = null;
 
-function getAudioContext() {
+function initAudioEngine() {
   if (!audioCtx) {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioCtx = new AudioContext();
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
     }
   }
+
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+    const unlockAudio = () => {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          document.removeEventListener('click', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
+        }).catch(() => {});
+      } else {
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+      }
+    };
+
+    audioCtx.resume().then(() => {
+      if (audioCtx.state !== 'suspended') {
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('touchstart', unlockAudio);
+      }
+    }).catch(() => {});
+
+    document.addEventListener('click', unlockAudio, { passive: true });
+    document.addEventListener('touchstart', unlockAudio, { passive: true });
   }
+
   return audioCtx;
 }
 
-function playSound(type) {
+// Aliased for backward compatibility
+function getAudioContext() {
+  return initAudioEngine();
+}
+
+// Procedural Offline Synthesizer for Quiz Feedback Sounds
+function playFeedbackSound(type) {
   if (gameState.audioMuted) return;
-  const ctx = getAudioContext();
+  const ctx = initAudioEngine();
   if (!ctx) return;
+
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
 
   const now = ctx.currentTime;
 
-  if (type === 'ding') {
+  if (type === 'correct' || type === 'ding') {
+    // "Ding" agudo e brilhante: oscilador sine a 880Hz (Lá5), ganho 0.3 -> 0.01 em 0.15s
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(880, now);
-    osc.frequency.exponentialRampToValueAtTime(1320, now + 0.15);
     gain.gain.setValueAtTime(0.3, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(now);
-    osc.stop(now + 0.25);
-  } else if (type === 'buzz') {
+    osc.stop(now + 0.15);
+  } else if (type === 'incorrect' || type === 'buzz') {
+    // "Buzz" grave e áspero: oscilador sawtooth a 110Hz (Lá2), ganho 0.4 -> 0.01 em 0.3s
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(120, now);
-    gain.gain.setValueAtTime(0.3, now);
+    osc.frequency.setValueAtTime(110, now);
+    gain.gain.setValueAtTime(0.4, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 0.3);
   }
+}
+
+// Backward compatibility helper
+function playSound(type) {
+  playFeedbackSound(type);
 }
 
 // Translation Helper
@@ -375,19 +474,22 @@ function showRecoveryModal(savedData) {
     </div>
   `;
 
-  document.getElementById('btn-resume-session').addEventListener('click', () => {
+  document.getElementById('btn-resume-session').addEventListener('click', async () => {
     gameState.currentSlide = savedData.slide;
     gameState.maxUnlockedSlide = savedData.maxUnlocked || savedData.slide;
     gameState.quizAnswers = savedData.answers || {};
     if (savedData.lang) gameState.activeLanguage = savedData.lang;
     container.innerHTML = '';
-    loadTranslations(gameState.activeLanguage);
+    await loadTranslations(gameState.activeLanguage);
+    renderCurrentSlide();
   });
 
-  document.getElementById('btn-restart-session').addEventListener('click', () => {
+  document.getElementById('btn-restart-session').addEventListener('click', async () => {
     localStorage.removeItem(STORAGE_KEY_PROGRESS);
     container.innerHTML = '';
-    loadTranslations(gameState.activeLanguage);
+    gameState.currentSlide = 1;
+    await loadTranslations(gameState.activeLanguage);
+    renderCurrentSlide();
   });
 }
 
@@ -456,24 +558,22 @@ function renderTopBar() {
 
 // Helper to convert style object to inline CSS string
 function styleObjToCss(styleObj = {}) {
-  if (gameState.designerMode) {
-    return Object.entries(styleObj)
-      .filter(([k]) => k !== 'pointer')
-      .map(([k, v]) => {
-        const cssKey = k.replace(/([A-Z])/g, '-$1').toLowerCase();
-        return `${cssKey}:${v}`;
-      })
-      .concat('position:absolute')
-      .join(';');
+  const cssStyles = [];
+  const isAbsolute = styleObj.top !== undefined || styleObj.left !== undefined || styleObj.right !== undefined;
+
+  Object.entries(styleObj).forEach(([k, v]) => {
+    if (k === 'pointer') return; // Ignora o ponteiro visual da cauda do balão no CSS inline
+    const cssKey = k.replace(/([A-Z])/g, '-$1').toLowerCase();
+    cssStyles.push(`${cssKey}:${v}`);
+  });
+
+  if (isAbsolute) {
+    cssStyles.push('position:absolute');
+  } else {
+    cssStyles.push('position:relative', 'margin-left:auto', 'margin-right:auto');
   }
 
-  // Normal Responsive App Mode (Smartphones, Tablets, Laptops)
-  const flowStyles = [];
-  if (styleObj.width) flowStyles.push(`width:${styleObj.width}`);
-  if (styleObj.maxWidth) flowStyles.push(`max-width:${styleObj.maxWidth}`);
-  if (styleObj.fontSize) flowStyles.push(`font-size:${styleObj.fontSize}`);
-  flowStyles.push('position:relative', 'margin-left:auto', 'margin-right:auto');
-  return flowStyles.join(';');
+  return cssStyles.join(';');
 }
 
 // Main Render Dispatcher
@@ -516,6 +616,18 @@ function renderCurrentSlide() {
   else if (slideId === 8) renderScreen8(overlayContainer);
   else if (slideId === 9) renderScreen9(overlayContainer);
   else if (slideId === 10) renderScreen10(overlayContainer);
+  else if (slideId === 23) renderScreen23(overlayContainer);
+  else if (slideId === 24) renderScreen24(overlayContainer);
+  else if (slideId === 25) renderScreen25(overlayContainer);
+  else if (slideId === 26) renderScreen26(overlayContainer);
+  else if (slideId === 27) renderScreen27(overlayContainer);
+  else if (slideId === 28) renderScreen28(overlayContainer);
+  else if (slideId === 29) renderScreen29(overlayContainer);
+  else if (slideId === 36) renderScreen36(overlayContainer);
+  else if (slideId === 37) renderScreen37(overlayContainer);
+  else if (slideId === 38) renderScreen38(overlayContainer);
+  else if (slideId === 42) renderScreen42(overlayContainer);
+  else if (slideId === 46) renderScreen46(overlayContainer);
   else if (QUIZ_CONFIG_MAP[slideId]) renderQuizScreen(overlayContainer, slideId);
   else if (QUIZ_FEEDBACK_MAP[slideId]) renderQuizFeedbackScreen(overlayContainer, slideId);
   else renderGenericScreenPlaceholder(overlayContainer, slideId);
@@ -626,10 +738,15 @@ function renderScreen1(container) {
     </div>
   `;
 
-  document.getElementById('btn-start-game').addEventListener('click', () => {
-    getAudioContext();
-    goToSlide(2);
-  });
+  const startBtn = document.getElementById('btn-start-game');
+  if (startBtn) {
+    const handleStart = () => {
+      initAudioEngine();
+      goToSlide(2);
+    };
+    startBtn.addEventListener('click', handleStart);
+    startBtn.addEventListener('touchstart', handleStart, { passive: true });
+  }
 }
 
 // Screen 2: Meet Laura (Exact Reproduction of /docs/tela2.png with Lucide Icons: grape, leaf, target)
@@ -1238,10 +1355,66 @@ const QUIZ_CONFIG_MAP = {
       { key: 'C', textKey: 's20_quiz_option_c' },
       { key: 'D', textKey: 's20_quiz_option_d' }
     ]
+  },
+  30: {
+    quizNum: 5,
+    correctOption: 'A',
+    correctSlide: 31,
+    incorrectSlide: 32,
+    titleKey: 's30_quiz_title',
+    questionKey: 's30_quiz_question',
+    options: [
+      { key: 'A', textKey: 's30_quiz_option_a' },
+      { key: 'B', textKey: 's30_quiz_option_b' },
+      { key: 'C', textKey: 's30_quiz_option_c' },
+      { key: 'D', textKey: 's30_quiz_option_d' }
+    ]
+  },
+  33: {
+    quizNum: 6,
+    correctOption: 'A',
+    correctSlide: 34,
+    incorrectSlide: 35,
+    titleKey: 's33_quiz_title',
+    questionKey: 's33_quiz_question',
+    options: [
+      { key: 'A', textKey: 's33_quiz_option_a' },
+      { key: 'B', textKey: 's33_quiz_option_b' },
+      { key: 'C', textKey: 's33_quiz_option_c' },
+      { key: 'D', textKey: 's33_quiz_option_d' }
+    ]
+  },
+  39: {
+    quizNum: 7,
+    correctOption: ['A', 'B', 'C'],
+    correctSlide: 40,
+    incorrectSlide: 41,
+    titleKey: 's39_quiz_title',
+    questionKey: 's39_quiz_question',
+    options: [
+      { key: 'A', textKey: 's39_quiz_option_a' },
+      { key: 'B', textKey: 's39_quiz_option_b' },
+      { key: 'C', textKey: 's39_quiz_option_c' },
+      { key: 'D', textKey: 's39_quiz_option_d' }
+    ]
+  },
+  43: {
+    quizNum: 8,
+    correctOption: 'A',
+    correctSlide: 44,
+    incorrectSlide: 45,
+    titleKey: 's43_quiz_title',
+    questionKey: 's43_quiz_question',
+    options: [
+      { key: 'A', textKey: 's43_quiz_option_a' },
+      { key: 'B', textKey: 's43_quiz_option_b' },
+      { key: 'C', textKey: 's43_quiz_option_c' },
+      { key: 'D', textKey: 's43_quiz_option_d' }
+    ]
   }
 };
 
-// Master Configuration for Quiz Feedback Screens (Screens 12, 13, 15, 16, 18, 19, 21, 22)
+// Master Configuration for Quiz Feedback Screens (Screens 12, 13, 15, 16, 18, 19, 21, 22, 31, 32, 34, 35, 40, 41, 44, 45, 47, 48)
 const QUIZ_FEEDBACK_MAP = {
   12: { isCorrect: true, quizNum: 1, statusKey: 's12_feedback_status', infoKey: 's12_info_text', optionKey: 's12_quiz_correct_option', nextSlide: 14 },
   13: { isCorrect: false, quizNum: 1, statusKey: 's13_feedback_status', infoKey: 's13_info_text', retrySlide: 11 },
@@ -1250,7 +1423,17 @@ const QUIZ_FEEDBACK_MAP = {
   18: { isCorrect: true, quizNum: 3, statusKey: 's18_feedback_status', infoKey: 's18_info_text', optionKey: 's18_quiz_correct_b', nextSlide: 20 },
   19: { isCorrect: false, quizNum: 3, statusKey: 's19_feedback_status', infoKey: 's19_info_text', retrySlide: 17 },
   21: { isCorrect: true, quizNum: 4, statusKey: 's21_feedback_status', infoKey: 's21_info_text', optionKey: 's21_quiz_correct_a', nextSlide: 23 },
-  22: { isCorrect: false, quizNum: 4, statusKey: 's22_feedback_status', infoKey: 's22_info_text', retrySlide: 20 }
+  22: { isCorrect: false, quizNum: 4, statusKey: 's22_feedback_status', infoKey: 's22_info_text', retrySlide: 20 },
+  31: { isCorrect: true, quizNum: 5, statusKey: 's31_feedback_status', infoKey: 's31_info_text', optionKey: 's31_quiz_correct_a', nextSlide: 33 },
+  32: { isCorrect: false, quizNum: 5, statusKey: 's32_feedback_status', infoKey: 's32_info_text', retrySlide: 30 },
+  34: { isCorrect: true, quizNum: 6, statusKey: 's34_feedback_status', infoKey: 's34_info_text', optionKey: 's34_quiz_correct_a', nextSlide: 36 },
+  35: { isCorrect: false, quizNum: 6, statusKey: 's35_feedback_status', infoKey: 's35_info_text', retrySlide: 33 },
+  40: { isCorrect: true, quizNum: 7, statusKey: 's40_feedback_status', infoKey: 's40_info_text', optionKey: 's40_quiz_correct_a', nextSlide: 42 },
+  41: { isCorrect: false, quizNum: 7, statusKey: 's41_feedback_status', infoKey: 's41_info_text', retrySlide: 39 },
+  44: { isCorrect: true, quizNum: 8, statusKey: 's44_feedback_status', infoKey: 's44_info_text', optionKey: 's44_quiz_correct_a', nextSlide: 46 },
+  45: { isCorrect: false, quizNum: 8, statusKey: 's45_feedback_status', infoKey: 's45_info_text', retrySlide: 43 },
+  47: { isCorrect: true, quizNum: 9, statusKey: 's47_feedback_status', infoKey: 's47_info_text', optionKey: 's47_quiz_correct_a', nextSlide: 49 },
+  48: { isCorrect: false, quizNum: 9, statusKey: 's48_feedback_status', infoKey: 's48_info_text', retrySlide: 46 }
 };
 
 // Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20)
@@ -1313,13 +1496,14 @@ function renderQuizScreen(container, slideId) {
   const submitBtn = document.getElementById(`btn-submit-quiz-${slideId}`);
 
   optionCards.forEach(card => {
-    card.addEventListener('click', () => {
-      getAudioContext();
+    const handleSelect = () => {
+      initAudioEngine();
       optionCards.forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedOption = card.getAttribute('data-key');
       if (submitBtn) submitBtn.disabled = false;
-    });
+    };
+    card.addEventListener('click', handleSelect);
   });
 
   // Bind submit button event
@@ -1327,15 +1511,15 @@ function renderQuizScreen(container, slideId) {
     submitBtn.addEventListener('click', () => {
       if (!selectedOption) return;
 
-      const isCorrect = selectedOption === cfg.correctOption;
+      const isCorrect = Array.isArray(cfg.correctOption) ? cfg.correctOption.includes(selectedOption) : selectedOption === cfg.correctOption;
       gameState.quizAnswers[slideId] = { selected: selectedOption, correct: isCorrect };
       saveProgress();
 
       if (isCorrect) {
-        playSound('ding');
+        playFeedbackSound('correct');
         goToSlide(cfg.correctSlide);
       } else {
-        playSound('buzz');
+        playFeedbackSound('incorrect');
         goToSlide(cfg.incorrectSlide);
       }
     });
@@ -1420,6 +1604,666 @@ function renderQuizFeedbackScreen(container, slideId) {
   }
 }
 
+// Screen 23: Narrative Reconciliation (Mia & Laura Dialogue in Vineyard with Legal Alert)
+function renderScreen23(container) {
+  const coords = UI_COORDINATES_MAP.s23 || INITIAL_UI_COORDINATES_MAP.s23 || {
+    miaBubble: { top: '15%', left: '8%', width: '44%' },
+    lauraBubble: { top: '48%', left: '48%', width: '44%' },
+    legalCard: { top: '78%', left: '50%', transform: 'translateX(-50%)', width: '84%' }
+  };
+
+  const miaPointer = 'bubble-tail-left';
+  const lauraPointer = 'bubble-tail-right';
+
+  const miaTitle = t('s23_dialogue_title_mia', 'A calibração não é apenas uma boa prática - é um requisito legal.');
+  const miaText = t('s23_dialogue_text_mia', 'Surge da regulamentação nacional e é essencial para uma proteção fitossanitária segura e responsável.');
+  
+  const lauraText = t('s23_dialogue_text_laura', t('s23_body_text_laura', 'Estou pronta! Vamos calibrar a velocidade, a pressão e selecionar os bicos corretos.'));
+
+  const legalTitle = t('s23_section_title', 'É a lei');
+  const legalBody = t('s23_body_text', 'Calibre sempre o seu pulverizador de acordo com as regulamentações nacionais.');
+
+  container.innerHTML = `
+    <!-- Mia Speech Bubble (Top Left) -->
+    <div id="el-s23-miaBubble" class="speech-bubble ${miaPointer} designer-target" style="${styleObjToCss(coords.miaBubble || { top: '15%', left: '8%', width: '44%' })}">
+      <span class="speaker-name">MIA</span>
+      <div style="font-family: var(--font-header); font-weight: 800; font-size: clamp(0.74rem, calc(0.85rem * var(--scale-factor, 1)), 0.98rem); color: var(--forest-green); margin: 4px 0 6px 0; line-height: 1.25;">
+        ${miaTitle}
+      </div>
+      <div class="speech-text">
+        ${miaText}
+      </div>
+    </div>
+
+    <!-- Laura Speech Bubble (Middle Right) -->
+    <div id="el-s23-lauraBubble" class="speech-bubble ${lauraPointer} designer-target" style="${styleObjToCss(coords.lauraBubble || { top: '48%', left: '48%', width: '44%' })}">
+      <span class="speaker-name" style="background: var(--forest-green-light);">LAURA</span>
+      <div class="speech-text" style="margin-top: 4px;">
+        ${lauraText}
+      </div>
+    </div>
+
+    <!-- Legal Alert Card (Bottom Central) -->
+    <div id="el-s23-legalCard" class="cream-card designer-target" style="${styleObjToCss(coords.legalCard || { top: '78%', left: '50%', transform: 'translateX(-50%)', width: '84%' })}">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i data-lucide="scale" style="width: 20px; height: 20px; color: var(--forest-green);"></i>
+        <span>${legalTitle}</span>
+      </div>
+      <div class="cream-card-body" style="font-weight: 700; text-align: center; color: var(--text-dark); margin-top: 6px;">
+        ${legalBody}
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 24: Module 2 Intro - Setting the Task & Sprayer Inspection
+function renderScreen24(container) {
+  const title = t('s24_title', 'MÓDULO 2: DEFINIÇÃO DA TAREFA E INSPEÇÃO DO PULVERIZADOR');
+  const body = t('s24_body', 'Neste módulo, ajudamos a Laura a definir os parâmetros práticos de trabalho: velocidade do trator, débito pretendido e a escolha correta dos bicos de pulverização.');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s24-card" style="position: absolute; top: 20%; left: 6%; width: 88%;">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i data-lucide="wrench" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
+        <span>${title}</span>
+      </div>
+      <div class="cream-card-body" style="margin-top: 12px; font-weight: 600; line-height: 1.45; text-align: center;">
+        ${body}
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 25: Speed Verification Setup
+function renderScreen25(container) {
+  const title = t('s25_title', 'VERIFICAÇÃO DA VELOCIDADE DE AVANÇO');
+  const body = t('s25_body', 'A velocidade real do trator na vinha difere frequentemente da leitura do velocímetro. Devemos medir o tempo exato para percorrer uma distância conhecida (ex: 50 m ou 100 m).');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s25-card" style="position: absolute; top: 18%; left: 6%; width: 88%;">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i data-lucide="gauge" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
+        <span>${title}</span>
+      </div>
+      <div class="cream-card-body" style="margin-top: 12px; font-weight: 600; line-height: 1.45; text-align: center;">
+        ${body}
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 26: Interactive Tractor Speed Chronometer
+function renderScreen26(container) {
+  let timerInterval = null;
+  let startTime = 0;
+  let elapsedSec = 0;
+  let isRunning = false;
+  const distanceM = 50;
+
+  const title = t('s26_title', 'MEDIÇÃO DA VELOCIDADE DE AVANÇO');
+  const subtitle = t('s26_subtitle', 'Percorra 50 m na vinha e cronometre o tempo de deslocação.');
+
+  container.innerHTML = `
+    <div class="chrono-container designer-target" id="el-s26-chronoCard" style="top: 10%; left: 5%; width: 90%; position: absolute;">
+      <div style="font-family: var(--font-header); font-weight: 900; font-size: 1.05rem; color: var(--forest-green); text-transform: uppercase;">
+        ${title}
+      </div>
+      <div style="font-family: var(--font-body); font-weight: 600; font-size: 0.88rem; color: var(--text-dark); text-align: center;">
+        ${subtitle}
+      </div>
+
+      <div class="chrono-readout" id="chrono-timer-display">
+        00.0s
+      </div>
+
+      <div class="chrono-speed-badge" id="chrono-speed-display">
+        Velocidade: 0.0 km/h
+      </div>
+
+      <button id="btn-chrono-action" class="btn-start-challenge-pill" style="margin-top: 8px; width: 85%; font-size: 1rem; padding: 10px 16px;">
+        ⏱️ INICIAR CRONÓMETRO
+      </button>
+
+      <div id="chrono-hint-box" style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-top: 4px; text-align: center;">
+        Alvo: 50 m em 36s (5.0 km/h) ou 30s (6.0 km/h)
+      </div>
+    </div>
+  `;
+
+  const timerDisplay = document.getElementById('chrono-timer-display');
+  const speedDisplay = document.getElementById('chrono-speed-display');
+  const btnAction = document.getElementById('btn-chrono-action');
+
+  if (btnAction) {
+    btnAction.addEventListener('click', () => {
+      initAudioEngine();
+      if (!isRunning) {
+        isRunning = true;
+        btnAction.textContent = '⏹️ PARAR CRONÓMETRO';
+        btnAction.style.backgroundColor = '#C62828';
+        startTime = Date.now() - (elapsedSec * 1000);
+        timerInterval = setInterval(() => {
+          elapsedSec = (Date.now() - startTime) / 1000;
+          if (timerDisplay) timerDisplay.textContent = `${elapsedSec.toFixed(1)}s`;
+          const speedKmh = (distanceM * 3.6) / elapsedSec;
+          if (speedDisplay) speedDisplay.textContent = `Velocidade: ${speedKmh.toFixed(1)} km/h`;
+        }, 100);
+      } else {
+        isRunning = false;
+        clearInterval(timerInterval);
+        btnAction.textContent = '🔄 REINICIAR TESTE';
+        btnAction.style.backgroundColor = 'var(--forest-green)';
+        const speedKmh = (distanceM * 3.6) / elapsedSec;
+        if (speedDisplay) {
+          speedDisplay.textContent = `Velocidade Final: ${speedKmh.toFixed(1)} km/h`;
+        }
+      }
+    });
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 27: Target Application Rate & Total Flow Calculation
+function renderScreen27(container) {
+  const title = t('s27_title', 'CÁLCULO DO CAUDAL TOTAL (Q_total)');
+  const body = t('s27_body', 'Com um volume de calda de 250 L/ha, velocidade de 5.0 km/h e compasso de 2.8 m, o caudal total necessário é:');
+  const formulaText = 'Q_total = (250 × 5.0 × 2.8) / 600 = 5.83 L/min';
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s27-card" style="position: absolute; top: 16%; left: 6%; width: 88%;">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i data-lucide="calculator" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
+        <span>${title}</span>
+      </div>
+      <div class="cream-card-body" style="margin-top: 10px; font-weight: 600; line-height: 1.4; text-align: center;">
+        ${body}
+      </div>
+      <div style="margin-top: 14px; padding: 12px; background: rgba(30, 66, 34, 0.08); border-radius: 12px; border: 2px solid var(--forest-green); font-family: var(--font-header); font-weight: 900; font-size: 1.05rem; color: var(--forest-green); text-align: center;">
+        ${formulaText}
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 28: Active Nozzles & Individual Flow Rate
+function renderScreen28(container) {
+  const title = t('s28_title', 'CAUDAL INDIVIDUAL POR BICO (q)');
+  const body = t('s28_body', 'Com 6 bicos ativos no pulverizador de turbina da Laura, o caudal exigido por cada bico individual é:');
+  const formulaText = 'q = Q_total / 6 = 5.83 / 6 = 0.97 L/min';
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s28-card" style="position: absolute; top: 16%; left: 6%; width: 88%;">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i data-lucide="droplet" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
+        <span>${title}</span>
+      </div>
+      <div class="cream-card-body" style="margin-top: 10px; font-weight: 600; line-height: 1.4; text-align: center;">
+        ${body}
+      </div>
+      <div style="margin-top: 14px; padding: 12px; background: rgba(30, 66, 34, 0.08); border-radius: 12px; border: 2px solid var(--forest-green); font-family: var(--font-header); font-weight: 900; font-size: 1.05rem; color: var(--forest-green); text-align: center;">
+        ${formulaText}
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 29: Interactive ISO Nozzle & Pressure Selection Table with Zoom Lens
+function renderScreen29(container) {
+  let selectedNozzleIndex = 1;
+  let currentPressureBar = 8.0;
+
+  const ISO_NOZZLES = [
+    { code: '01', colorName: 'Laranja', hex: '#FF7F00', q30: 0.40 },
+    { code: '015', colorName: 'Verde', hex: '#2E7D32', q30: 0.60 },
+    { code: '02', colorName: 'Amarelo', hex: '#D4A017', q30: 0.80 },
+    { code: '03', colorName: 'Azul', hex: '#1E88E5', q30: 1.20 },
+    { code: '04', colorName: 'Vermelho', hex: '#E53935', q30: 1.60 },
+    { code: '05', colorName: 'Castanho', hex: '#6D4C41', q30: 2.00 },
+    { code: '06', colorName: 'Cinzento', hex: '#757575', q30: 2.40 },
+    { code: '08', colorName: 'Branco', hex: '#EEEEEE', textColor: '#111', q30: 3.20 }
+  ];
+
+  function updateZoomLens() {
+    const nozzle = ISO_NOZZLES[selectedNozzleIndex];
+    const q2 = nozzle.q30 * Math.sqrt(currentPressureBar / 3.0);
+    const isPressureOk = currentPressureBar >= 6.0 && currentPressureBar <= 12.0;
+
+    const zoomCard = document.getElementById('zoom-lens-card');
+    if (zoomCard) {
+      zoomCard.innerHTML = `
+        <div style="font-family: var(--font-header); font-weight: 900; font-size: 0.95rem; color: var(--forest-green); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>BICOS ISO ${nozzle.code} (${nozzle.colorName})</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-around; margin-top: 2px;">
+          <div>
+            <span style="font-size: 0.74rem; color: var(--text-muted); display: block;">Pressão</span>
+            <strong style="font-size: 1.05rem; color: var(--forest-green);">${currentPressureBar.toFixed(1)} bar</strong>
+          </div>
+          <div style="font-size: 1.3rem;">➔</div>
+          <div>
+            <span style="font-size: 0.74rem; color: var(--text-muted); display: block;">Caudal Calculado (q)</span>
+            <strong style="font-size: 1.15rem; color: #2E7D32;">${q2.toFixed(2)} L/min</strong>
+          </div>
+        </div>
+        <div style="margin-top: 4px; padding: 4px 8px; border-radius: 8px; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; ${isPressureOk ? 'background: #E8F5E9; color: #2E7D32; border: 1px solid #2E7D32;' : 'background: #FFEBEE; color: #C62828; border: 1px solid #C62828;'}">
+          ${isPressureOk ? '✓ Janela de Pressão Ideal (6.0 - 12.0 bar)' : '⚠️ Fora da Janela Recomendada (6-12 bar)'}
+        </div>
+      `;
+    }
+  }
+
+  const title = t('s29_title', 'TABELA INTERATIVA ISO 10625');
+  const subtitle = t('s29_subtitle', 'Selecione a cor do bico e ajuste a pressão de trabalho.');
+
+  container.innerHTML = `
+    <div class="iso-table-card designer-target" id="el-s29-isoCard" style="top: 5%; left: 4%; width: 92%; position: absolute;">
+      <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase; text-align: center;">
+        ${title}
+      </div>
+      <div style="font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--text-dark); text-align: center;">
+        ${subtitle}
+      </div>
+
+      <!-- ISO Nozzles Grid -->
+      <div class="iso-nozzle-grid">
+        ${ISO_NOZZLES.map((n, idx) => `
+          <div class="iso-nozzle-chip ${idx === selectedNozzleIndex ? 'active' : ''}" data-idx="${idx}" style="background-color: ${n.hex}; color: ${n.textColor || '#FFFFFF'};">
+            <span>ISO ${n.code}</span>
+            <small style="font-size: 0.65rem; opacity: 0.9;">${n.q30}L</small>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Pressure Slider Control -->
+      <div style="background: #FFFFFF; padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--cream-card-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span style="font-family: var(--font-header); font-weight: 800; font-size: 0.84rem; color: var(--forest-green);">PRESSÃO DE TRABALHO:</span>
+          <strong id="pressure-slider-val" style="font-size: 1.05rem; color: var(--forest-green);">8.0 bar</strong>
+        </div>
+        <input type="range" id="iso-pressure-slider" min="1.0" max="15.0" step="0.5" value="8.0" style="width: 100%; accent-color: var(--forest-green); cursor: pointer;">
+      </div>
+
+      <!-- Zoom Lens Magnifier Card -->
+      <div id="zoom-lens-card" class="zoom-lens-card"></div>
+    </div>
+  `;
+
+  updateZoomLens();
+
+  // Bind Nozzle Chip Clicks
+  const chips = container.querySelectorAll('.iso-nozzle-chip');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      initAudioEngine();
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedNozzleIndex = parseInt(chip.getAttribute('data-idx'), 10);
+      updateZoomLens();
+    });
+  });
+
+  // Bind Pressure Slider
+  const slider = document.getElementById('iso-pressure-slider');
+  const sliderVal = document.getElementById('pressure-slider-val');
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      currentPressureBar = parseFloat(e.target.value);
+      if (sliderVal) sliderVal.textContent = `${currentPressureBar.toFixed(1)} bar`;
+      updateZoomLens();
+    });
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 36: Start of Chapter 5 - Verification of the Results
+function renderScreen36(container) {
+  const title = t('s36_title', '5. VERIFICATION OF THE RESULTS');
+  const body = t('s36_body', 'Depois de definir os parâmetros teóricos e selecionar os bicos, a Laura deve verificar fisicamente o pulverizador no terreno antes de iniciar a aplicação.');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s36-card" style="position: absolute; top: 18%; left: 6%; width: 88%;">
+      <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <i data-lucide="check-square" style="width: 22px; height: 22px; color: var(--forest-green);"></i>
+        <span>${title}</span>
+      </div>
+      <div class="cream-card-body" style="margin-top: 12px; font-weight: 600; line-height: 1.45; text-align: center;">
+        ${body}
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 37: 4 Pillars of Sprayer Inspection
+function renderScreen37(container) {
+  const title = t('s37_title', 'OS 4 PILARES DA INSPEÇÃO DE CAMPO');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s37-card" style="position: absolute; top: 8%; left: 5%; width: 90%;">
+      <div class="cream-card-header" style="text-align: center; margin-bottom: 8px;">
+        ${title}
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 10px; border-left: 4px solid var(--forest-green); font-size: 0.85rem; font-weight: 700;">
+          1. Débito Real do Bico (Copo Graduado)
+        </div>
+        <div style="background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 10px; border-left: 4px solid #1E88E5; font-size: 0.85rem; font-weight: 700;">
+          2. Direção do Fluxo de Ar (Fitas de Papel)
+        </div>
+        <div style="background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 10px; border-left: 4px solid #F57F17; font-size: 0.85rem; font-weight: 700;">
+          3. Volume do Fluxo de Ar (Pás / Transmissão)
+        </div>
+        <div style="background: rgba(255,255,255,0.9); padding: 8px 12px; border-radius: 10px; border-left: 4px solid #8E24AA; font-size: 0.85rem; font-weight: 700;">
+          4. Teste de Cobertura de Gotas (Papel Hidrossensível WSP)
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 38: Interactive Graduated Measuring Cup Simulator
+function renderScreen38(container) {
+  let isMeasuring = false;
+  let hasMeasured = false;
+
+  const title = t('s38_title', 'MEDIÇÃO DE DÉBITO COM COPO GRADUADO');
+  const subtitle = t('s38_subtitle', 'Recolha a água emitida por 1 bico durante 1 minuto a 8.0 bar.');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s38-cupCard" style="top: 8%; left: 5%; width: 90%; position: absolute; text-align: center;">
+      <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase;">
+        ${title}
+      </div>
+      <div style="font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--text-dark); margin-top: 2px;">
+        ${subtitle}
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-around; margin: 12px 0;">
+        <div class="measuring-cup">
+          <div id="cup-liquid-fill" class="cup-liquid"></div>
+        </div>
+
+        <div style="text-align: left; background: #FFFFFF; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--cream-card-border);">
+          <div style="font-size: 0.78rem; color: var(--text-muted);">Bico: <strong>ISO Verde 015</strong></div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Pressão: <strong>8.0 bar</strong></div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Exigido: <strong style="color: var(--forest-green);">0.97 L/min</strong></div>
+          <div id="cup-reading-result" style="font-size: 0.95rem; font-weight: 900; color: #C62828; margin-top: 6px;">
+            Medido: -- L/min
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-measure-cup" class="btn-start-challenge-pill" style="width: 85%; font-size: 0.95rem; padding: 10px 16px;">
+        🧪 INICIAR MEDIÇÃO (1 MINUTO)
+      </button>
+    </div>
+  `;
+
+  const btn = document.getElementById('btn-measure-cup');
+  const liquid = document.getElementById('cup-liquid-fill');
+  const reading = document.getElementById('cup-reading-result');
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      initAudioEngine();
+      if (isMeasuring || hasMeasured) return;
+      isMeasuring = true;
+      btn.disabled = true;
+      btn.textContent = '⏳ A MEDIR (1 MINUTO)...';
+      if (liquid) liquid.classList.add('filling');
+
+      setTimeout(() => {
+        isMeasuring = false;
+        hasMeasured = true;
+        btn.disabled = false;
+        btn.textContent = '✓ MEDIÇÃO CONCLUÍDA (1.20 L/min)';
+        btn.style.backgroundColor = '#2E7D32';
+        if (reading) {
+          reading.textContent = 'Medido: 1.20 L/min (+23.7% desvio)';
+        }
+      }, 3000);
+    });
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 42: Interactive Air Ribbon Streamer Simulator
+function renderScreen42(container) {
+  let angleDeg = 35;
+
+  const title = t('s42_title', 'DIREÇÃO DO FLUXO DE AR (FITAS)');
+  const subtitle = t('s42_subtitle', 'Ajuste a inclinação do defletor de ar até alinhar as fitas com a copa.');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s42-ribbonCard" style="top: 8%; left: 5%; width: 90%; position: absolute; text-align: center;">
+      <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase;">
+        ${title}
+      </div>
+      <div style="font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--text-dark); margin-top: 2px;">
+        ${subtitle}
+      </div>
+
+      <!-- Ribbon Simulation Graphic Box -->
+      <div style="position: relative; width: 100%; height: 120px; background: #E8F5E9; border-radius: 12px; border: 1.5px solid #2E7D32; margin: 10px 0; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div style="position: absolute; left: 10px; font-weight: 900; font-size: 0.75rem; color: #1E4222;">TURBINA DE AR</div>
+        <div id="ribbon-element-stream" class="ribbon-streamer" style="position: absolute; left: 110px; transform: rotate(-${angleDeg}deg);"></div>
+        <div style="position: absolute; right: 10px; border-right: 3px dashed #2E7D32; height: 100%; width: 40px; background: rgba(46, 125, 50, 0.15); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #1E4222;">COPA</div>
+      </div>
+
+      <!-- Deflector Slider Control -->
+      <div style="background: #FFFFFF; padding: 8px 12px; border-radius: 12px; border: 1.5px solid var(--cream-card-border);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span style="font-family: var(--font-header); font-weight: 800; font-size: 0.84rem; color: var(--forest-green);">ÂNGULO DO DEFLETOR:</span>
+          <strong id="ribbon-angle-val" style="font-size: 1rem; color: var(--forest-green);">35° (Alto)</strong>
+        </div>
+        <input type="range" id="ribbon-angle-slider" min="0" max="45" step="5" value="35" style="width: 100%; accent-color: var(--forest-green); cursor: pointer;">
+      </div>
+
+      <div id="ribbon-status-box" style="margin-top: 8px; padding: 6px; border-radius: 8px; font-size: 0.8rem; font-weight: 800; background: #FFEBEE; color: #C62828; border: 1px solid #C62828;">
+        ⚠️ Alerta: Fitas apontam acima da copa! Risco severo de deriva ambiental.
+      </div>
+    </div>
+  `;
+
+  const slider = document.getElementById('ribbon-angle-slider');
+  const angleVal = document.getElementById('ribbon-angle-val');
+  const ribbon = document.getElementById('ribbon-element-stream');
+  const statusBox = document.getElementById('ribbon-status-box');
+
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      angleDeg = parseInt(e.target.value, 10);
+      if (ribbon) ribbon.style.transform = `rotate(-${angleDeg}deg)`;
+      
+      let label = `${angleDeg}°`;
+      if (angleDeg > 20) {
+        label += ' (Muito Alto)';
+        if (statusBox) {
+          statusBox.style.background = '#FFEBEE';
+          statusBox.style.color = '#C62828';
+          statusBox.style.borderColor = '#C62828';
+          statusBox.textContent = '⚠️ Alerta: Fitas apontam acima da copa! Risco severo de deriva ambiental.';
+        }
+      } else if (angleDeg >= 5 && angleDeg <= 20) {
+        label += ' (Ideal)';
+        if (statusBox) {
+          statusBox.style.background = '#E8F5E9';
+          statusBox.style.color = '#2E7D32';
+          statusBox.style.borderColor = '#2E7D32';
+          statusBox.textContent = '✓ Alinhamento Correto: Fluxo de ar direcionado perfeitamente para a copa.';
+        }
+      } else {
+        label += ' (Muito Baixo)';
+        if (statusBox) {
+          statusBox.style.background = '#FFF3E0';
+          statusBox.style.color = '#E65100';
+          statusBox.style.borderColor = '#E65100';
+          statusBox.textContent = '⚠️ Alerta: Fluxo de ar muito baixo! Perda de penetração no topo da copa.';
+        }
+      }
+      if (angleVal) angleVal.textContent = label;
+    });
+  }
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+// Screen 46: Interactive Water-Sensitive Paper (WSP) Diagnostic Simulator
+function renderScreen46(container) {
+  const samples = {
+    ext: { classified: null, target: 'excessive', label: 'Exterior da Copa' },
+    mid: { classified: null, target: 'sufficient', label: 'Meio da Copa' },
+    int: { classified: null, target: 'weak', label: 'Interior da Copa' }
+  };
+
+  let activeSample = 'ext';
+
+  function updateWspUI() {
+    const s = samples[activeSample];
+
+    const zoomContainer = document.getElementById('wsp-zoom-container');
+    if (zoomContainer) {
+      zoomContainer.innerHTML = `
+        <div style="font-family: var(--font-header); font-weight: 800; font-size: 0.9rem; color: var(--forest-green); margin-bottom: 4px;">
+          AMOSTRA: ${s.label.toUpperCase()}
+        </div>
+        <div style="width: 100%; height: 60px; background: #FDD835; border: 2px solid #F57F17; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+          ${activeSample === 'ext' ? `
+            <div style="width: 80%; height: 70%; background: rgba(30, 136, 229, 0.7); border-radius: 50%; filter: blur(4px);"></div>
+            <span style="position: absolute; font-size: 0.72rem; font-weight: 800; color: #0D47A1;">Escorrimento de Gotas</span>
+          ` : activeSample === 'mid' ? `
+            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; width: 80%;">
+              ${Array(18).fill(0).map(() => `<div style="width: 6px; height: 6px; background: #1565C0; border-radius: 50%;"></div>`).join('')}
+            </div>
+            <span style="position: absolute; font-size: 0.72rem; font-weight: 800; color: #0D47A1; background: rgba(255,255,255,0.8); padding: 1px 4px; border-radius: 4px;">Gotas Homogéneas</span>
+          ` : `
+            <div style="display: flex; gap: 12px;">
+              <div style="width: 4px; height: 4px; background: #1565C0; border-radius: 50%;"></div>
+              <div style="width: 4px; height: 4px; background: #1565C0; border-radius: 50%;"></div>
+            </div>
+            <span style="position: absolute; font-size: 0.72rem; font-weight: 800; color: #0D47A1; background: rgba(255,255,255,0.8); padding: 1px 4px; border-radius: 4px;">Pouquíssimas Gotas</span>
+          `}
+        </div>
+
+        <!-- Classification Buttons -->
+        <div style="display: flex; gap: 6px; margin-top: 8px;">
+          <button class="wsp-class-btn ${s.classified === 'excessive' ? 'selected' : ''}" data-val="excessive" style="flex: 1; padding: 6px 2px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1px solid #C62828; background: ${s.classified === 'excessive' ? '#C62828' : '#FFF'}; color: ${s.classified === 'excessive' ? '#FFF' : '#C62828'};">
+            EXCESSIVA
+          </button>
+          <button class="wsp-class-btn ${s.classified === 'sufficient' ? 'selected' : ''}" data-val="sufficient" style="flex: 1; padding: 6px 2px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1px solid #2E7D32; background: ${s.classified === 'sufficient' ? '#2E7D32' : '#FFF'}; color: ${s.classified === 'sufficient' ? '#FFF' : '#2E7D32'};">
+            SUFICIENTE
+          </button>
+          <button class="wsp-class-btn ${s.classified === 'weak' ? 'selected' : ''}" data-val="weak" style="flex: 1; padding: 6px 2px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1px solid #E65100; background: ${s.classified === 'weak' ? '#E65100' : '#FFF'}; color: ${s.classified === 'weak' ? '#FFF' : '#E65100'};">
+            MUITO FRACA
+          </button>
+        </div>
+      `;
+
+      // Bind classification click events
+      zoomContainer.querySelectorAll('.wsp-class-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          initAudioEngine();
+          s.classified = btn.getAttribute('data-val');
+          updateWspUI();
+
+          const allClassified = samples.ext.classified && samples.mid.classified && samples.int.classified;
+          const nextNavBtn = document.getElementById('nav-next');
+          if (nextNavBtn && allClassified) {
+            nextNavBtn.disabled = false;
+          }
+        });
+      });
+    }
+  }
+
+  const title = t('s46_title', 'DIAGNÓSTICO WSP (PAPEL HIDROSSENSÍVEL)');
+  const subtitle = t('s46_subtitle', 'Inspecione e classifique as 3 amostras foliares na vinha.');
+
+  container.innerHTML = `
+    <div class="cream-card designer-target" id="el-s46-wspCard" style="top: 5%; left: 4%; width: 92%; position: absolute; text-align: center;">
+      <div style="font-family: var(--font-header); font-weight: 900; font-size: 1rem; color: var(--forest-green); text-transform: uppercase;">
+        ${title}
+      </div>
+      <div style="font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--text-dark); margin-top: 2px;">
+        ${subtitle}
+      </div>
+
+      <!-- Sample Selector Chips -->
+      <div style="display: flex; gap: 6px; margin: 10px 0;">
+        <div class="wsp-sample-card ${activeSample === 'ext' ? 'completed' : ''}" data-key="ext" style="flex: 1;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #111;">EXTERIOR</div>
+          <small style="font-size: 0.68rem; color: #555;">${samples.ext.classified ? '✓ Classificado' : 'Clique'}</small>
+        </div>
+        <div class="wsp-sample-card ${activeSample === 'mid' ? 'completed' : ''}" data-key="mid" style="flex: 1;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #111;">MÉDIO</div>
+          <small style="font-size: 0.68rem; color: #555;">${samples.mid.classified ? '✓ Classificado' : 'Clique'}</small>
+        </div>
+        <div class="wsp-sample-card ${activeSample === 'int' ? 'completed' : ''}" data-key="int" style="flex: 1;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #111;">INTERIOR</div>
+          <small style="font-size: 0.68rem; color: #555;">${samples.int.classified ? '✓ Classificado' : 'Clique'}</small>
+        </div>
+      </div>
+
+      <!-- Zoom Container for active sample -->
+      <div id="wsp-zoom-container" style="background: #FFFFFF; padding: 10px; border-radius: 12px; border: 1.5px solid var(--cream-card-border);"></div>
+    </div>
+  `;
+
+  updateWspUI();
+
+  // Bind sample selector chips
+  const chips = container.querySelectorAll('.wsp-sample-card');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      initAudioEngine();
+      activeSample = chip.getAttribute('data-key');
+      updateWspUI();
+    });
+  });
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
 // Generic Screen Placeholder for slides > 10
 function renderGenericScreenPlaceholder(container, slideId) {
   const screenWord = t('ui_screen', 'Screen');
@@ -1488,16 +2332,7 @@ function applySmartBestFit(container, slideId) {
     UI_COORDINATES_MAP[slideKey][elKey].fontSize = refinedFontSize;
   });
 
-  localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-
-  // Sync with local server file
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    fetch('/api/sync-coords', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(UI_COORDINATES_MAP)
-    }).catch(e => console.error('Sync error:', e));
-  }
+  saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
 }
 
 // Display Toast Notification for Designer Mode Actions
@@ -1615,13 +2450,7 @@ function setupDesignerModeControls(container, slideId) {
         UI_COORDINATES_MAP[slideKey][elKey].pointer = tailClass || 'pointer-none';
         localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
         
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          fetch('/api/sync-coords', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(UI_COORDINATES_MAP)
-          }).catch(e => console.error('Sync error:', e));
-        }
+        saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
 
         updateToolbar(activeEl);
       };
@@ -1657,7 +2486,8 @@ function setupDesignerModeControls(container, slideId) {
         localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
 
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          fetch('/api/save-coordinates', {
+          const backendUrl = getBackendUrl();
+          fetch(`${backendUrl}/api/save-coordinates`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(UI_COORDINATES_MAP)
@@ -1719,13 +2549,7 @@ function setupDesignerModeControls(container, slideId) {
     UI_COORDINATES_MAP[slideKey][elKey].width = curWidth + '%';
     localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
 
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      fetch('/api/sync-coords', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(UI_COORDINATES_MAP)
-      }).catch(e => console.error('Sync error:', e));
-    }
+    saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
 
     updateToolbar(activeEl);
   }
@@ -1745,15 +2569,7 @@ function setupDesignerModeControls(container, slideId) {
     if (!UI_COORDINATES_MAP[slideKey]) UI_COORDINATES_MAP[slideKey] = {};
     if (!UI_COORDINATES_MAP[slideKey][elKey]) UI_COORDINATES_MAP[slideKey][elKey] = {};
     UI_COORDINATES_MAP[slideKey][elKey].fontSize = newRem;
-    localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      fetch('/api/sync-coords', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(UI_COORDINATES_MAP)
-      }).catch(e => console.error('Sync error:', e));
-    }
+    saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
 
     updateToolbar(activeEl);
   }
@@ -1815,13 +2631,7 @@ function setupDesignerModeControls(container, slideId) {
 
     window.addEventListener('mouseup', () => {
       if (isDragging) {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          fetch('/api/sync-coords', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(UI_COORDINATES_MAP)
-          }).catch(e => console.error('Sync error:', e));
-        }
+        saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
       }
       isDragging = false;
     });
@@ -1859,15 +2669,7 @@ function setupDesignerModeControls(container, slideId) {
     UI_COORDINATES_MAP[slideKey][elKey].top = newTop;
     UI_COORDINATES_MAP[slideKey][elKey].left = newLeft;
 
-    localStorage.setItem(STORAGE_KEY_CUSTOM_COORDS, JSON.stringify(UI_COORDINATES_MAP));
-
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      fetch('/api/sync-coords', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(UI_COORDINATES_MAP)
-      }).catch(e => console.error('Sync error:', e));
-    }
+    saveCustomCoordinatesLocally(UI_COORDINATES_MAP, '/api/sync-coords', false);
 
     updateToolbar(el);
   };
@@ -1925,7 +2727,18 @@ function renderBottomNavBar() {
   const muteBtn = document.getElementById('nav-mute');
 
   if (backBtn && !isBackDisabled && !isScreen1) {
-    backBtn.addEventListener('click', () => goToSlide(gameState.currentSlide - 1));
+    backBtn.addEventListener('click', () => {
+      if (gameState.currentSlide === 23) {
+        const quiz4Ans = gameState.quizAnswers[20];
+        if (quiz4Ans && quiz4Ans.correct === false) {
+          goToSlide(22);
+        } else {
+          goToSlide(21);
+        }
+      } else {
+        goToSlide(gameState.currentSlide - 1);
+      }
+    });
   }
 
   if (nextBtn && !isNextDisabled && !isScreen1) {
@@ -1941,14 +2754,22 @@ function renderBottomNavBar() {
   }
 }
 
-// Calculate Responsive Scale Factor dynamically for smartphones, tablets & laptops
-function updateResponsiveScale() {
-  const container = document.getElementById('game-container');
-  if (!container) return;
-  
-  // Calculate viewport height (1vh workaround for mobile browsers)
+// Synchronous Viewport Height Calculator for Mobile Browsers (1vh Fix)
+function updateViewportHeight() {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+}
+
+// Immediate execution on script load to set --real-vh as early as possible
+updateViewportHeight();
+window.addEventListener('resize', updateViewportHeight);
+window.addEventListener('orientationchange', updateViewportHeight);
+
+// Calculate Responsive Scale Factor dynamically for smartphones, tablets & laptops
+function updateResponsiveScale() {
+  updateViewportHeight();
+  const container = document.getElementById('game-container');
+  if (!container) return;
 
   const width = container.clientWidth;
   // Reference target width is 420px (standard 9:16 vertical viewport)
@@ -1956,8 +2777,42 @@ function updateResponsiveScale() {
   container.style.setProperty('--scale-factor', scale.toFixed(3));
 }
 
+// Dev Debug HUD Tool for Real-Time Coordinates Calibration
+function initDebugHUD() {
+  if (window.location.hostname !== 'localhost' && !window.location.search.includes('debug=true')) return;
+
+  const container = document.getElementById('game-container');
+  if (!container) return;
+
+  let hud = document.getElementById('dev-coords-hud');
+  if (!hud) {
+    hud = document.createElement('div');
+    hud.id = 'dev-coords-hud';
+    hud.style.cssText = 'position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.85); color: #fff; padding: 10px; font-family: monospace; font-size: 11px; z-index: 9999; border-radius: 6px; pointer-events: none;';
+    hud.innerHTML = 'DEV HUD: Click screen for coords';
+    container.appendChild(hud);
+  }
+
+  let grid = document.getElementById('dev-coords-grid');
+  if (!grid) {
+    grid = document.createElement('div');
+    grid.id = 'dev-coords-grid';
+    grid.style.cssText = 'position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; border: 2px red dashed; box-sizing: border-box; z-index: 9998;';
+    container.appendChild(grid);
+  }
+
+  container.addEventListener('click', (e) => {
+    const rect = container.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const yPct = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    if (hud) hud.innerHTML = `Coords: left: ${xPct}%; top: ${yPct}%;`;
+    console.log(`COORDS: left: ${xPct}%, top: ${yPct}%`);
+  });
+}
+
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
+  updateViewportHeight();
   updateResponsiveScale();
   window.addEventListener('resize', updateResponsiveScale);
   window.addEventListener('orientationchange', updateResponsiveScale);
@@ -1965,8 +2820,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   preloadBackdropImages();
   loadCustomCoordinates();
   renderTopBar();
+  initDebugHUD();
+
+  // 1. Carrega sempre as traduções na inicialização para o modal ficar traduzido
+  await loadTranslations(gameState.activeLanguage);
+
+  // 2. Verifica a existência de progresso guardado
   const hasSession = checkSessionRecovery();
   if (!hasSession) {
-    await loadTranslations(gameState.activeLanguage);
+    // Se não houver sessão anterior, renderiza o ecrã inicial (Tela 1)
+    renderCurrentSlide();
   }
 });
