@@ -1,15 +1,15 @@
 /* 
-  RENOVATE Serious Game - Official Service Worker Engine (v2.0.0 Hotfix Edition)
-  Full Offline Pre-Caching, Lifecycle Synchronization & Differentiated Caching Strategies
+  RENOVATE Serious Game - Official Service Worker Engine (v2.1.3 PWA Hotfix)
+  Network-First Strategy for Core App Logic, Automatic Cache Purge & Instant Client Claim
 */
 
-const CACHE_NAME = 'renovate-serious-game-v2.0.0';
+const CACHE_NAME = 'renovate-serious-game-v2.1.3';
 
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=2.0.0',
-  './app.js?v=2.0.0',
+  './styles.css?v=2.1.3',
+  './app.js?v=2.1.3',
   './manifest.json',
   './public/images/RENOVATE-logo.svg',
   './public/images/RENOVATE-logo.png',
@@ -50,7 +50,7 @@ self.addEventListener('install', (event) => {
       return Promise.all(
         ASSETS_TO_CACHE.map((asset) => {
           return cache.add(asset).catch((err) => {
-            console.warn(`[SW] Warning: Optional asset skipped during pre-cache: ${asset}`, err);
+            console.warn(`[SW] Optional asset skipped during pre-cache: ${asset}`, err);
           });
         })
       );
@@ -76,29 +76,54 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// 3. Service Worker Fetch Interception & Localhost Bypass
+// 3. Service Worker Fetch Interception: Network-First for HTML/JS/CSS, Cache-First for static media
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // BYPASS CRÍTICO PARA LOCALHOST: Não cachear nada em ambiente de desenvolvimento
+  // Localhost Development Bypass
   if (url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.pathname.includes('/api/')) {
     return event.respondWith(fetch(event.request));
   }
 
-  // Comportamento normal de produção (Stale-While-Revalidate seguro)
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        fetch(event.request).then((networkResponse) => {
+  const isCoreAsset = url.pathname.endsWith('/') || 
+                      url.pathname.endsWith('/index.html') || 
+                      url.pathname.endsWith('.js') || 
+                      url.pathname.endsWith('.css') || 
+                      url.pathname.endsWith('.json');
+
+  if (isCoreAsset) {
+    // NETWORK-FIRST STRATEGY: Fetch latest from GitHub Pages first, update cache, fallback to cache if offline
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
+              cache.put(event.request, responseClone);
             });
           }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    })
-  );
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // CACHE-FIRST STRATEGY for Static Media / Images
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, networkResponse);
+              });
+            }
+          }).catch(() => {});
+          return cachedResponse;
+        }
+        return fetch(event.request);
+      })
+    );
+  }
 });
