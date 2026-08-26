@@ -405,17 +405,30 @@ function showRecoveryModal(savedData) {
   container.innerHTML = `
     <div class="modal-backdrop">
       <div class="cream-card modal-content">
-        <div class="cream-card-header">RENOVATE Serious Game</div>
-        <div class="cream-card-body" style="margin-top:12px;">
+        <div class="modal-header-emblem">
+          <i data-lucide="bookmark-check" style="width: 28px; height: 28px; stroke: #FFCC66; stroke-width: 2.2;"></i>
+        </div>
+        <div class="modal-header-title">RENOVATE Serious Game</div>
+        <div class="modal-body-text">
           ${promptText}
         </div>
         <div class="modal-actions">
-          <button id="btn-resume-session" class="btn-modal btn-modal-primary">${resumeTitle}</button>
-          <button id="btn-restart-session" class="btn-modal btn-modal-secondary">${restartTitle}</button>
+          <button id="btn-resume-session" class="btn-modal btn-modal-primary">
+            <i data-lucide="play" style="width: 18px; height: 18px; stroke: #FFCC66;"></i>
+            <span>${resumeTitle}</span>
+          </button>
+          <button id="btn-restart-session" class="btn-modal btn-modal-secondary">
+            <i data-lucide="rotate-ccw" style="width: 16px; height: 16px; stroke: #D97706;"></i>
+            <span>${restartTitle}</span>
+          </button>
         </div>
       </div>
     </div>
   `;
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 
   document.getElementById('btn-resume-session').addEventListener('click', async () => {
     gameState.currentSlide = savedData.slide;
@@ -462,8 +475,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.012" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.012' : 'v2.1.4.012 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.013" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.013' : 'v2.1.4.013 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
