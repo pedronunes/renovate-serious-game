@@ -538,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.033" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.033' : 'v2.1.4.033 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.034" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.034' : 'v2.1.4.034 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1785,6 +1785,22 @@ const QUIZ_FEEDBACK_MAP = {
   48: { isCorrect: false, quizNum: 9, statusKey: 's48_feedback_status', infoKey: 's48_info_text', retrySlide: 46 }
 };
 
+// Helper function to extract option letter badge (supporting Latin A-D & Greek Α-Δ / Alpha-Delta) and clean body text
+function parseQuizOption(rawText, defaultKey) {
+  if (!rawText) return { badgeLetter: defaultKey, cleanText: '' };
+  const match = rawText.match(/^([A-Z\u0370-\u03FFa-z\u03b1-\u03c90-9])[\.\)\s]+(.*)/u);
+  if (match) {
+    return {
+      badgeLetter: match[1].toUpperCase(),
+      cleanText: match[2].trim()
+    };
+  }
+  return {
+    badgeLetter: defaultKey,
+    cleanText: rawText.replace(/^[A-D\u0391-\u0394][\.\s]*/u, '').trim()
+  };
+}
+
 // Render Interactive Quiz Question Screen (Screens 11, 14, 17, 20, 30, 33, 39, 43)
 function renderQuizScreen(container, slideId) {
   const cfg = QUIZ_CONFIG_MAP[slideId];
@@ -2742,12 +2758,11 @@ function renderBottomNavBar() {
   const isScreen1 = slideId === 1;
   const isBackDisabled = slideId <= 1;
 
-  // Lock NEXT and BACK buttons on Quiz screens until answered
+  // Lock ONLY NEXT button on Quiz screens until answered; BACK is ALWAYS accessible so users are never trapped!
   const isQuizScreen = Boolean(QUIZ_CONFIG_MAP[slideId]);
   const isQuizUnanswered = isQuizScreen && !gameState.quizAnswers[slideId];
   
-  // On active unanswered quiz screens, both BACK and NEXT get disabled
-  const isBackNavDisabled = isBackDisabled || isQuizUnanswered;
+  const isBackNavDisabled = isBackDisabled;
   const isNextNavDisabled = slideId >= gameState.totalSlides || isQuizUnanswered;
 
   const backLabel = t('ui_back', 'BACK');
