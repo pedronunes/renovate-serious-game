@@ -1,7 +1,6 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
 
 const PORT = 3000;
 
@@ -19,6 +18,41 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   let reqUrl = decodeURIComponent(req.url.split('?')[0]);
+
+  // Handle API route for saving coordinates to physical code
+  if (req.method === 'POST' && reqUrl === '/api/save-coordinates') {
+    let body = '';
+    req.on('data', chunk => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        const coordsMap = JSON.parse(body);
+        const appJsPath = path.join(__dirname, 'app.js');
+        let appJsContent = fs.readFileSync(appJsPath, 'utf8');
+
+        // Replace INITIAL_UI_COORDINATES_MAP in app.js
+        const regex = /const\s+INITIAL_UI_COORDINATES_MAP\s*=\s*\{[^]*?\};/;
+        const newMapString = `const INITIAL_UI_COORDINATES_MAP = ${JSON.stringify(coordsMap, null, 2)};`;
+        appJsContent = appJsContent.replace(regex, newMapString);
+
+        fs.writeFileSync(appJsPath, appJsContent, 'utf8');
+
+        // Sync to docs/app.js if exists
+        const docsAppJsPath = path.join(__dirname, 'docs', 'app.js');
+        if (fs.existsSync(docsAppJsPath)) {
+          let docsContent = fs.readFileSync(docsAppJsPath, 'utf8');
+          docsContent = docsContent.replace(regex, newMapString);
+          fs.writeFileSync(docsAppJsPath, docsContent, 'utf8');
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, message: 'Coordenadas gravadas com sucesso no ficheiro app.js!' }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
 
   if (reqUrl === '/') reqUrl = '/index.html';
 
