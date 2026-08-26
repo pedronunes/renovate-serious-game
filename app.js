@@ -48,15 +48,15 @@ const INITIAL_UI_COORDINATES_MAP = {
   "s02": {
     "textContainer": {
       "top": "10.5%",
-      "left": "6%",
-      "width": "54%",
+      "left": "6.0%",
+      "width": "54.0%",
       "fontSize": "1.05rem"
     },
     "attributesCard": {
-      "top": "76%",
-      "left": "4%",
-      "width": "92%",
-      "fontSize": "0.85rem"
+      "top": "76.0%",
+      "left": "4.0%",
+      "width": "92.0%",
+      "fontSize": "1.05rem"
     }
   },
   "s03": {
