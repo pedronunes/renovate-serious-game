@@ -118,38 +118,38 @@ const INITIAL_UI_COORDINATES_MAP = {
       "pointer": "bubble-tail-left"
     },
     "tip": {
-      "top": "34.0%",
+      "top": "32.0%",
       "left": "46.0%",
       "width": "48.0%"
     },
     "pillars": {
-      "top": "58.0%",
+      "top": "62.0%",
       "left": "6.0%",
       "width": "88.0%"
     }
   },
   "s09": {
     "bubble": {
-      "top": "10.0%",
+      "top": "8.0%",
       "left": "46.0%",
       "width": "48.0%",
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "42.0%",
+      "top": "47.0%",
       "left": "6.0%",
       "width": "88.0%"
     }
   },
   "s10": {
     "bubble": {
-      "top": "10.0%",
+      "top": "8.0%",
       "left": "46.0%",
       "width": "48.0%",
       "pointer": "bubble-tail-left"
     },
     "card": {
-      "top": "40.0%",
+      "top": "44.0%",
       "left": "5.0%",
       "width": "90.0%"
     }
@@ -471,8 +471,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.017" on mobile to free horizontal space
-  const versionText = isMobile ? 'v2.1.4.017' : 'v2.1.4.017 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.018" on mobile to free horizontal space
+  const versionText = isMobile ? 'v2.1.4.018' : 'v2.1.4.018 • 26.08.2026';
   
   // Format center title for small mobile screens to prevent overlap
   let centerTitleText = 'Serious Game RENOVATE';
@@ -1060,7 +1060,7 @@ function renderScreen8(container) {
   const tipLeft = (coords.tip && coords.tip.left) ? coords.tip.left : '46.0%';
   const tipWidth = (coords.tip && coords.tip.width) ? coords.tip.width : '48.0%';
 
-  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '58.0%';
+  const pillarsTop = (coords.pillars && coords.pillars.top) ? coords.pillars.top : '62.0%';
   const pillarsLeft = (coords.pillars && coords.pillars.left) ? coords.pillars.left : '6.0%';
   const pillarsWidth = (coords.pillars && coords.pillars.width) ? coords.pillars.width : '88.0%';
 
@@ -1153,11 +1153,11 @@ function renderScreen9(container) {
   const infoTitle = t('s09_info_title', 'Remember');
   const infoText = t('s09_info_text', 'Calibration is the practical and reliable way to achieve the right spray volume rate in your vineyard or orchard.');
 
-  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '10.0%';
+  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '8.0%';
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '42.0%';
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '47.0%';
   const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '6.0%';
   const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '88.0%';
 
@@ -1244,11 +1244,11 @@ function renderScreen10(container) {
 
   const cleanParamTitle = (str) => str.replace(/^\d+[\.\s]*/, '');
 
-  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '10.0%';
+  const bubbleTop = (coords.bubble && coords.bubble.top) ? coords.bubble.top : '8.0%';
   const bubbleLeft = (coords.bubble && coords.bubble.left) ? coords.bubble.left : '46.0%';
   const bubbleWidth = (coords.bubble && coords.bubble.width) ? coords.bubble.width : '48.0%';
 
-  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '40.0%';
+  const cardTop = (coords.card && coords.card.top) ? coords.card.top : '44.0%';
   const cardLeft = (coords.card && coords.card.left) ? coords.card.left : '5.0%';
   const cardWidth = (coords.card && coords.card.width) ? coords.card.width : '90.0%';
 
