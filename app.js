@@ -154,6 +154,18 @@ const INITIAL_UI_COORDINATES_MAP = {
       "width": "90.0%"
     }
   },
+  "s11": { "card": { "top": "3.5%", "left": "4.0%", "width": "92.0%" } },
+  "s12": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s13": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s14": { "card": { "top": "3.5%", "left": "4.0%", "width": "92.0%" } },
+  "s15": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s16": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s17": { "card": { "top": "3.5%", "left": "4.0%", "width": "92.0%" } },
+  "s18": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s19": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s20": { "card": { "top": "3.5%", "left": "4.0%", "width": "92.0%" } },
+  "s21": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
+  "s22": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
   "s23": {
     "miaBubble": {
       "top": "15.0%",
@@ -526,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.032" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.032' : 'v2.1.4.032 • 26.08.2026';
+  // Format version badge: compact "v2.1.4.033" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.033' : 'v2.1.4.033 • 26.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -2775,7 +2787,16 @@ function renderBottomNavBar() {
   if (backBtn && !isBackNavDisabled && !isScreen1) {
     backBtn.addEventListener('click', () => {
       initAudioEngine();
-      if (gameState.currentSlide === 23) {
+      const currentId = gameState.currentSlide;
+      const fb = QUIZ_FEEDBACK_MAP[currentId];
+      if (fb) {
+        const parentQuiz = FEEDBACK_TO_QUIZ_SLIDE[currentId];
+        if (parentQuiz) {
+          goToSlide(parentQuiz);
+          return;
+        }
+      }
+      if (currentId === 23) {
         const quiz4Ans = gameState.quizAnswers[20];
         if (quiz4Ans && quiz4Ans.correct === false) {
           goToSlide(22);
@@ -2783,7 +2804,7 @@ function renderBottomNavBar() {
           goToSlide(21);
         }
       } else {
-        goToSlide(gameState.currentSlide - 1);
+        goToSlide(currentId - 1);
       }
     });
   }
@@ -2791,7 +2812,18 @@ function renderBottomNavBar() {
   if (nextBtn && !isNextNavDisabled && !isScreen1) {
     nextBtn.addEventListener('click', () => {
       initAudioEngine();
-      goToSlide(gameState.currentSlide + 1);
+      const currentId = gameState.currentSlide;
+      const fb = QUIZ_FEEDBACK_MAP[currentId];
+      if (fb) {
+        if (fb.isCorrect && fb.nextSlide) {
+          goToSlide(fb.nextSlide);
+          return;
+        } else if (!fb.isCorrect && fb.retrySlide) {
+          goToSlide(fb.retrySlide);
+          return;
+        }
+      }
+      goToSlide(currentId + 1);
     });
   }
 }
