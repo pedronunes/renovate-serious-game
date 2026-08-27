@@ -272,12 +272,12 @@ const MOBILE_UI_COORDINATES_MAP = {
   },
   "s06": {
     "iconBlock": {
-      "top": "3.0%",
+      "top": "2.0%",
       "left": "0%",
       "width": "100%"
     },
     "card": {
-      "top": "13.5%",
+      "top": "12.0%",
       "left": "5.0%",
       "width": "90.0%"
     }
@@ -291,41 +291,41 @@ const MOBILE_UI_COORDINATES_MAP = {
   },
   "s08": {
     "bubble": {
-      "top": "4.5%",
-      "left": "46.0%",
-      "width": "50.0%"
+      "top": "1.5%",
+      "left": "44.0%",
+      "width": "53.0%"
     },
     "tip": {
-      "top": "27.5%",
-      "left": "46.0%",
-      "width": "50.0%"
+      "top": "18.5%",
+      "left": "44.0%",
+      "width": "53.0%"
     },
     "pillars": {
-      "top": "48.0%",
+      "top": "36.5%",
       "left": "4.0%",
       "width": "92.0%"
     }
   },
   "s09": {
     "bubble": {
-      "top": "5.0%",
-      "left": "46.0%",
-      "width": "50.0%"
+      "top": "1.5%",
+      "left": "44.0%",
+      "width": "53.0%"
     },
     "card": {
-      "top": "48.5%",
+      "top": "22.0%",
       "left": "4.0%",
       "width": "92.0%"
     }
   },
   "s10": {
     "bubble": {
-      "top": "5.0%",
-      "left": "46.0%",
-      "width": "50.0%"
+      "top": "1.5%",
+      "left": "44.0%",
+      "width": "53.0%"
     },
     "card": {
-      "top": "27.0%",
+      "top": "16.0%",
       "left": "3.5%",
       "width": "93.0%"
     }
@@ -703,8 +703,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.047" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.047' : 'v2.1.4.047 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.048" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.048' : 'v2.1.4.048 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1446,23 +1446,23 @@ function renderScreen6(container) {
     .replace(/(medium droplet size\s*\(M\)|tamanho de gota médio\s*\(M\)|tamaño de gota medio\s*\(M\)|taille de goutte moyenne\s*\(M\)|dimensione media delle gocce\s*\(M\)|mittleren Tropfengröße\s*\(M\)|gemiddelde druppelgrootte\s*\(M\)|střední velikosti kapek\s*\(M\)|średniej wielkości kropel\s*\(M\)|μεσαίο μέγεθος σταγόνας\s*\(M\))/gi, '<strong class="highlight-param">$1</strong>');
 
   container.innerHTML = `
-    <!-- Separate Floating Top Icon Block -->
+    <!-- Separate Floating Top Icon Block (Increased Spacing to Text Boxes) -->
     <div id="el-s06-iconBlock" style="text-align: center; ${styleObjToCss(coords.iconBlock || { top: '6%', left: '0%', width: '100%' })}">
-      <i data-lucide="info" class="s06-info-top-icon"></i>
+      <i data-lucide="info" class="s06-info-top-icon" style="width: 90px; height: 90px; stroke: #1E4222; stroke-width: 2.2; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));"></i>
     </div>
 
-    <!-- Separate Floating Text Cards Container -->
+    <!-- Separate Floating Text Cards Container (Opacity 0.78, Increased Line-Height 1.88, Spanning > 50% Screen Height) -->
     <div id="el-s06-card" style="${styleObjToCss(coords.card || { top: '19%', left: '6%', width: '88%' })}">
-      <div class="s06-blocks-container">
-        <div class="s06-translucent-block">
+      <div class="s06-blocks-container" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
           ${rawInfo1}
         </div>
 
-        <div class="s06-translucent-block">
+        <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
           ${rawInfo2}
         </div>
 
-        <div class="s06-translucent-block">
+        <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
           ${rawInfo3}
         </div>
       </div>
