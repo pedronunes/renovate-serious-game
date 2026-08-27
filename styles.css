@@ -103,20 +103,22 @@ button,
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Top App Bar (Official RENOVATE Gold Bar #FFCC66 with 104px Height & Status Bar Clearance) */
+/* ==========================================================
+   TOP APP BAR - DESKTOP CANONICAL BLUEPRINT (LOCKED & PRESERVED)
+   ========================================================== */
 .top-nav-bar {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: max(104px, calc(104px * var(--scale-factor, 1)));
-  min-height: 102px;
+  height: calc(68px * var(--scale-factor, 1));
+  min-height: 68px;
   background-color: var(--renovate-gold);
   border-bottom: 1.5px solid var(--forest-green);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: max(16px, env(safe-area-inset-top, 16px)) calc(14px * var(--scale-factor, 1)) calc(10px * var(--scale-factor, 1)) calc(14px * var(--scale-factor, 1));
+  padding: env(safe-area-inset-top, 0px) calc(12px * var(--scale-factor, 1)) 0 calc(12px * var(--scale-factor, 1));
   z-index: 200;
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
   flex-shrink: 0;
@@ -128,13 +130,12 @@ button,
   align-items: center;
   gap: calc(8px * var(--scale-factor, 1));
   z-index: 2;
-  max-width: 55%;
+  max-width: 60%;
   overflow: hidden;
-  margin-top: calc(4px * var(--scale-factor, 1));
 }
 
 .top-bar-logo {
-  height: calc(32px * var(--scale-factor, 1));
+  height: calc(28px * var(--scale-factor, 1));
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
@@ -142,7 +143,7 @@ button,
 
 .top-bar-app-title {
   font-family: var(--font-header);
-  font-size: clamp(0.75rem, calc(0.88rem * var(--scale-factor, 1)), 1.02rem);
+  font-size: clamp(0.72rem, calc(0.85rem * var(--scale-factor, 1)), 0.98rem);
   font-weight: 900;
   color: var(--forest-green);
   text-transform: uppercase;
@@ -155,9 +156,8 @@ button,
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  gap: calc(3px * var(--scale-factor, 1));
+  gap: calc(2px * var(--scale-factor, 1));
   z-index: 2;
-  margin-top: calc(4px * var(--scale-factor, 1));
 }
 
 .top-bar-right-controls {
@@ -168,15 +168,64 @@ button,
 
 .top-bar-version-badge {
   font-family: var(--font-body);
-  font-size: calc(9.5px * var(--scale-factor, 1));
+  font-size: calc(8.5px * var(--scale-factor, 1));
   color: #1E4222;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
-  letter-spacing: 0.3px;
-  opacity: 0.92;
-  margin-top: calc(2px * var(--scale-factor, 1));
-  margin-right: calc(4px * var(--scale-factor, 1));
-  margin-bottom: calc(2px * var(--scale-factor, 1));
+  letter-spacing: 0.2px;
+  opacity: 0.88;
+  margin-right: calc(2px * var(--scale-factor, 1));
+}
+
+/* ==========================================================
+   SMARTPHONES E TABLETS OVERRIDES (104px TALL BAR + NOTCH CLEARANCE)
+   Apenas ativado em smartphones e tablets, NUNCA no computador!
+   ========================================================== */
+@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+  .top-nav-bar {
+    height: max(104px, calc(104px * var(--scale-factor, 1))) !important;
+    min-height: 102px !important;
+    padding: max(16px, env(safe-area-inset-top, 16px)) calc(14px * var(--scale-factor, 1)) calc(10px * var(--scale-factor, 1)) calc(14px * var(--scale-factor, 1)) !important;
+  }
+
+  .top-bar-left {
+    max-width: 55% !important;
+    margin-top: calc(4px * var(--scale-factor, 1)) !important;
+  }
+
+  .top-bar-logo {
+    height: calc(32px * var(--scale-factor, 1)) !important;
+  }
+
+  .top-bar-app-title {
+    font-size: clamp(0.75rem, calc(0.88rem * var(--scale-factor, 1)), 1.02rem) !important;
+  }
+
+  .top-bar-right {
+    margin-top: calc(4px * var(--scale-factor, 1)) !important;
+    gap: calc(3px * var(--scale-factor, 1)) !important;
+  }
+
+  .top-bar-version-badge {
+    font-size: calc(9.5px * var(--scale-factor, 1)) !important;
+    font-weight: 800 !important;
+    opacity: 0.92 !important;
+    margin-top: calc(2px * var(--scale-factor, 1)) !important;
+    margin-right: calc(4px * var(--scale-factor, 1)) !important;
+    margin-bottom: calc(2px * var(--scale-factor, 1)) !important;
+  }
+}
+
+body.device-mobile-tablet .top-nav-bar {
+  height: max(104px, calc(104px * var(--scale-factor, 1))) !important;
+  min-height: 102px !important;
+  padding: max(16px, env(safe-area-inset-top, 16px)) calc(14px * var(--scale-factor, 1)) calc(10px * var(--scale-factor, 1)) calc(14px * var(--scale-factor, 1)) !important;
+}
+
+body.device-desktop .top-nav-bar {
+  height: calc(68px * var(--scale-factor, 1)) !important;
+  min-height: 68px !important;
+  padding: env(safe-area-inset-top, 0px) calc(12px * var(--scale-factor, 1)) 0 calc(12px * var(--scale-factor, 1)) !important;
 }
 
 /* Custom Modern Language Selector Dropdown System */
@@ -277,13 +326,13 @@ button,
   font-weight: 800;
 }
 
-/* Slide Backdrop Layer (Layer 1) */
+/* Slide Backdrop Layer (Layer 1) - Desktop Baseline (Locked) */
 .slide-screen {
   position: absolute;
-  top: calc(96px * var(--scale-factor, 1));
+  top: calc(64px * var(--scale-factor, 1));
   left: 0;
   width: 100%;
-  height: calc(100% - calc(174px * var(--scale-factor, 1)));
+  height: calc(100% - calc(128px * var(--scale-factor, 1)));
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -305,13 +354,13 @@ button,
   backface-visibility: hidden;
 }
 
-/* UI Overlay Layer (Layer 2) */
+/* UI Overlay Layer (Layer 2) - Desktop Baseline (Locked) */
 .ui-overlay {
   position: absolute;
-  top: calc(96px * var(--scale-factor, 1));
+  top: calc(64px * var(--scale-factor, 1));
   left: 0;
   width: 100%;
-  height: calc(100% - calc(174px * var(--scale-factor, 1)));
+  height: calc(100% - calc(128px * var(--scale-factor, 1)));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -319,10 +368,39 @@ button,
   padding: calc(12px * var(--scale-factor, 1)) 12px;
   box-sizing: border-box;
   overflow-y: auto;
-  overflow-y: auto;
   overflow-x: hidden;
   pointer-events: none;
   z-index: 10;
+}
+
+/* Mobile & Tablet Overrides for Slide Backdrop & Overlay */
+@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+  .slide-screen {
+    top: calc(96px * var(--scale-factor, 1)) !important;
+    height: calc(100% - calc(174px * var(--scale-factor, 1))) !important;
+  }
+  .ui-overlay {
+    top: calc(96px * var(--scale-factor, 1)) !important;
+    height: calc(100% - calc(174px * var(--scale-factor, 1))) !important;
+  }
+}
+
+body.device-mobile-tablet .slide-screen {
+  top: calc(96px * var(--scale-factor, 1)) !important;
+  height: calc(100% - calc(174px * var(--scale-factor, 1))) !important;
+}
+body.device-mobile-tablet .ui-overlay {
+  top: calc(96px * var(--scale-factor, 1)) !important;
+  height: calc(100% - calc(174px * var(--scale-factor, 1))) !important;
+}
+
+body.device-desktop .slide-screen {
+  top: calc(64px * var(--scale-factor, 1)) !important;
+  height: calc(100% - calc(128px * var(--scale-factor, 1))) !important;
+}
+body.device-desktop .ui-overlay {
+  top: calc(64px * var(--scale-factor, 1)) !important;
+  height: calc(100% - calc(128px * var(--scale-factor, 1))) !important;
 }
 
 .ui-overlay::-webkit-scrollbar {

@@ -27,19 +27,19 @@ const SUPPORTED_LANGUAGES = [
 const INITIAL_UI_COORDINATES_MAP = {
   "s01": {
     "titleHeader": {
-      "top": "13.5%",
+      "top": "16.5%",
       "left": "5.0%",
       "width": "90.0%",
       "fontSize": "1.41rem"
     },
     "startBtn": {
-      "top": "61.5%",
+      "top": "74.5%",
       "left": "10.0%",
       "width": "80.0%",
       "fontSize": "1.05rem"
     },
     "stepperCard": {
-      "top": "71.5%",
+      "top": "84.5%",
       "left": "4.0%",
       "width": "92.0%",
       "fontSize": "1.05rem"
@@ -201,8 +201,62 @@ const INITIAL_UI_COORDINATES_MAP = {
   }
 };
 
-// Active Coordinates Map initialized from deep clone
+// Active Coordinates Map initialized from deep clone (Desktop canonical baseline)
 let UI_COORDINATES_MAP = JSON.parse(JSON.stringify(INITIAL_UI_COORDINATES_MAP));
+
+// Mobile & Tablet Overrides Map (Adjustments exclusively applied on smartphones & tablets)
+const MOBILE_UI_COORDINATES_MAP = {
+  "s01": {
+    "titleHeader": {
+      "top": "13.5%",
+      "left": "5.0%",
+      "width": "90.0%",
+      "fontSize": "1.41rem"
+    },
+    "startBtn": {
+      "top": "61.5%",
+      "left": "10.0%",
+      "width": "80.0%",
+      "fontSize": "1.05rem"
+    },
+    "stepperCard": {
+      "top": "71.5%",
+      "left": "4.0%",
+      "width": "92.0%",
+      "fontSize": "1.05rem"
+    }
+  }
+};
+
+// Device Mode Detector: Detects if running on Smartphone/Tablet vs Desktop Computer
+function isMobileOrTabletDevice() {
+  if (typeof window === 'undefined') return false;
+  const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches ||
+                  (navigator && navigator.maxTouchPoints > 0);
+  const isNarrow = window.innerWidth < 1024;
+  return isTouch || isNarrow;
+}
+
+// Coordinate Resolver: Guarantees 100% desktop lockdown while allowing mobile/tablet optimizations
+function getEffectiveCoordinates(slideKey) {
+  const base = INITIAL_UI_COORDINATES_MAP[slideKey] || {};
+  if (isMobileOrTabletDevice() && MOBILE_UI_COORDINATES_MAP[slideKey]) {
+    return Object.assign({}, base, MOBILE_UI_COORDINATES_MAP[slideKey]);
+  }
+  return UI_COORDINATES_MAP[slideKey] || base;
+}
+
+// Synchronize device classes on body to guarantee CSS isolation
+function updateDeviceModeClass() {
+  if (typeof document === 'undefined' || !document.body) return;
+  if (isMobileOrTabletDevice()) {
+    document.body.classList.add('device-mobile-tablet');
+    document.body.classList.remove('device-desktop');
+  } else {
+    document.body.classList.add('device-desktop');
+    document.body.classList.remove('device-mobile-tablet');
+  }
+}
 
 // Preload all backdrop images for instantaneous 60fps transitions without lag or black screens
 function preloadBackdropImages() {
@@ -537,8 +591,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.044" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.044' : 'v2.1.4.044 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.045" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.045' : 'v2.1.4.045 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -964,7 +1018,7 @@ function renderCurrentSlide() {
 
 // Screen 1: Exact Reproduction of /docs/tela1.png (No circle avatar, large bold title, clear subtitle)
 function renderScreen1(container) {
-  const coords = UI_COORDINATES_MAP.s01 || INITIAL_UI_COORDINATES_MAP.s01;
+  const coords = getEffectiveCoordinates('s01');
 
   const fullTitle = t('s01_chapter_title', 'CALIBRATION CHALLENGE');
   const body = t('s01_body_text', 'Help Laura calibrate her sprayer before treating her vineyard.');
@@ -2817,11 +2871,13 @@ function updateResponsiveScale() {
 
   document.documentElement.style.setProperty('--scale-factor', scaleFactor.toFixed(3));
 
+  updateDeviceModeClass();
   renderTopBar();
 }
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
+  updateDeviceModeClass();
   updateViewportHeight();
   updateResponsiveScale();
   window.addEventListener('resize', updateResponsiveScale);
