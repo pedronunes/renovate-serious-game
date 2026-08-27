@@ -454,11 +454,14 @@ button,
 
 .stepper-label {
   font-family: var(--font-body);
-  font-size: clamp(0.62rem, calc(0.76rem * var(--scale-factor, 1)), 0.85rem);
+  font-size: clamp(0.58rem, calc(0.72rem * var(--scale-factor, 1)), 0.82rem);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--forest-green);
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: none;
+  text-align: center;
 }
 
 /* Floating Title Header directly on sky */

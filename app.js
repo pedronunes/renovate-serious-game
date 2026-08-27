@@ -27,19 +27,19 @@ const SUPPORTED_LANGUAGES = [
 const INITIAL_UI_COORDINATES_MAP = {
   "s01": {
     "titleHeader": {
-      "top": "16.5%",
+      "top": "13.5%",
       "left": "5.0%",
       "width": "90.0%",
       "fontSize": "1.41rem"
     },
     "startBtn": {
-      "top": "74.5%",
+      "top": "61.5%",
       "left": "10.0%",
       "width": "80.0%",
       "fontSize": "1.05rem"
     },
     "stepperCard": {
-      "top": "84.5%",
+      "top": "71.5%",
       "left": "4.0%",
       "width": "92.0%",
       "fontSize": "1.05rem"
@@ -537,8 +537,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.040" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.040' : 'v2.1.4.040 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.041" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.041' : 'v2.1.4.041 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
