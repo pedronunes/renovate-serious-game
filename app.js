@@ -332,6 +332,97 @@ const MOBILE_UI_COORDINATES_MAP = {
   }
 };
 
+// Peripheral / Device Language Detector: Auto-detects device language on launch
+function detectDeviceLanguage() {
+  if (typeof navigator === 'undefined') return 'en-GB';
+
+  const supportedCodes = SUPPORTED_LANGUAGES.map(l => l.code);
+  const candidates = [];
+
+  if (navigator.languages && Array.isArray(navigator.languages)) {
+    candidates.push(...navigator.languages);
+  }
+  if (navigator.language) {
+    candidates.push(navigator.language);
+  }
+  if (navigator.userLanguage) {
+    candidates.push(navigator.userLanguage);
+  }
+  if (navigator.browserLanguage) {
+    candidates.push(navigator.browserLanguage);
+  }
+
+  const primaryLangMap = {
+    'es': 'es-ES',
+    'it': 'it-IT',
+    'pt': 'pt-PT',
+    'fr': 'fr-FR',
+    'de': 'de-DE',
+    'pl': 'pl-PL',
+    'cs': 'cs-CZ',
+    'el': 'el-GR',
+    'nl': 'nl-NL',
+    'en': 'en-GB'
+  };
+
+  const countryRegionMap = {
+    'es': 'es-ES',
+    'it': 'it-IT',
+    'pt': 'pt-PT',
+    'fr': 'fr-FR',
+    'de': 'de-DE',
+    'at': 'de-DE',
+    'pl': 'pl-PL',
+    'cz': 'cs-CZ',
+    'gr': 'el-GR',
+    'cy': 'el-CY',
+    'nl': 'nl-NL'
+  };
+
+  // Pass 1: Direct exact match on supported ISO code (case-insensitive)
+  for (const raw of candidates) {
+    if (!raw || typeof raw !== 'string') continue;
+    const clean = raw.trim();
+    const exact = supportedCodes.find(c => c.toLowerCase() === clean.toLowerCase());
+    if (exact) return exact;
+  }
+
+  // Pass 2: Specific region checks (e.g. nl-be, el-cy)
+  for (const raw of candidates) {
+    if (!raw || typeof raw !== 'string') continue;
+    const lower = raw.trim().toLowerCase();
+    if (lower.startsWith('nl-be') || lower === 'nl-be') return 'nl-BE';
+    if (lower.startsWith('el-cy') || lower === 'el-cy') return 'el-CY';
+  }
+
+  // Pass 3: Primary 2-letter language code (e.g. 'es', 'it', 'pt', 'fr', 'de', 'pl', 'cs', 'el', 'nl', 'en')
+  for (const raw of candidates) {
+    if (!raw || typeof raw !== 'string') continue;
+    const parts = raw.trim().toLowerCase().split(/[-_]/);
+    const lang = parts[0];
+    if (primaryLangMap[lang]) {
+      if (lang === 'nl' && parts[1] === 'be') return 'nl-BE';
+      if (lang === 'el' && parts[1] === 'cy') return 'el-CY';
+      return primaryLangMap[lang];
+    }
+  }
+
+  // Pass 4: Country / Region code match (e.g. device located in Spain, Italy, etc.)
+  for (const raw of candidates) {
+    if (!raw || typeof raw !== 'string') continue;
+    const parts = raw.trim().toLowerCase().split(/[-_]/);
+    if (parts.length > 1) {
+      const region = parts[parts.length - 1];
+      if (countryRegionMap[region]) {
+        return countryRegionMap[region];
+      }
+    }
+  }
+
+  // Pass 5: If device is in an unsupported language -> fallback to en-GB
+  return 'en-GB';
+}
+
 // Device Mode Detector: Detects if running on Smartphone/Tablet vs Desktop Computer
 function isMobileOrTabletDevice() {
   if (typeof window === 'undefined') return false;
@@ -407,7 +498,7 @@ function preloadBackdropImages() {
 const gameState = {
   currentSlide: 1,
   totalSlides: 157,
-  activeLanguage: 'pt-PT',
+  activeLanguage: detectDeviceLanguage(),
   activeTranslations: {},
   quizAnswers: {},
   maxUnlockedSlide: 1,
@@ -594,11 +685,6 @@ function saveProgress() {
 }
 
 function checkSessionRecovery() {
-  const savedLang = localStorage.getItem(STORAGE_KEY_LANG);
-  if (savedLang) {
-    gameState.activeLanguage = savedLang;
-  }
-
   const savedMute = localStorage.getItem(STORAGE_KEY_MUTE);
   if (savedMute !== null) {
     gameState.audioMuted = savedMute === 'true';
@@ -610,7 +696,6 @@ function checkSessionRecovery() {
   try {
     const saved = JSON.parse(savedRaw);
     if (saved && saved.slide && saved.slide > 1) {
-      if (saved.lang) gameState.activeLanguage = saved.lang;
       showRecoveryModal(saved);
       return true;
     }
@@ -659,13 +744,15 @@ function showRecoveryModal(savedData) {
 
   const btnResume = document.getElementById('btn-resume-session');
   if (btnResume) {
-    btnResume.addEventListener('click', (e) => {
+    btnResume.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       gameState.currentSlide = savedData.slide;
       gameState.maxUnlockedSlide = savedData.maxUnlocked || savedData.slide;
       gameState.quizAnswers = savedData.answers || {};
-      if (savedData.lang) gameState.activeLanguage = savedData.lang;
+      if (savedData.lang && savedData.lang !== gameState.activeLanguage) {
+        await loadTranslations(savedData.lang, false);
+      }
       container.innerHTML = '';
       renderCurrentSlide();
     });
@@ -711,8 +798,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.049" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.049' : 'v2.1.4.049 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.050" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.050' : 'v2.1.4.050 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
