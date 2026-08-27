@@ -639,6 +639,61 @@ body.device-desktop .ui-overlay {
   letter-spacing: 0.2px;
 }
 
+/* Responsive Ergonomics for Attributes Card on Mobile & Tablet */
+@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+  .attributes-card-3col {
+    padding: 8px 6px 10px 6px !important;
+    border-radius: 14px !important;
+  }
+  .attr-col {
+    padding: 2px 3px !important;
+  }
+  .attr-icon-badge-3d {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    margin-bottom: 4px !important;
+  }
+  .attr-icon-lucide {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .attr-text {
+    font-size: clamp(0.58rem, calc(0.68rem * var(--scale-factor, 1)), 0.76rem) !important;
+    line-height: 1.15 !important;
+  }
+  .speech-bubble {
+    padding: 10px 12px !important;
+  }
+}
+
+body.device-mobile-tablet .attributes-card-3col {
+  padding: 8px 6px 10px 6px !important;
+  border-radius: 14px !important;
+}
+body.device-mobile-tablet .attr-col {
+  padding: 2px 3px !important;
+}
+body.device-mobile-tablet .attr-icon-badge-3d {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  margin-bottom: 4px !important;
+}
+body.device-mobile-tablet .attr-icon-lucide {
+  width: 18px !important;
+  height: 18px !important;
+}
+body.device-mobile-tablet .attr-text {
+  font-size: clamp(0.58rem, calc(0.68rem * var(--scale-factor, 1)), 0.76rem) !important;
+  line-height: 1.15 !important;
+}
+body.device-mobile-tablet .speech-bubble {
+  padding: 10px 12px !important;
+}
+
 /* Cream PDF Style Card System */
 .cream-card {
   background: rgba(247, 245, 238, 0.92);

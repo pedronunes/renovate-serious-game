@@ -214,16 +214,60 @@ const MOBILE_UI_COORDINATES_MAP = {
       "fontSize": "1.41rem"
     },
     "startBtn": {
-      "top": "61.5%",
+      "top": "62.5%",
       "left": "10.0%",
       "width": "80.0%",
       "fontSize": "1.05rem"
     },
     "stepperCard": {
-      "top": "71.5%",
+      "top": "72.5%",
       "left": "4.0%",
       "width": "92.0%",
       "fontSize": "1.05rem"
+    }
+  },
+  "s02": {
+    "textContainer": {
+      "top": "12.5%",
+      "left": "6.0%",
+      "width": "54.0%",
+      "fontSize": "1.02rem"
+    },
+    "attributesCard": {
+      "top": "71.0%",
+      "left": "4.0%",
+      "width": "92.0%",
+      "fontSize": "0.82rem"
+    }
+  },
+  "s03": {
+    "textContainer": {
+      "top": "12.5%",
+      "left": "46.0%",
+      "width": "50.0%",
+      "fontSize": "0.98rem"
+    },
+    "attributesCard": {
+      "top": "71.0%",
+      "left": "4.0%",
+      "width": "92.0%",
+      "fontSize": "0.82rem"
+    }
+  },
+  "s04": {
+    "textContainer": {
+      "top": "12.0%",
+      "left": "5.5%",
+      "width": "48.0%",
+      "fontSize": "0.96rem"
+    }
+  },
+  "s05": {
+    "bubble": {
+      "top": "43.5%",
+      "left": "5.0%",
+      "width": "64.0%",
+      "pointer": "bubble-tail-top-mia"
     }
   }
 };
@@ -241,7 +285,15 @@ function isMobileOrTabletDevice() {
 function getEffectiveCoordinates(slideKey) {
   const base = INITIAL_UI_COORDINATES_MAP[slideKey] || {};
   if (isMobileOrTabletDevice() && MOBILE_UI_COORDINATES_MAP[slideKey]) {
-    return Object.assign({}, base, MOBILE_UI_COORDINATES_MAP[slideKey]);
+    const merged = {};
+    for (const k in base) {
+      merged[k] = Object.assign({}, base[k]);
+    }
+    const mobileOverrides = MOBILE_UI_COORDINATES_MAP[slideKey];
+    for (const k in mobileOverrides) {
+      merged[k] = Object.assign({}, merged[k] || {}, mobileOverrides[k]);
+    }
+    return merged;
   }
   return UI_COORDINATES_MAP[slideKey] || base;
 }
@@ -591,8 +643,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.045" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.045' : 'v2.1.4.045 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.046" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.046' : 'v2.1.4.046 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1113,7 +1165,7 @@ function renderScreen1(container) {
 
 // Screen 2: Meet Laura (Exact Reproduction of /docs/tela2.png with Lucide Icons: grape, leaf, target)
 function renderScreen2(container) {
-  const coords = UI_COORDINATES_MAP.s02 || INITIAL_UI_COORDINATES_MAP.s02;
+  const coords = getEffectiveCoordinates('s02');
   const title = t('s02_screen_title', t('ui_meet_laura', 'MEET LAURA'));
   
   const fullBody = t('s02_body_text', 'Laura is a passionate vineyard grower. She wants to protect her crops, reduce waste and take care of the environment.');
@@ -1178,7 +1230,7 @@ function renderScreen2(container) {
 
 // Screen 3: Meet Mia (Exact Reproduction of /docs/tela3.png with Right-Aligned Sky Header and Lucide Icons: graduation-cap, lightbulb, handshake)
 function renderScreen3(container) {
-  const coords = UI_COORDINATES_MAP.s03 || INITIAL_UI_COORDINATES_MAP.s03;
+  const coords = getEffectiveCoordinates('s03');
   const title = t('s03_screen_title', t('ui_meet_mia', 'MEET MIA'));
   
   const fullBody = t('s03_body_text', "Mia is Laura's advisor. She helps her make the right decisions and get the best results with her sprayer.");
@@ -1243,7 +1295,7 @@ function renderScreen3(container) {
 
 // Screen 4: The Situation (Exact floating text style as Screen 2 & 3 - Floating directly on sky!)
 function renderScreen4(container) {
-  const coords = UI_COORDINATES_MAP.s04 || INITIAL_UI_COORDINATES_MAP.s04;
+  const coords = getEffectiveCoordinates('s04');
   const title = t('s04_screen_title', 'THE SITUATION');
   const fullBody = t('s04_body_text', 'Warm and humid weather favours downy mildew infection. Timely and well-calibrated spraying is essential.');
 
@@ -1265,7 +1317,7 @@ function renderScreen4(container) {
     p2 = '';
   }
 
-  const textStyle = styleObjToCss(coords.textContainer || { top: '5.5%', left: '5%', width: '56%' });
+  const textStyle = styleObjToCss(coords.textContainer || { top: '12%', left: '5.5%', width: '48%' });
 
   container.innerHTML = `
     <!-- Upper Left Text Container directly on sky (Identical to Screen 2 & 3 floating typography!) -->
@@ -1279,7 +1331,11 @@ function renderScreen4(container) {
 
 // Screen 5: Mia Welcome Dialogue (With <break> / newline paragraph breaks across all 12 languages, registered trademark VitiShield®, and expanding height)
 function renderScreen5(container) {
-  const coords = UI_COORDINATES_MAP.s05 || INITIAL_UI_COORDINATES_MAP.s05;
+  const coords = getEffectiveCoordinates('s05');
+  const isMobile = isMobileOrTabletDevice();
+  const speechTextFontSize = isMobile ? '0.94rem' : '1.02rem';
+  const paragraphMargin = isMobile ? '7px' : '10px';
+
   const pointerClass = (coords.bubble && coords.bubble.pointer) || 'pointer-left';
   
   const rawSpeech = t('s05_dialogue_mia', "Hi Laura!\r\nWeather conditions are favourable for downy mildew.\r\nI recommend applying VitiShield® today.\r\nBut before entering the vineyard, let's make sure your sprayer is correctly calibrated.\r\nI'll guide you through the whole process.");
@@ -1300,15 +1356,15 @@ function renderScreen5(container) {
   }
 
   const formattedHtml = paragraphs
-    .map(p => `<p class="speech-p" style="margin-bottom: 10px; line-height: 1.38; font-weight: 600;">${p}</p>`)
+    .map(p => `<p class="speech-p" style="margin-bottom: ${paragraphMargin}; line-height: 1.35; font-weight: 600;">${p}</p>`)
     .join('');
 
   const bubbleClass = (coords.bubble && coords.bubble.pointer) || 'bubble-tail-top-mia';
 
   container.innerHTML = `
-    <div id="el-s05-bubble" class="speech-bubble ${bubbleClass}" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '48%', left: '5%', width: '62%' })}">
+    <div id="el-s05-bubble" class="speech-bubble ${bubbleClass}" style="min-height: max-content; ${styleObjToCss(coords.bubble || { top: '43.5%', left: '5%', width: '64%' })}">
       <div class="speaker-name">MIA</div>
-      <div class="speech-text" style="font-size: 1.02rem; color: #1F2220;">
+      <div class="speech-text" style="font-size: ${speechTextFontSize}; color: #1F2220;">
         ${formattedHtml}
       </div>
     </div>
