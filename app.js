@@ -168,20 +168,20 @@ const INITIAL_UI_COORDINATES_MAP = {
   "s22": { "card": { "top": "3.0%", "left": "4.0%", "width": "92.0%" } },
   "s23": {
     "miaBubble": {
-      "top": "15.0%",
-      "left": "8.0%",
+      "top": "4.6%",
+      "left": "5.3%",
       "width": "44.0%",
       "pointer": "pointer-left"
     },
     "lauraBubble": {
-      "top": "48.0%",
-      "left": "48.0%",
+      "top": "9.2%",
+      "left": "52.0%",
       "width": "44.0%",
       "pointer": "pointer-right"
     },
     "legalCard": {
-      "top": "78.0%",
-      "left": "50.0%",
+      "top": "78.5%",
+      "left": "50%",
       "transform": "translateX(-50%)",
       "width": "84.0%"
     }
@@ -538,8 +538,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.038" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.038' : 'v2.1.4.038 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.039" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.039' : 'v2.1.4.039 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1993,13 +1993,13 @@ function renderQuizFeedbackScreen(container, slideId) {
 // Screen 23: Narrative Reconciliation (Mia & Laura Dialogue in Vineyard with Legal Alert)
 function renderScreen23(container) {
   const coords = UI_COORDINATES_MAP.s23 || INITIAL_UI_COORDINATES_MAP.s23 || {
-    miaBubble: { top: '15%', left: '8%', width: '44%' },
-    lauraBubble: { top: '48%', left: '48%', width: '44%' },
-    legalCard: { top: '78%', left: '50%', transform: 'translateX(-50%)', width: '84%' }
+    miaBubble: { top: '4.6%', left: '5.3%', width: '44.0%', pointer: 'pointer-left' },
+    lauraBubble: { top: '9.2%', left: '52.0%', width: '44.0%', pointer: 'pointer-right' },
+    legalCard: { top: '78.5%', left: '50%', transform: 'translateX(-50%)', width: '84.0%' }
   };
 
-  const miaPointer = 'bubble-tail-left';
-  const lauraPointer = 'bubble-tail-right';
+  const miaPointer = 'bubble-tail-left pointer-left';
+  const lauraPointer = 'bubble-tail-right pointer-right';
 
   const miaTitle = t('s23_dialogue_title_mia', 'A calibração não é apenas uma boa prática - é um requisito legal.');
   const miaText = t('s23_dialogue_text_mia', 'Surge da regulamentação nacional e é essencial para uma proteção fitossanitária segura e responsável.');
@@ -2011,7 +2011,7 @@ function renderScreen23(container) {
 
   container.innerHTML = `
     <!-- Mia Speech Bubble (Top Left) -->
-    <div id="el-s23-miaBubble" class="speech-bubble ${miaPointer}" style="${styleObjToCss(coords.miaBubble || { top: '15%', left: '8%', width: '44%' })}">
+    <div id="el-s23-miaBubble" class="speech-bubble ${miaPointer}" style="${styleObjToCss(coords.miaBubble || { top: '4.6%', left: '5.3%', width: '44.0%' })}">
       <span class="speaker-name">MIA</span>
       <div style="font-family: var(--font-header); font-weight: 800; font-size: clamp(0.74rem, calc(0.85rem * var(--scale-factor, 1)), 0.98rem); color: var(--forest-green); margin: 4px 0 6px 0; line-height: 1.25;">
         ${miaTitle}
@@ -2021,8 +2021,8 @@ function renderScreen23(container) {
       </div>
     </div>
 
-    <!-- Laura Speech Bubble (Middle Right) -->
-    <div id="el-s23-lauraBubble" class="speech-bubble ${lauraPointer}" style="${styleObjToCss(coords.lauraBubble || { top: '48%', left: '48%', width: '44%' })}">
+    <!-- Laura Speech Bubble (Top Right) -->
+    <div id="el-s23-lauraBubble" class="speech-bubble ${lauraPointer}" style="${styleObjToCss(coords.lauraBubble || { top: '9.2%', left: '52.0%', width: '44.0%' })}">
       <span class="speaker-name" style="background: var(--forest-green-light);">LAURA</span>
       <div class="speech-text" style="margin-top: 4px;">
         ${lauraText}
@@ -2030,7 +2030,7 @@ function renderScreen23(container) {
     </div>
 
     <!-- Legal Alert Card (Bottom Central) -->
-    <div id="el-s23-legalCard" class="cream-card" style="${styleObjToCss(coords.legalCard || { top: '78%', left: '50%', transform: 'translateX(-50%)', width: '84%' })}">
+    <div id="el-s23-legalCard" class="cream-card" style="${styleObjToCss(coords.legalCard || { top: '78.5%', left: '50%', transform: 'translateX(-50%)', width: '84.0%' })}">
       <div class="cream-card-header" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
         <i data-lucide="scale" style="width: 20px; height: 20px; color: var(--forest-green);"></i>
         <span>${legalTitle}</span>

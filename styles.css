@@ -747,6 +747,63 @@ button,
   z-index: 19;
 }
 
+/* Aliases for pointer-left and pointer-right */
+.pointer-left { position: absolute; overflow: visible !important; }
+.pointer-left::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: -13px;
+  border-width: 9px 13px 9px 0;
+  border-style: solid;
+  border-color: transparent rgba(247, 245, 238, 0.95) transparent transparent;
+  display: block;
+  width: 0;
+  height: 0;
+  z-index: 20;
+}
+.pointer-left::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: -15px;
+  border-width: 11px 15px 11px 0;
+  border-style: solid;
+  border-color: transparent rgba(30, 66, 34, 0.45) transparent transparent;
+  display: block;
+  width: 0;
+  height: 0;
+  z-index: 19;
+}
+
+.pointer-right { position: absolute; overflow: visible !important; }
+.pointer-right::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  right: -13px;
+  border-width: 9px 0 9px 13px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(247, 245, 238, 0.95);
+  display: block;
+  width: 0;
+  height: 0;
+  z-index: 20;
+}
+.pointer-right::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  right: -15px;
+  border-width: 11px 0 11px 15px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(30, 66, 34, 0.45);
+  display: block;
+  width: 0;
+  height: 0;
+  z-index: 19;
+}
+
 .speech-bubble .speaker-name {
   font-family: var(--font-header);
   font-size: clamp(0.8rem, calc(0.92rem * var(--scale-factor, 1)), 1.05rem);
