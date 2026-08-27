@@ -533,12 +533,12 @@ function renderTopBar() {
   const isMobile = screenWidth <= 768;
 
   const currentLangObj = SUPPORTED_LANGUAGES.find(l => l.code === gameState.activeLanguage) || SUPPORTED_LANGUAGES[0];
-  const shortCode = currentLangObj.shortDisplay || currentLangObj.code.split('-')[0].toUpperCase();
+  const isoCode = currentLangObj.code;
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
-  const langLabel = isCompactMobile ? shortCode : `${shortCode} • ${fullLangName}`;
+  const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.041" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.041' : 'v2.1.4.041 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.042" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.042' : 'v2.1.4.042 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -567,9 +567,9 @@ function renderTopBar() {
           <div id="lang-menu" class="lang-dropdown-menu">
             ${SUPPORTED_LANGUAGES.map(l => {
               const isSel = l.code === gameState.activeLanguage;
-              const itemCode = l.shortDisplay || l.code.split('-')[0].toUpperCase();
+              const itemCode = l.code;
               const itemName = l.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
-              const itemText = isCompactMobile ? itemCode : `${itemCode} • ${itemName}`;
+              const itemText = `${itemCode} • ${itemName}`;
               return `
                 <div class="lang-option-item ${isSel ? 'selected' : ''}" data-lang="${l.code}">
                   <span>${itemText}</span>
