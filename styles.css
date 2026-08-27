@@ -336,7 +336,7 @@ body.device-desktop .top-nav-bar {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: #F7F7F2;
+  background-color: #1E4222;
   overflow: hidden;
   z-index: 1;
 }
@@ -719,8 +719,11 @@ body.device-mobile-tablet .speech-bubble {
     line-height: 1.36 !important;
   }
 
-  /* Screen 8 Mobile Enhancements - Perfectly stacked without overlap */
+  /* Screen 8 Mobile Enhancements - Exact User Spec: Bubble top: 5px, Pillars bottom: 5px, Tip 10px above Pillars */
   #el-s08-bubble {
+    top: 5px !important;
+    left: 44.0% !important;
+    width: 53.0% !important;
     padding: 6px 10px !important;
   }
   #el-s08-bubble .speaker-name {
@@ -731,7 +734,23 @@ body.device-mobile-tablet .speech-bubble {
     font-size: 0.78rem !important;
     line-height: 1.22 !important;
   }
+  .s08-bottom-wrapper {
+    position: absolute !important;
+    bottom: 5px !important;
+    left: 4.0% !important;
+    width: 92.0% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    pointer-events: none !important;
+    z-index: 15;
+  }
   #el-s08-tip {
+    position: static !important;
+    width: 57.0% !important;
+    pointer-events: auto !important;
+    margin: 0 !important;
     padding: 6px 8px !important;
     border-radius: 10px !important;
   }
@@ -749,6 +768,10 @@ body.device-mobile-tablet .speech-bubble {
     margin-top: 2px !important;
   }
   #el-s08-pillars {
+    position: static !important;
+    width: 100% !important;
+    pointer-events: auto !important;
+    margin: 0 !important;
     padding: 8px 10px !important;
     border-radius: 12px !important;
   }
@@ -780,8 +803,11 @@ body.device-mobile-tablet .speech-bubble {
     height: 18px !important;
   }
 
-  /* Screen 9 Mobile Enhancements - Card and Remember box fully visible above footer */
+  /* Screen 9 Mobile Enhancements - Exact User Spec: Bubble top: 5px, Card bottom: 5px */
   #el-s09-bubble {
+    top: 5px !important;
+    left: 44.0% !important;
+    width: 53.0% !important;
     padding: 6px 10px !important;
   }
   #el-s09-bubble .speaker-name {
@@ -793,6 +819,10 @@ body.device-mobile-tablet .speech-bubble {
     line-height: 1.22 !important;
   }
   #el-s09-card {
+    top: auto !important;
+    bottom: 5px !important;
+    left: 4.0% !important;
+    width: 92.0% !important;
     padding: 8px 10px !important;
     border-radius: 12px !important;
   }
@@ -828,8 +858,11 @@ body.device-mobile-tablet .speech-bubble {
     height: 18px !important;
   }
 
-  /* Screen 10 Mobile Enhancements - Compact parameters grid with zero bubble overlap */
+  /* Screen 10 Mobile Enhancements - Exact User Spec: Bubble top: 5px, Card bottom: 5px */
   #el-s10-bubble {
+    top: 5px !important;
+    left: 44.0% !important;
+    width: 53.0% !important;
     padding: 5px 8px !important;
   }
   #el-s10-bubble .speaker-name {
@@ -841,6 +874,10 @@ body.device-mobile-tablet .speech-bubble {
     line-height: 1.18 !important;
   }
   #el-s10-card {
+    top: auto !important;
+    bottom: 5px !important;
+    left: 3.5% !important;
+    width: 93.0% !important;
     padding: 6px 8px !important;
     border-radius: 12px !important;
   }
@@ -881,6 +918,11 @@ body.device-mobile-tablet .speech-bubble {
     height: 34px !important;
     max-height: 34px !important;
   }
+}
+
+/* Desktop default for s08-bottom-wrapper is transparent to flow */
+.s08-bottom-wrapper {
+  display: contents;
 }
 
 /* Cream PDF Style Card System */

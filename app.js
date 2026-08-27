@@ -370,7 +370,9 @@ function updateDeviceModeClass() {
   }
 }
 
-// Preload all backdrop images for instantaneous 60fps transitions without lag or black screens
+// Pre-decoded GPU image cache to guarantee 60fps instant transitions with zero white flash
+const preloadedImagesMap = new Map();
+
 function preloadBackdropImages() {
   const imagesToPreload = [
     './public/images/SeriousGame_tela-Simples.jpg',
@@ -390,8 +392,14 @@ function preloadBackdropImages() {
   ];
 
   imagesToPreload.forEach(src => {
-    const img = new Image();
-    img.src = src;
+    if (!preloadedImagesMap.has(src)) {
+      const img = new Image();
+      img.src = src;
+      if (img.decode) {
+        img.decode().catch(() => {});
+      }
+      preloadedImagesMap.set(src, img);
+    }
   });
 }
 
@@ -703,8 +711,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.048" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.048' : 'v2.1.4.048 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.049" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.049' : 'v2.1.4.049 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1069,24 +1077,45 @@ function renderCurrentSlide() {
   const slideId = gameState.currentSlide;
 
   // Determine Backdrop Image (Layer 1) & Background Position
-  // Exact Artwork Backdrop for Screens 1, 2, 3, 4, 5, 8, 9, 10, 23
+  let targetBg = './public/images/SeriousGame_tela-Simples.jpg';
+  let targetPos = 'center center';
+  let targetMarginTop = '0px';
+
   if ((slideId >= 1 && slideId <= 5) || (slideId >= 8 && slideId <= 10)) {
-    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela${slideId}.jpg')`;
-    slideContainer.style.backgroundPosition = 'center top';
-    slideContainer.style.marginTop = '-1px';
-  } else if (slideId === 6 || slideId === 7 || (slideId >= 11 && slideId !== 23)) {
-    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela-Simples.jpg')`;
-    slideContainer.style.backgroundPosition = 'center center';
-    slideContainer.style.marginTop = '0px';
+    targetBg = `./public/images/SeriousGame_tela${slideId}.jpg`;
+    targetPos = 'center top';
+    targetMarginTop = '-1px';
   } else if (slideId === 23) {
-    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela23.jpg')`;
-    slideContainer.style.backgroundPosition = 'center center';
-    slideContainer.style.marginTop = '0px';
-  } else {
-    slideContainer.style.backgroundImage = `url('./public/images/SeriousGame_tela-Simples.jpg')`;
-    slideContainer.style.backgroundPosition = 'center center';
-    slideContainer.style.marginTop = '0px';
+    targetBg = './public/images/SeriousGame_tela23.jpg';
+    targetPos = 'center center';
+    targetMarginTop = '0px';
   }
+
+  // Avoid redundant background re-assignment to prevent repaint/white flicker
+  const currentBgStyle = slideContainer.style.backgroundImage || '';
+  if (!currentBgStyle.includes(targetBg)) {
+    slideContainer.style.backgroundImage = `url('${targetBg}')`;
+  }
+  slideContainer.style.backgroundPosition = targetPos;
+  slideContainer.style.marginTop = targetMarginTop;
+
+  // Proactively pre-decode adjacent slides (previous & next) in GPU memory
+  [slideId - 1, slideId + 1].forEach(adjId => {
+    if (adjId >= 1 && adjId <= gameState.totalSlides) {
+      let adjBg = './public/images/SeriousGame_tela-Simples.jpg';
+      if ((adjId >= 1 && adjId <= 5) || (adjId >= 8 && adjId <= 10)) {
+        adjBg = `./public/images/SeriousGame_tela${adjId}.jpg`;
+      } else if (adjId === 23) {
+        adjBg = './public/images/SeriousGame_tela23.jpg';
+      }
+      if (!preloadedImagesMap.has(adjBg)) {
+        const adjImg = new Image();
+        adjImg.src = adjBg;
+        if (adjImg.decode) adjImg.decode().catch(() => {});
+        preloadedImagesMap.set(adjBg, adjImg);
+      }
+    }
+  });
 
   // Render Overlay (Layer 2)
   if (slideId === 1) renderScreen1(overlayContainer);
@@ -1555,51 +1584,54 @@ function renderScreen8(container) {
       </div>
     </div>
 
-    <!-- Mia's Tip Box -->
-    <div id="el-s08-tip" class="tip-card" style="position: absolute; top: ${tipTop}; left: ${tipLeft}; width: ${tipWidth};">
-      <div class="tip-card-header" style="display: flex; align-items: center; gap: 8px; font-weight: 900; color: #855300; font-size: 1.05rem;">
-        <i data-lucide="lightbulb" style="width: 24px; height: 24px; stroke: #D97706;"></i>
-        <span>${tipTitle}</span>
-      </div>
-      <div class="tip-card-text" style="font-size: 0.95rem; line-height: 1.42; margin-top: 6px; font-weight: 600; color: #452A00;">
-        ${tipText}
-      </div>
-    </div>
-
-    <!-- 3 Pillars of Effectiveness Translucent Card -->
-    <div id="el-s08-pillars" class="cream-card" style="position: absolute; top: ${pillarsTop}; left: ${pillarsLeft}; width: ${pillarsWidth};">
-      <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 8px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
-        ${secTitle}
-      </div>
-      
-      <div class="pillars-list" style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="droplet" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
-          </div>
-          <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p1Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p1Text}</span>
-          </div>
+    <!-- Bottom Stack Container: In Desktop display:contents (neutral); in Mobile bottom:5px, gap:10px -->
+    <div class="s08-bottom-wrapper">
+      <!-- Mia's Tip Box -->
+      <div id="el-s08-tip" class="tip-card" style="position: absolute; top: ${tipTop}; left: ${tipLeft}; width: ${tipWidth};">
+        <div class="tip-card-header" style="display: flex; align-items: center; gap: 8px; font-weight: 900; color: #855300; font-size: 1.05rem;">
+          <i data-lucide="lightbulb" style="width: 24px; height: 24px; stroke: #D97706;"></i>
+          <span>${tipTitle}</span>
         </div>
-
-        <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="flask-conical" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
-          </div>
-          <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p2Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p2Text}</span>
-          </div>
+        <div class="tip-card-text" style="font-size: 0.95rem; line-height: 1.42; margin-top: 6px; font-weight: 600; color: #452A00;">
+          ${tipText}
         </div>
+      </div>
 
-        <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
-          <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <i data-lucide="target" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
+      <!-- 3 Pillars of Effectiveness Translucent Card -->
+      <div id="el-s08-pillars" class="cream-card" style="position: absolute; top: ${pillarsTop}; left: ${pillarsLeft}; width: ${pillarsWidth};">
+        <div class="cream-card-header" style="font-size: 1.35rem; font-weight: 900; color: #1E4222; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.02em; padding-bottom: 8px; border-bottom: 2px solid rgba(30, 66, 34, 0.2);">
+          ${secTitle}
+        </div>
+        
+        <div class="pillars-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="droplet" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
+            </div>
+            <div class="pillar-item-content">
+              <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p1Title}</span>
+              <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p1Text}</span>
+            </div>
           </div>
-          <div class="pillar-item-content">
-            <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p3Title}</span>
-            <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p3Text}</span>
+
+          <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="flask-conical" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
+            </div>
+            <div class="pillar-item-content">
+              <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p2Title}</span>
+              <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p2Text}</span>
+            </div>
+          </div>
+
+          <div class="pillar-item" style="display: flex; align-items: flex-start; gap: 12px;">
+            <div style="background: rgba(30, 66, 34, 0.12); padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i data-lucide="target" style="width: 28px; height: 28px; stroke: #1E4222; stroke-width: 2.2;"></i>
+            </div>
+            <div class="pillar-item-content">
+              <span class="pillar-item-title" style="font-weight: 900; color: #1E4222; font-size: 1.08rem; display: block; margin-bottom: 2px;">${p3Title}</span>
+              <span class="pillar-item-text" style="font-size: 0.94rem; color: #333333; line-height: 1.38; font-weight: 500;">${p3Text}</span>
+            </div>
           </div>
         </div>
       </div>
