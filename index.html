@@ -6,15 +6,18 @@
   <title>RENOVATE Serious Game - Sprayer Calibration</title>
   <meta name="description" content="Official RENOVATE Serious Game on pesticide sprayer calibration for vineyard and orchard crops.">
   
-  <!-- Progressive Web App (PWA) Standalone App Support for iOS & Android -->
+  <!-- Progressive Web App (PWA) Standalone App Support for iOS, Android & Desktop -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFCC66">
+  <link rel="icon" type="image/png" sizes="192x192" href="public/images/renovate-app-icon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="public/images/renovate-app-icon.png">
+  <link rel="shortcut icon" href="public/images/renovate-app-icon.png">
   
   <!-- Apple iOS Mobile Full-Screen App Meta Tags (Hides Safari Address Bar & Navigation) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="RENOVATE">
-  <link rel="apple-touch-icon" href="public/images/pwa-icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="public/images/renovate-app-icon.png">
 
   <!-- Premium Google Fonts: Montserrat, Outfit & Roboto -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +30,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
 
   <!-- Cache-Busted Master Stylesheet v2.1.4 -->
-  <link rel="stylesheet" href="styles.css?v=2.1.4.039">
+  <link rel="stylesheet" href="styles.css?v=2.1.4.040">
 </head>
 <body>
 
@@ -61,13 +64,13 @@
   </div>
 
   <!-- Cache-Busted Main Game Engine v2.1.4 -->
-  <script src="app.js?v=2.1.4.039"></script>
+  <script src="app.js?v=2.1.4.040"></script>
 
   <!-- Service Worker Registration for PWA Standalone App Experience -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=2.1.4.039')
+        navigator.serviceWorker.register('./sw.js?v=2.1.4.040')
           .then(reg => {
             console.log('PWA ServiceWorker active v2.1.4:', reg.scope);
             reg.onupdatefound = () => {
