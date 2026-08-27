@@ -269,6 +269,66 @@ const MOBILE_UI_COORDINATES_MAP = {
       "width": "64.0%",
       "pointer": "bubble-tail-top-mia"
     }
+  },
+  "s06": {
+    "iconBlock": {
+      "top": "3.0%",
+      "left": "0%",
+      "width": "100%"
+    },
+    "card": {
+      "top": "13.5%",
+      "left": "5.0%",
+      "width": "90.0%"
+    }
+  },
+  "s07": {
+    "card": {
+      "top": "20.0%",
+      "left": "6.0%",
+      "width": "88.0%"
+    }
+  },
+  "s08": {
+    "bubble": {
+      "top": "4.5%",
+      "left": "46.0%",
+      "width": "50.0%"
+    },
+    "tip": {
+      "top": "27.5%",
+      "left": "46.0%",
+      "width": "50.0%"
+    },
+    "pillars": {
+      "top": "48.0%",
+      "left": "4.0%",
+      "width": "92.0%"
+    }
+  },
+  "s09": {
+    "bubble": {
+      "top": "5.0%",
+      "left": "46.0%",
+      "width": "50.0%"
+    },
+    "card": {
+      "top": "48.5%",
+      "left": "4.0%",
+      "width": "92.0%"
+    }
+  },
+  "s10": {
+    "bubble": {
+      "top": "5.0%",
+      "left": "46.0%",
+      "width": "50.0%"
+    },
+    "card": {
+      "top": "27.0%",
+      "left": "3.5%",
+      "width": "93.0%"
+    }
   }
 };
 
@@ -643,8 +703,8 @@ function renderTopBar() {
   const fullLangName = currentLangObj.display.replace(/^[a-z]{2}-[A-Z]{2}\s*/, '');
   const langLabel = isCompactMobile ? isoCode : `${isoCode} • ${fullLangName}`;
 
-  // Format version badge: compact "v2.1.4.046" on mobile to fit under controls
-  const versionText = isMobile ? 'v2.1.4.046' : 'v2.1.4.046 • 27.08.2026';
+  // Format version badge: compact "v2.1.4.047" on mobile to fit under controls
+  const versionText = isMobile ? 'v2.1.4.047' : 'v2.1.4.047 • 27.08.2026';
   
   // Format app title text beside logo
   let appTitleText = 'Serious Game RENOVATE';
@@ -1373,7 +1433,7 @@ function renderScreen5(container) {
 
 // Screen 6: Sprayer Calibration Info (On SeriousGame_tela-Simples.jpg, 90px Info Icon in a SEPARATE floating block, line-height 1.88, cream blocks with opacity 0.78, 12-language parameter highlights)
 function renderScreen6(container) {
-  const coords = UI_COORDINATES_MAP.s06 || INITIAL_UI_COORDINATES_MAP.s06;
+  const coords = getEffectiveCoordinates('s06');
   
   const rawInfo1 = t('s06_info_01', 'Weather conditions favour downy mildew infection.');
   let rawInfo2 = t('s06_info_02', 'Mia recommends applying VitiShield® Fungicide at 1 L/ha (or 100 cm3 /100 L of water), using 250 L/ha and a medium droplet size (M).');
@@ -1386,23 +1446,23 @@ function renderScreen6(container) {
     .replace(/(medium droplet size\s*\(M\)|tamanho de gota médio\s*\(M\)|tamaño de gota medio\s*\(M\)|taille de goutte moyenne\s*\(M\)|dimensione media delle gocce\s*\(M\)|mittleren Tropfengröße\s*\(M\)|gemiddelde druppelgrootte\s*\(M\)|střední velikosti kapek\s*\(M\)|średniej wielkości kropel\s*\(M\)|μεσαίο μέγεθος σταγόνας\s*\(M\))/gi, '<strong class="highlight-param">$1</strong>');
 
   container.innerHTML = `
-    <!-- Separate Floating Top Icon Block (Increased Spacing to Text Boxes) -->
+    <!-- Separate Floating Top Icon Block -->
     <div id="el-s06-iconBlock" style="text-align: center; ${styleObjToCss(coords.iconBlock || { top: '6%', left: '0%', width: '100%' })}">
-      <i data-lucide="info" class="s06-info-top-icon" style="width: 90px; height: 90px; stroke: #1E4222; stroke-width: 2.2; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));"></i>
+      <i data-lucide="info" class="s06-info-top-icon"></i>
     </div>
 
-    <!-- Separate Floating Text Cards Container (Opacity 0.78, Increased Line-Height 1.88, Spanning > 50% Screen Height) -->
+    <!-- Separate Floating Text Cards Container -->
     <div id="el-s06-card" style="${styleObjToCss(coords.card || { top: '19%', left: '6%', width: '88%' })}">
-      <div class="s06-blocks-container" style="display: flex; flex-direction: column; gap: 16px;">
-        <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
+      <div class="s06-blocks-container">
+        <div class="s06-translucent-block">
           ${rawInfo1}
         </div>
 
-        <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
+        <div class="s06-translucent-block">
           ${rawInfo2}
         </div>
 
-        <div class="s06-translucent-block" style="background: rgba(247, 247, 242, 0.78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 18px 22px; border-radius: 16px; border: 1.5px solid rgba(35, 73, 38, 0.35); box-shadow: 0 6px 20px rgba(0,0,0,0.12); font-size: 1.25rem; font-weight: 600; line-height: 1.88; color: #1F2220;">
+        <div class="s06-translucent-block">
           ${rawInfo3}
         </div>
       </div>
@@ -1417,7 +1477,7 @@ function renderScreen6(container) {
 
 // Screen 7: Chapter 1 Start Announcement Card (Centered as Primary Focus)
 function renderScreen7(container) {
-  const coords = UI_COORDINATES_MAP.s07 || INITIAL_UI_COORDINATES_MAP.s07;
+  const coords = getEffectiveCoordinates('s07');
   
   const rawChapterTitle = t('s07_chapter_01_title', '1. Understanding the calibration process and its importance');
   const cleanTitle = rawChapterTitle.replace(/^1[\.\s]*/, '').trim();
@@ -1460,7 +1520,7 @@ function renderScreen7(container) {
 
 // Screen 8: Mia's Tip & 3 Pillars (On SeriousGame_tela8.jpg with Enlarged Titles & Enlarged Lucide Icons)
 function renderScreen8(container) {
-  const coords = UI_COORDINATES_MAP.s08 || INITIAL_UI_COORDINATES_MAP.s08;
+  const coords = getEffectiveCoordinates('s08');
 
   const speech = t('s08_dialogue_mia', 'Laura, before we touch the sprayer, we need a clear goal. Do you know what guarantees a successful treatment?');
   const tipTitle = t('s08_tip_title', "Mia's Tip");
@@ -1554,7 +1614,7 @@ function renderScreen8(container) {
 
 // Screen 9: Technical Explanation Part 1 (On SeriousGame_tela9.jpg with Lucide Icons & Matching Screen 8 Style)
 function renderScreen9(container) {
-  const coords = UI_COORDINATES_MAP.s09 || INITIAL_UI_COORDINATES_MAP.s09;
+  const coords = getEffectiveCoordinates('s09');
 
   const rawSpeech = t('s09_dialogue_mia', 'Calibration prepares your sprayer for efficient and safe operation. It allows a precise and uniform application of plant protection products at the intended rate.');
   
@@ -1652,7 +1712,7 @@ function renderScreen9(container) {
 
 // Screen 10: The 4 Key Parameters (Exact Reproduction of /docs/tela10.png with Enlarged Topic Illustration Images)
 function renderScreen10(container) {
-  const coords = UI_COORDINATES_MAP.s10 || INITIAL_UI_COORDINATES_MAP.s10;
+  const coords = getEffectiveCoordinates('s10');
 
   const speech = t('s10_dialogue_mia', 'To set the correct spray volume, we need to adjust four key operational parameters.');
   const secTitle = t('s10_section_title', 'The 4 Key Parameters');
@@ -1697,7 +1757,7 @@ function renderScreen10(container) {
       </div>
 
       <!-- Tip Warning Banner Box -->
-      <div style="margin-bottom: 12px; padding: 8px 12px; background: rgba(235, 245, 235, 0.95); border-radius: 12px; border: 1.5px solid #2E7D32; display: flex; align-items: center; gap: 10px;">
+      <div class="s10-tip-box" style="margin-bottom: 12px; padding: 8px 12px; background: rgba(235, 245, 235, 0.95); border-radius: 12px; border: 1.5px solid #2E7D32; display: flex; align-items: center; gap: 10px;">
         <div style="background: rgba(46, 125, 50, 0.15); padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           <i data-lucide="lightbulb" style="width: 22px; height: 22px; stroke: #2E7D32; stroke-width: 2.2;"></i>
         </div>
@@ -1707,42 +1767,42 @@ function renderScreen10(container) {
       </div>
 
       <!-- 2x2 Grid of 4 Key Parameters with ENLARGED Illustration Images -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="s10-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         
         <!-- Parameter 1: Driving Speed (Green) -->
-        <div style="background: rgba(245, 250, 245, 0.95); border: 2px solid #2E7D32; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: #2E7D32; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">1</div>
-          <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1E4222; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
+        <div class="s10-grid-item" style="background: rgba(245, 250, 245, 0.95); border: 2px solid #2E7D32; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+          <div class="s10-grid-item-badge" style="width: 28px; height: 28px; border-radius: 50%; background: #2E7D32; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">1</div>
+          <div class="s10-grid-item-title" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1E4222; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p1)}
           </div>
-          <img src="./public/images/s10_param1_tractor.png" alt="Driving Speed Tractor" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img class="s10-grid-item-img" src="./public/images/s10_param1_tractor.png" alt="Driving Speed Tractor" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 2: Spray Pressure (Red) -->
-        <div style="background: rgba(255, 245, 245, 0.95); border: 2px solid #C62828; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: #C62828; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">2</div>
-          <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #C62828; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
+        <div class="s10-grid-item" style="background: rgba(255, 245, 245, 0.95); border: 2px solid #C62828; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+          <div class="s10-grid-item-badge" style="width: 28px; height: 28px; border-radius: 50%; background: #C62828; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">2</div>
+          <div class="s10-grid-item-title" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #C62828; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p2)}
           </div>
-          <img src="./public/images/s10_param2_pressure.png" alt="Spray Pressure Gauge" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img class="s10-grid-item-img" src="./public/images/s10_param2_pressure.png" alt="Spray Pressure Gauge" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 3: Nozzle Size (Blue) -->
-        <div style="background: rgba(245, 248, 255, 0.95); border: 2px solid #1565C0; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: #1565C0; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">3</div>
-          <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1565C0; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
+        <div class="s10-grid-item" style="background: rgba(245, 248, 255, 0.95); border: 2px solid #1565C0; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+          <div class="s10-grid-item-badge" style="width: 28px; height: 28px; border-radius: 50%; background: #1565C0; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">3</div>
+          <div class="s10-grid-item-title" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.92rem; color: #1565C0; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p3)}
           </div>
-          <img src="./public/images/s10_param3_nozzles.png" alt="Nozzle Size" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img class="s10-grid-item-img" src="./public/images/s10_param3_nozzles.png" alt="Nozzle Size" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
         <!-- Parameter 4: Number of Active Nozzles (Purple) -->
-        <div style="background: rgba(252, 245, 255, 0.95); border: 2px solid #6A1B9A; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-          <div style="width: 28px; height: 28px; border-radius: 50%; background: #6A1B9A; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">4</div>
-          <div style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.86rem; color: #6A1B9A; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
+        <div class="s10-grid-item" style="background: rgba(252, 245, 255, 0.95); border: 2px solid #6A1B9A; border-radius: 14px; padding: 10px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+          <div class="s10-grid-item-badge" style="width: 28px; height: 28px; border-radius: 50%; background: #6A1B9A; color: #FFFFFF; font-weight: 900; font-size: 1rem; display: flex; align-items: center; justify-content: center; margin-bottom: 6px;">4</div>
+          <div class="s10-grid-item-title" style="font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.86rem; color: #6A1B9A; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">
             ${cleanParamTitle(p4)}
           </div>
-          <img src="./public/images/s10_param4_activenozzles.png" alt="Active Nozzles Sprayer" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
+          <img class="s10-grid-item-img" src="./public/images/s10_param4_activenozzles.png" alt="Active Nozzles Sprayer" style="max-width: 100%; height: clamp(52px, calc(72px * var(--scale-factor, 1)), 85px); object-fit: contain;">
         </div>
 
       </div>
